@@ -119,6 +119,11 @@
 
     <!-- The number of columns that the top level tiles span in the QuickSettings -->
     <integer name="quick_settings_user_time_settings_tile_span">1</integer>
+    
+    <!-- The default tiles to reset to in QuickSettings -->
+    <string name="quick_settings_tiles_reset" translatable="false">
+        wifi,bt,inversion,cell,airplane,dnd,rotation,flashlight,location,cast,hotspot
+    </string>
 
     <!-- The tiles to display in QuickSettings -->
     <string name="quick_settings_tiles" translatable="false">default</string>
@@ -183,7 +188,7 @@
      from home. -->
     <integer name="recents_task_enter_from_home_duration">225</integer>
 
-    <!-- The stagger for each task when animating the task from the bottom of the screen when 
+    <!-- The stagger for each task when animating the task from the bottom of the screen when
      transitioning from home. -->
     <integer name="recents_task_enter_from_home_stagger_delay">12</integer>
 
@@ -304,4 +309,3 @@
     <bool name="flashlight_use_wakelock">false</bool>
 
 </resources>
-

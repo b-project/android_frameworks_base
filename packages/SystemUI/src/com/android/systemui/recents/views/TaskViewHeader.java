@@ -68,6 +68,7 @@ public class TaskViewHeader extends FrameLayout {
     ImageView mMoveTaskButton;
     ImageView mDismissButton;
     ImageView mPinButton;
+    ImageView mFloatButton;
     ImageView mApplicationIcon;
     TextView mActivityDescription;
 
@@ -79,6 +80,10 @@ public class TaskViewHeader extends FrameLayout {
     Drawable mDarkDismissDrawable;
     Drawable mLightPinDrawable;
     Drawable mDarkPinDrawable;
+    Drawable mLightMultiwindowDrawable;
+    Drawable mDarkMultiwindowDrawable;
+    Drawable mLightFloatDrawable;
+    Drawable mDarkFloatDrawable;
     RippleDrawable mBackground;
     GradientDrawable mBackgroundColorDrawable;
     AnimatorSet mFocusAnimator;
@@ -131,6 +136,10 @@ public class TaskViewHeader extends FrameLayout {
         mLightPinDrawable = res.getDrawable(R.drawable.ic_pin);
         mDarkPinDrawable = res.getDrawable(R.drawable.ic_pin_dark);
 
+        // Load floating windows intent
+        mLightFloatDrawable = context.getDrawable(R.drawable.ic_floating_on);
+        mDarkFloatDrawable = context.getDrawable(R.drawable.ic_qs_dark_floating_on);
+
         // Configure the highlight paint
         if (sHighlightPaint == null) {
             sHighlightPaint = new Paint();
@@ -153,6 +162,7 @@ public class TaskViewHeader extends FrameLayout {
         mDismissButton = (ImageView) findViewById(R.id.dismiss_task);
         mMoveTaskButton = (ImageView) findViewById(R.id.move_task);
         mPinButton = (ImageView) findViewById(R.id.lock_to_app_fab);
+		mFloatButton = (ImageView) findViewById(R.id.float_task);
 
         // Hide the backgrounds if they are ripple drawables
         if (!Constants.DebugFlags.App.EnableTaskFiltering) {
@@ -238,47 +248,15 @@ public class TaskViewHeader extends FrameLayout {
                 mLightDismissDrawable : mDarkDismissDrawable);
         mDismissButton.setContentDescription(String.format(mDismissContentDescription,
                 t.contentDescription));
-        mMoveTaskButton.setVisibility((mConfig.multiStackEnabled) ? View.VISIBLE : View.INVISIBLE);
-        if (mConfig.multiStackEnabled) {
-            updateResizeTaskBarIcon(t);
-        }
+        mMoveTaskButton.setVisibility((mConfig.multiStackEnabled) ? View.VISIBLE : View.GONE);
+        mMoveTaskButton.setImageDrawable(t.useLightOnPrimaryColor ?
+                mLightMultiwindowDrawable : mDarkMultiwindowDrawable);
+        boolean floatingswitch = Settings.System.getInt(mContext.getContentResolver(), Settings.System.FLOATING_WINDOW_MODE, 1) == 1;
+        mMoveTaskButton.setVisibility((floatingswitch) ? View.VISIBLE : View.INVISIBLE);
+		mFloatButton.setImageDrawable(t.useLightOnPrimaryColor ?
+                mLightFloatDrawable : mDarkFloatDrawable);
     }
 
-    /** Updates the resize task bar button. */
-    void updateResizeTaskBarIcon(Task t) {
-        Rect display = mSsp.getWindowRect();
-        Rect taskRect = mSsp.getTaskBounds(t.key.stackId);
-        int resId = R.drawable.star;
-        if (display.equals(taskRect) || taskRect.isEmpty()) {
-            resId = R.drawable.vector_drawable_place_fullscreen;
-        } else {
-            boolean top = display.top == taskRect.top;
-            boolean bottom = display.bottom == taskRect.bottom;
-            boolean left = display.left == taskRect.left;
-            boolean right = display.right == taskRect.right;
-            if (top && bottom && left) {
-                resId = R.drawable.vector_drawable_place_left;
-            } else if (top && bottom && right) {
-                resId = R.drawable.vector_drawable_place_right;
-            } else if (top && left && right) {
-                resId = R.drawable.vector_drawable_place_top;
-            } else if (bottom && left && right) {
-                resId = R.drawable.vector_drawable_place_bottom;
-            } else if (top && right) {
-                resId = R.drawable.vector_drawable_place_top_right;
-            } else if (top && left) {
-                resId = R.drawable.vector_drawable_place_top_left;
-            } else if (bottom && right) {
-                resId = R.drawable.vector_drawable_place_bottom_right;
-            } else if (bottom && left) {
-                resId = R.drawable.vector_drawable_place_bottom_left;
-            }
-        }
-        mMoveTaskButton.setImageResource(resId);
-        mMoveTaskButton.setColorFilter(t.useLightOnPrimaryColor ?
-                mTaskbarIconLightColor :
-                mTaskbarIconDarkColor, Mode.SRC_ATOP);
-    }
 
     /** Unbinds the bar view from the task */
     void unbindFromTask() {
@@ -301,6 +279,16 @@ public class TaskViewHeader extends FrameLayout {
             mPinButton.setVisibility(View.VISIBLE);
             mPinButton.animate().cancel();
             mPinButton.animate()
+                    .alpha(0f)
+                    .setStartDelay(0)
+                    .setInterpolator(mConfig.fastOutSlowInInterpolator)
+                    .setDuration(mConfig.taskViewExitToAppDuration)
+                    .withLayer()
+                    .start();
+        }
+        if (mFloatButton.getVisibility() == View.VISIBLE) {
+            mFloatButton.animate().cancel();
+            mFloatButton.animate()
                     .alpha(0f)
                     .setStartDelay(0)
                     .setInterpolator(mConfig.fastOutSlowInInterpolator)
@@ -334,6 +322,22 @@ public class TaskViewHeader extends FrameLayout {
                     .withLayer()
                     .start();
         }
+        /** If we disabled the floating button in settings, do not make it visible */
+            if (mFloatButton.getVisibility() != View.VISIBLE) {
+                if (Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.FLOATING_WINDOW_MODE, 1) == 1) {
+                   mFloatButton.setVisibility(View.VISIBLE);
+                } else {
+                    mFloatButton.setVisibility(View.GONE);
+                }
+                mFloatButton.setAlpha(0f);
+                mFloatButton.animate()
+                        .alpha(1f)
+                        .setStartDelay(0)
+                        .setInterpolator(mConfig.fastOutLinearInInterpolator)
+                        .setDuration(mConfig.taskViewEnterFromAppDuration)
+                        .start();
+        }
     }
 
     /** Mark this task view that the user does has not interacted with the stack after a certain time. */
@@ -350,12 +354,24 @@ public class TaskViewHeader extends FrameLayout {
             mPinButton.setVisibility(View.VISIBLE);
             mPinButton.setAlpha(1f);
         }
+        /** If we disabled the master float switch, do not make this visible */
+        if (mFloatButton.getVisibility() != View.VISIBLE) {
+            mFloatButton.animate().cancel();
+            if (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.FLOATING_WINDOW_MODE, 1) == 1) {
+                mFloatButton.setVisibility(View.VISIBLE);
+            } else {
+                mFloatButton.setVisibility(View.GONE);
+            }
+            mFloatButton.setAlpha(1f);
+        }
     }
 
     /** Resets the state tracking that the user has not interacted with the stack after a certain time. */
     void resetNoUserInteractionState() {
         mDismissButton.setVisibility(View.INVISIBLE);
         mPinButton.setVisibility(View.INVISIBLE);
+        mFloatButton.setVisibility(View.INVISIBLE);
     }
 
     @Override
