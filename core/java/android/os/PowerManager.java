@@ -20,7 +20,10 @@ import android.annotation.SdkConstant;
 import android.annotation.SystemApi;
 import android.content.ComponentName;
 import android.content.Context;
+<<<<<<< HEAD
 import android.content.Intent;
+=======
+>>>>>>> 7695fad... perf: Improve performance profiles
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -349,6 +352,7 @@ public final class PowerManager {
     public static final int GO_TO_SLEEP_REASON_TIMEOUT = 2;
 
     /**
+<<<<<<< HEAD
      * Go to sleep reason code: Going to sleep due to the lid switch being closed.
      * @hide
      */
@@ -390,6 +394,31 @@ public final class PowerManager {
      * @hide
      */
     public static final String REBOOT_RECOVERY = "recovery";
+=======
+     * Power save profile
+     * @hide
+     */
+    public static final String PROFILE_POWER_SAVE = "0";
+
+    /**
+     * Balanced power profile
+     * @hide
+     */
+    public static final String PROFILE_BALANCED = "1";
+
+    /**
+     * High-performance profile
+     * @hide
+     */
+    public static final String PROFILE_HIGH_PERFORMANCE = "2";
+
+    /**
+     * Broadcast sent when profile is changed
+     * @hide
+     */
+    public static final String POWER_PROFILE_CHANGED =
+            "com.cyanogenmod.power.PROFILE_CHANGED";
+>>>>>>> 7695fad... perf: Improve performance profiles
 
     final Context mContext;
     final IPowerManager mService;
@@ -950,6 +979,7 @@ public final class PowerManager {
     }
 
     /**
+<<<<<<< HEAD
      * Turn off the device.
      *
      * @param confirm If true, shows a shutdown confirmation dialog.
@@ -1018,6 +1048,69 @@ public final class PowerManager {
     @SystemApi
     public static final String ACTION_SCREEN_BRIGHTNESS_BOOST_CHANGED
             = "android.os.action.SCREEN_BRIGHTNESS_BOOST_CHANGED";
+=======
+     * True if the system supports power profiles
+     *
+     * @hide
+     */
+    public boolean hasPowerProfiles() {
+        return !TextUtils.isEmpty(getDefaultPowerProfile()) &&
+               !TextUtils.isEmpty(mContext.getResources().getString(
+                       com.android.internal.R.string.config_perf_profile_prop));
+    }
+
+    /**
+     * Gets the default power profile for the device.
+     *
+     * Returns null if not enabled.
+     *
+     * @hide
+     */
+    public String getDefaultPowerProfile() {
+        return mContext.getResources().getString(
+                com.android.internal.R.string.config_perf_profile_default_entry);
+    }
+
+    /**
+     * Set the system power profile
+     *
+     * @throws IllegalArgumentException if invalid
+     * @hide
+     */
+    public void setPowerProfile(String profile) {
+        if (!hasPowerProfiles()) {
+            throw new IllegalArgumentException("Power profiles not enabled on this system!");
+        }
+
+        try {
+            if (mService != null) {
+                mService.setPowerProfile(profile);
+            }
+        } catch (RemoteException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    /**
+     * Gets the current power profile
+     *
+     * Returns null if power profiles are not enabled
+     * @hide
+     */
+    public String getPowerProfile() {
+        String ret = null;
+        if (hasPowerProfiles()) {
+            try {
+                if (mService != null) {
+                    ret = mService.getPowerProfile();
+                }
+            } catch (RemoteException e) {
+                // nothing
+            }
+        }
+        return ret;
+    }
+>>>>>>> 7695fad... perf: Improve performance profiles
 
     /**
      * A wake lock is a mechanism to indicate that your application needs

@@ -191,6 +191,7 @@ public final class SystemServer {
         }
     }
 
+<<<<<<< HEAD
     private void run() {
         // If a device's clock is before 1970 (before 0), a lot of
         // APIs crash dealing with negative numbers, notably
@@ -245,6 +246,11 @@ public final class SystemServer {
 
         // Mmmmmm... more memory!
         VMRuntime.getRuntime().clearGrowthLimit();
+=======
+    public void initAndLoop() {
+        EventLog.writeEvent(EventLogTags.BOOT_PROGRESS_SYSTEM_RUN,
+            SystemClock.uptimeMillis());
+>>>>>>> 7695fad... perf: Improve performance profiles
 
         // The system server has to run all of the time, so it needs to be
         // as efficient as possible with its memory usage.
@@ -443,10 +449,55 @@ public final class SystemServer {
         InputManagerService inputManager = null;
         TelephonyRegistry telephonyRegistry = null;
         ConsumerIrService consumerIr = null;
+<<<<<<< HEAD
         AudioService audioService = null;
         MmsServiceBroker mmsService = null;
         EntropyMixer entropyMixer = null;
         CameraService cameraService = null;
+=======
+
+        // Create a handler thread just for the window manager to enjoy.
+        HandlerThread wmHandlerThread = new HandlerThread("WindowManager");
+        wmHandlerThread.start();
+        Handler wmHandler = new Handler(wmHandlerThread.getLooper());
+        wmHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                //Looper.myLooper().setMessageLogging(new LogPrinter(
+                //        android.util.Log.DEBUG, TAG, android.util.Log.LOG_ID_SYSTEM));
+                android.os.Process.setThreadPriority(
+                        android.os.Process.THREAD_PRIORITY_DISPLAY);
+                android.os.Process.setCanSelfBackground(false);
+
+                // For debug builds, log event loop stalls to dropbox for analysis.
+                if (StrictMode.conditionallyEnableDebugLogging()) {
+                    Slog.i(TAG, "Enabled StrictMode logging for WM Looper");
+                }
+            }
+        });
+
+        // bootstrap services
+        boolean onlyCore = false;
+        boolean firstBoot = false;
+        try {
+            // Wait for installd to finished starting up so that it has a chance to
+            // create critical directories such as /data/user with the appropriate
+            // permissions.  We need this to complete before we initialize other services.
+            Slog.i(TAG, "Waiting for installd to be ready.");
+            installer = new Installer();
+            installer.ping();
+
+            Slog.i(TAG, "Power Manager");
+            power = new PowerManagerService();
+            ServiceManager.addService(Context.POWER_SERVICE, power);
+
+            Slog.i(TAG, "Activity Manager");
+            context = ActivityManagerService.main(factoryTest, power);
+        } catch (RuntimeException e) {
+            Slog.e("System", "******************************************");
+            Slog.e("System", "************ Failure starting bootstrap service", e);
+        }
+>>>>>>> 7695fad... perf: Improve performance profiles
 
         boolean disableStorage = SystemProperties.getBoolean("config.disable_storage", false);
         boolean disableBluetooth = SystemProperties.getBoolean("config.disable_bluetooth", false);

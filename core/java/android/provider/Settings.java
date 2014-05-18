@@ -4513,6 +4513,7 @@ public final class Settings {
         public static final String LOCK_SCREEN_WEATHER_HIDE_PANEL = "lock_screen_weather_hide_panel";
 
         /**
+<<<<<<< HEAD
          * Hide the weather panel when the visible lockscreen notifications will reach this number
          * 1: 1 notification (always)
          * 2: 2 notifications
@@ -4527,6 +4528,9 @@ public final class Settings {
 
         /**
          * Number of notifications visible on the lockscreen including the overflow container
+=======
+         * Whether to unlock the screen with the home key.  The value is boolean (1 or 0).
+>>>>>>> 7695fad... perf: Improve performance profiles
          * @hide
          */
         public static final String LOCK_SCREEN_VISIBLE_NOTIFICATIONS = "lock_screen_visible_notifications";
@@ -8629,6 +8633,19 @@ public final class Settings {
          */
         public static final String PULSE_CUSTOM_FUDGE_FACTOR = "pulse_custom_fudge_factor";
         
+
+        /**
+         * Performance profile
+         * @see config_perf_profile_prop in frameworks/base/core/res/res/values/config.xml
+         * @hide
+         */
+        public static final String PERFORMANCE_PROFILE = "performance_profile";
+
+        /**
+         * App-based performance profile selection
+         * @hide
+         */
+        public static final String APP_PERFORMANCE_PROFILES_ENABLED = "app_perf_profiles_enabled";
 
         /**
          * This are the settings to be backed up.
