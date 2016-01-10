@@ -263,6 +263,17 @@ public interface MetricsConstants {
     public static final int TUNER_BATTERY_PERCENTAGE = 237;
     public static final int FUELGAUGE_INACTIVE_APPS = 238;
     public static final int DONT_TRACK_ME_BRO = 239;
+    public static final int QS_NAVBAR_TOGGLE = 240;
+
+
+
+   //Notification Drawer	
+   public static final int NOTIFICATION_DRAWER_SETTINGS = 241;
+
+    // Lock screen weather settings
+    public static final int LOCKSCREEN_WEATHER_SETTINGS = 242;
+
+    public static final int QS_HEADSUP = 243;
 
     // These constants must match those in the analytic pipeline, do not edit.
     // Add temporary values to the top of MetricsLogger instead.
