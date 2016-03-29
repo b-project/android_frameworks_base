@@ -154,7 +154,7 @@
   <java-symbol type="integer" name="config_deviceHardwareKeys" />
   
   
-  <java-symbol type="drawable" name="rr_logo" />
+  <java-symbol type="drawable" name="bluros_logo" />
 
   <!-- Boot dexopt layout -->
   <java-symbol type="drawable" name="dexopt_brand_logo" />

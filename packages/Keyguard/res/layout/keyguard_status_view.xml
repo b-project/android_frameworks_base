@@ -82,24 +82,24 @@
             style="@style/widget_big_thin" />
         <include layout="@layout/keyguard_status_area" />
         <include layout="@layout/keyguard_weather_view" />
-        <TextView
-            android:id="@+id/owner_info"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/date_owner_info_margin"
-            android:layout_gravity="center_horizontal"
-            android:textColor="@color/clock_gray"
-            android:textSize="@dimen/widget_label_font_size"
-            android:letterSpacing="0.05"
-            android:ellipsize="marquee"
-            android:singleLine="true" />
 
         <include layout="@layout/keyguard_shortcuts"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"/>
+
+        <TextView 
+            android:textSize="@dimen/widget_label_font_size" 
+            android:textColor="#ccffffff" 
+            android:ellipsize="marquee" 
+            android:layout_gravity="center_horizontal" 
+            android:id="@+id/owner_info" 
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content" 
+            android:layout_marginLeft="16.0dip" 
+            android:layout_marginTop="@dimen/date_owner_info_margin" 
+            android:layout_marginRight="16.0dip" 
+            android:singleLine="true" />
 
     </LinearLayout>
 </com.android.keyguard.KeyguardStatusView>
