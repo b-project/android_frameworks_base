@@ -47,7 +47,6 @@ public final class SignalTileView extends QSTileView {
     private ImageView mOut;
     private boolean mQSColorSwitch = false;
     private SettingsObserver mSettingsObserver;	
-    private int  mIconColor;
 
     private int mWideOverlayIconStartPadding;
 

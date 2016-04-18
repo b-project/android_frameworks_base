@@ -23,7 +23,6 @@ import android.content.res.Resources;
 import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -65,7 +64,12 @@ public class WifiTile extends QSTile<QSTile.SignalState> {
         mWifiController = mController.getAccessPointController();
         mDetailAdapter = new WifiDetailAdapter();
     }
-    
+
+    @Override
+    public boolean hasDualTargetsDetails() {
+        return true;
+    }
+
     @Override
     protected SignalState newTileState() {
         return new SignalState();
@@ -273,6 +277,11 @@ public class WifiTile extends QSTile<QSTile.SignalState> {
         }
 
         @Override
+        public StatusBarPanelCustomTile getCustomTile() {
+            return null;
+        }
+
+        @Override
         public Boolean getToggleState() {
             return mState.enabled;
         }
@@ -300,7 +309,6 @@ public class WifiTile extends QSTile<QSTile.SignalState> {
             ListView listView = mItemsList.getListView();
             listView.setDivider(null);
             listView.setOnItemClickListener(this);
-            mItemsList.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
             listView.setAdapter(mAdapter =
                     new QSDetailItemsList.QSDetailListAdapter(context, mDisplayedAccessPoints));
             mItemsList.setEmptyState(R.drawable.ic_qs_wifi_detail_empty,

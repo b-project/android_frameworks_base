@@ -588,6 +588,11 @@ public class UserSwitcherController {
         }
 
         @Override
+        public StatusBarPanelCustomTile getCustomTile() {
+            return null;
+        }
+
+        @Override
         public Boolean getToggleState() {
             return null;
         }
