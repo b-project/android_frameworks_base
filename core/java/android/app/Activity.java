@@ -26,6 +26,7 @@ import android.annotation.NonNull;
 import android.annotation.Nullable;
 import android.annotation.StyleRes;
 import android.os.PersistableBundle;
+import android.provider.Settings;
 import android.transition.Scene;
 import android.transition.TransitionManager;
 import android.util.ArrayMap;
@@ -63,6 +64,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.PixelFormat;
 import android.media.AudioManager;
 import android.media.session.MediaController;
 import android.net.Uri;
@@ -113,9 +116,15 @@ import android.view.WindowManagerGlobal;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
-
 import com.android.internal.util.screwd.ColorUtils;
+import android.app.SwipeBackLayout;
 
+import com.android.internal.R;
+
+import java.io.File;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.lang.annotation.Retention;
@@ -811,6 +820,10 @@ public class Activity extends ContextThemeWrapper
 
     private Thread mUiThread;
 
+    // SwipeBack Gestures support
+    private SwipeBackLayout mSwipeBackLayout;
+    private boolean mSwipeBackEnabled = false;
+
     ActivityTransitionState mActivityTransitionState = new ActivityTransitionState();
     SharedElementCallback mEnterTransitionListener = SharedElementCallback.NULL_CALLBACK;
     SharedElementCallback mExitTransitionListener = SharedElementCallback.NULL_CALLBACK;
@@ -989,6 +1002,88 @@ public class Activity extends ContextThemeWrapper
         mPreviousOrientation = getResources().getConfiguration().orientation;
         mScaleGestureDetector = new ScaleGestureDetector(getApplicationContext(), mScaleGestureListener);
         mScaleGestureDetector.setQuickScaleEnabled(false);
+        if (isCurrentHomeActivity() || !isAllowedForSwipeBack(this.getPackageName())) {
+            // disable swipe back on launchers or blocked
+            setSwipeBackEnable(false);
+        }
+    }
+
+    /**
+     * get if this activity is home
+     *
+     */
+
+    private boolean isCurrentHomeActivity() {
+        ActivityInfo homeInfo = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
+                .resolveActivityInfo(this.getPackageManager(), 0);
+        return homeInfo != null
+                && homeInfo.packageName.equals(this.getPackageName())
+                && homeInfo.name.equals(this.getClass().getName());
+    }
+
+    /**
+     * If this app is allowed for SwipeBackLayout return true
+     *
+     */
+    public static boolean isAllowedForSwipeBack(String pkg) {
+        File f = new File("/data/data/" + pkg + "/.disable_swipe_back");
+        if (f.exists())	return false;
+        else		return true;
+    }
+    
+    /**
+     * Set if an app is blocked or allowed for SwipeBackLayout
+     *
+     */
+    public static boolean setSwipeBackBlacklistStatus(String pkg, boolean status) {
+        Process process;
+        DataOutputStream os;
+        try {
+            process = Runtime.getRuntime().exec("su");
+            os = new DataOutputStream(process.getOutputStream());
+            os.writeBytes("chmod -R 0777 /data/data/" + pkg + "\nexit\n");
+            os.flush();
+            process.waitFor();
+            os.close();
+        } catch (Exception e1) {
+            return false;
+        }
+        if (status) {
+            File f = new File("/data/data/" + pkg + "/.disable_swipe_back");
+            if (!f.exists()) {
+                try {
+                    f.createNewFile();
+                } catch (IOException e2) {
+                    try {
+                         process = Runtime.getRuntime().exec("su");
+                         os = new DataOutputStream(process.getOutputStream());
+                         os.writeBytes("chmod -R 0755 /data/data/" + pkg + "\nexit\n");
+                         os.flush();
+                         process.waitFor();
+                         os.close();
+                    } catch (Exception e3) {
+                        return false;
+                    }
+                    return false;
+                }
+            }
+        } else {
+            File f = new File("/data/data/" + pkg + "/.disable_swipe_back");
+            if (f.exists()) {
+                f.delete();
+            }
+        }
+        try {
+            process = Runtime.getRuntime().exec("su");
+            os = new DataOutputStream(process.getOutputStream());
+            os.writeBytes("chmod -R 0755 /data/data/" + pkg + "\nexit\n");
+            os.flush();
+            process.waitFor();
+            os.close();
+        } catch (Exception e4) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -1223,6 +1318,35 @@ public class Activity extends ContextThemeWrapper
             onTitleChanged(getTitle(), getTitleColor());
         }
         mCalled = true;
+        mSwipeBackEnabled = (Settings.System.getInt(getContentResolver(), Settings.System.SWIPE_BACK_GESTURE_ENABLED, 1) == 1) && isAllowedForSwipeBack(this.getPackageName());
+        if (mSwipeBackEnabled == true && mSwipeBackLayout == null) {
+            // getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            // getWindow().getDecorView().setBackgroundDrawable(null);
+            mSwipeBackLayout = new SwipeBackLayout(this);
+            int mSwipeEdge = Settings.System.getInt(getContentResolver(), Settings.System.SWIPE_BACK_GESTURE_EDGE, 0);
+            int mEdgeFlag;
+            switch (mSwipeEdge) {
+                case 0:
+                    mEdgeFlag = SwipeBackLayout.EDGE_LEFT;
+                    break;
+                case 1:
+                    mEdgeFlag = SwipeBackLayout.EDGE_RIGHT;
+                    break;
+                case 2:
+                    mEdgeFlag = SwipeBackLayout.EDGE_BOTTOM;
+                    break;
+                case 3:
+                    mEdgeFlag = SwipeBackLayout.EDGE_ALL;
+                    break;
+                default:
+                    mEdgeFlag = SwipeBackLayout.EDGE_LEFT;
+                    break;
+            }
+            mSwipeBackLayout.setEdgeTrackingEnabled(mEdgeFlag);
+        }
+        if (mSwipeBackEnabled == true) {
+            mSwipeBackLayout.attachToActivity(this);
+        }
     }
 
     /**
@@ -2356,9 +2480,120 @@ public class Activity extends ContextThemeWrapper
      *
      * @return The view if found or null otherwise.
      */
-    @Nullable
+
     public View findViewById(@IdRes int id) {
-        return getWindow().findViewById(id);
+       // return getWindow().findViewById(id);
+  //  public View findViewById(int id) {
+       View v = getWindow().findViewById(id);
+        if (v != null)
+            return v;
+
+        mSwipeBackEnabled = (Settings.System.getInt(getContentResolver(), Settings.System.SWIPE_BACK_GESTURE_ENABLED, 1) == 1) && isAllowedForSwipeBack(this.getPackageName());
+        if (mSwipeBackEnabled == true && mSwipeBackLayout == null) {
+            getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            getWindow().getDecorView().setBackgroundDrawable(null);
+            mSwipeBackLayout = new SwipeBackLayout(this);
+            int mSwipeEdge = Settings.System.getInt(getContentResolver(), Settings.System.SWIPE_BACK_GESTURE_EDGE, 0);
+            int mEdgeFlag;
+            switch (mSwipeEdge) {
+                case 0:
+                    mEdgeFlag = SwipeBackLayout.EDGE_LEFT;
+                    break;
+                case 1:
+                    mEdgeFlag = SwipeBackLayout.EDGE_RIGHT;
+                    break;
+                case 2:
+                    mEdgeFlag = SwipeBackLayout.EDGE_BOTTOM;
+                    break;
+                case 3:
+                    mEdgeFlag = SwipeBackLayout.EDGE_ALL;
+                    break;
+                default:
+                    mEdgeFlag = SwipeBackLayout.EDGE_LEFT;
+                    break;
+            }
+            mSwipeBackLayout.setEdgeTrackingEnabled(mEdgeFlag);
+            return mSwipeBackLayout.findViewById(id);
+        } else if (mSwipeBackEnabled == true) {
+            return mSwipeBackLayout.findViewById(id);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Get the Swipe Back Layout
+     *
+     * @return The layout used for swipe back gestures
+     */
+    public SwipeBackLayout getSwipeBackLayout() {
+        mSwipeBackEnabled = (Settings.System.getInt(getContentResolver(), Settings.System.SWIPE_BACK_GESTURE_ENABLED, 1) == 1) && isAllowedForSwipeBack(this.getPackageName());
+        if (mSwipeBackEnabled == true && mSwipeBackLayout == null) {
+            getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            getWindow().getDecorView().setBackgroundDrawable(null);
+            mSwipeBackLayout = new SwipeBackLayout(this);
+            int mSwipeEdge = Settings.System.getInt(getContentResolver(), Settings.System.SWIPE_BACK_GESTURE_EDGE, 0);
+            int mEdgeFlag;
+            switch (mSwipeEdge) {
+                case 0:
+                    mEdgeFlag = SwipeBackLayout.EDGE_LEFT;
+                    break;
+                case 1:
+                    mEdgeFlag = SwipeBackLayout.EDGE_RIGHT;
+                    break;
+                case 2:
+                    mEdgeFlag = SwipeBackLayout.EDGE_BOTTOM;
+                    break;
+                case 3:
+                    mEdgeFlag = SwipeBackLayout.EDGE_ALL;
+                    break;
+                default:
+                    mEdgeFlag = SwipeBackLayout.EDGE_LEFT;
+                    break;
+            }
+            mSwipeBackLayout.setEdgeTrackingEnabled(mEdgeFlag);
+            return mSwipeBackLayout;
+        } else if(mSwipeBackEnabled == true) {
+            return mSwipeBackLayout;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Set if the swipe back gesture is enabled
+     *
+     */
+    public void setSwipeBackEnable(boolean enable) {
+        mSwipeBackEnabled = (Settings.System.getInt(getContentResolver(), Settings.System.SWIPE_BACK_GESTURE_ENABLED, 1) == 1);
+        if (mSwipeBackEnabled == true && mSwipeBackLayout == null) {
+            // getWindow().setBackgroundDrawable(new ColorDrawable(0));
+            // getWindow().getDecorView().setBackgroundDrawable(null);
+            mSwipeBackLayout = new SwipeBackLayout(this);
+            int mSwipeEdge = Settings.System.getInt(getContentResolver(), Settings.System.SWIPE_BACK_GESTURE_EDGE, 0);
+            int mEdgeFlag;
+            switch (mSwipeEdge) {
+                case 0:
+                    mEdgeFlag = SwipeBackLayout.EDGE_LEFT;
+                    break;
+                case 1:
+                    mEdgeFlag = SwipeBackLayout.EDGE_RIGHT;
+                    break;
+                case 2:
+                    mEdgeFlag = SwipeBackLayout.EDGE_BOTTOM;
+                    break;
+                case 3:
+                    mEdgeFlag = SwipeBackLayout.EDGE_ALL;
+                    break;
+                default:
+                    mEdgeFlag = SwipeBackLayout.EDGE_LEFT;
+                    break;
+            }
+            mSwipeBackLayout.setEdgeTrackingEnabled(mEdgeFlag);
+            mSwipeBackLayout.setEnableGesture(enable);
+        } else if (mSwipeBackEnabled == true) {
+            mSwipeBackLayout.setEnableGesture(enable);
+        }
     }
 
     /**

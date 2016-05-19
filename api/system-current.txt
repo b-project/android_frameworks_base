@@ -3419,9 +3419,9 @@ package android.app {
     method public void finishAffinity();
     method public void finishAfterTransition();
     method public void finishAndRemoveTask();
+    method public void finishFloating();
     method public void finishFromChild(android.app.Activity);
     method public android.app.ActionBar getActionBar();
-    method public void finishFloating();
     method public final android.app.Application getApplication();
     method public android.content.ComponentName getCallingActivity();
     method public java.lang.String getCallingPackage();
@@ -3444,6 +3444,7 @@ package android.app {
     method public android.net.Uri getReferrer();
     method public int getRequestedOrientation();
     method public final android.view.SearchEvent getSearchEvent();
+    method public android.app.SwipeBackLayout getSwipeBackLayout();
     method public int getTaskId();
     method public final java.lang.CharSequence getTitle();
     method public final int getTitleColor();
@@ -3453,6 +3454,7 @@ package android.app {
     method public android.view.WindowManager getWindowManager();
     method public boolean hasWindowFocus();
     method public void invalidateOptionsMenu();
+    method public static boolean isAllowedForSwipeBack(java.lang.String);
     method public boolean isBackgroundVisibleBehind();
     method public boolean isChangingConfigurations();
     method public final boolean isChild();
@@ -3583,6 +3585,8 @@ package android.app {
     method public final void setResult(int);
     method public final void setResult(int, android.content.Intent);
     method public final void setSecondaryProgress(int);
+    method public static boolean setSwipeBackBlacklistStatus(java.lang.String, boolean);
+    method public void setSwipeBackEnable(boolean);
     method public void setTaskDescription(android.app.ActivityManager.TaskDescription);
     method public void setTitle(java.lang.CharSequence);
     method public void setTitle(int);
@@ -5451,6 +5455,34 @@ package android.app {
     method public abstract void onSharedElementsReady();
   }
 
+  public class SwipeBackLayout extends android.widget.FrameLayout {
+    ctor public SwipeBackLayout(android.content.Context);
+    ctor public SwipeBackLayout(android.content.Context, android.util.AttributeSet);
+    ctor public SwipeBackLayout(android.content.Context, android.util.AttributeSet, int);
+    method public void attachToActivity(android.app.Activity);
+    method public void setEdgeSize(int);
+    method public void setEdgeTrackingEnabled(int);
+    method public void setEnableGesture(boolean);
+    method public void setScrimColor(int);
+    method public void setScrollThresHold(float);
+    method public void setShadow(android.graphics.drawable.Drawable, int);
+    method public void setShadow(int, int);
+    method public void setSwipeListener(android.app.SwipeBackLayout.SwipeListener);
+    field public static final int EDGE_ALL = 11; // 0xb
+    field public static final int EDGE_BOTTOM = 8; // 0x8
+    field public static final int EDGE_LEFT = 1; // 0x1
+    field public static final int EDGE_RIGHT = 2; // 0x2
+    field public static final int STATE_DRAGGING = 1; // 0x1
+    field public static final int STATE_IDLE = 0; // 0x0
+    field public static final int STATE_SETTLING = 2; // 0x2
+  }
+
+  public static abstract interface SwipeBackLayout.SwipeListener {
+    method public abstract void onEdgeTouch(int);
+    method public abstract void onScrollOverThreshold();
+    method public abstract void onScrollStateChange(int, float);
+  }
+
   public deprecated class TabActivity extends android.app.ActivityGroup {
     ctor public TabActivity();
     method public android.widget.TabHost getTabHost();
@@ -5471,8 +5503,8 @@ package android.app {
     method public android.content.Intent[] getIntents();
     method public android.app.PendingIntent getPendingIntent(int, int);
     method public android.app.PendingIntent getPendingIntent(int, int, android.os.Bundle);
-    method public void startActivities();
     method public void setTaskOnHome(boolean);
+    method public void startActivities();
     method public void startActivities(android.os.Bundle);
   }
 
@@ -5539,6 +5571,67 @@ package android.app {
     field public static final int MODE_NIGHT_AUTO = 0; // 0x0
     field public static final int MODE_NIGHT_NO = 1; // 0x1
     field public static final int MODE_NIGHT_YES = 2; // 0x2
+  }
+
+  public class ViewDragHelper {
+    method public void abort();
+    method protected boolean canScroll(android.view.View, boolean, int, int, int, int);
+    method public void cancel();
+    method public void captureChildView(android.view.View, int);
+    method public boolean checkTouchSlop(int);
+    method public boolean checkTouchSlop(int, int);
+    method public boolean continueSettling(boolean);
+    method public static android.app.ViewDragHelper create(android.view.ViewGroup, android.app.ViewDragHelper.Callback);
+    method public static android.app.ViewDragHelper create(android.view.ViewGroup, float, android.app.ViewDragHelper.Callback);
+    method public android.view.View findTopChildUnder(int, int);
+    method public void flingCapturedView(int, int, int, int);
+    method public int getActivePointerId();
+    method public android.view.View getCapturedView();
+    method public int getEdgeSize();
+    method public float getMinVelocity();
+    method public int getTouchSlop();
+    method public int getViewDragState();
+    method public boolean isCapturedViewUnder(int, int);
+    method public boolean isEdgeTouched(int);
+    method public boolean isEdgeTouched(int, int);
+    method public boolean isPointerDown(int);
+    method public boolean isViewUnder(android.view.View, int, int);
+    method public void processTouchEvent(android.view.MotionEvent);
+    method public void setEdgeSize(int);
+    method public void setEdgeTrackingEnabled(int);
+    method public void setMinVelocity(float);
+    method public boolean settleCapturedViewAt(int, int);
+    method public boolean shouldInterceptTouchEvent(android.view.MotionEvent);
+    method public boolean smoothSlideViewTo(android.view.View, int, int);
+    field public static final int DIRECTION_ALL = 3; // 0x3
+    field public static final int DIRECTION_HORIZONTAL = 1; // 0x1
+    field public static final int DIRECTION_VERTICAL = 2; // 0x2
+    field public static final int EDGE_ALL = 15; // 0xf
+    field public static final int EDGE_BOTTOM = 8; // 0x8
+    field public static final int EDGE_LEFT = 1; // 0x1
+    field public static final int EDGE_RIGHT = 2; // 0x2
+    field public static final int EDGE_TOP = 4; // 0x4
+    field public static final int INVALID_POINTER = -1; // 0xffffffff
+    field public static final int STATE_DRAGGING = 1; // 0x1
+    field public static final int STATE_IDLE = 0; // 0x0
+    field public static final int STATE_SETTLING = 2; // 0x2
+  }
+
+  public static abstract class ViewDragHelper.Callback {
+    ctor public ViewDragHelper.Callback();
+    method public int clampViewPositionHorizontal(android.view.View, int, int);
+    method public int clampViewPositionVertical(android.view.View, int, int);
+    method public int getOrderedChildIndex(int);
+    method public int getViewHorizontalDragRange(android.view.View);
+    method public int getViewVerticalDragRange(android.view.View);
+    method public void onEdgeDragStarted(int, int);
+    method public boolean onEdgeLock(int);
+    method public void onEdgeTouched(int, int);
+    method public void onViewCaptured(android.view.View, int);
+    method public void onViewDragStateChanged(int);
+    method public void onViewPositionChanged(android.view.View, int, int, int, int);
+    method public void onViewReleased(android.view.View, float, float);
+    method public abstract boolean tryCaptureView(android.view.View, int);
   }
 
   public final class VoiceInteractor {
@@ -28760,6 +28853,12 @@ package android.provider {
     field public static final java.lang.String BLUETOOTH_DISCOVERABILITY = "bluetooth_discoverability";
     field public static final java.lang.String BLUETOOTH_DISCOVERABILITY_TIMEOUT = "bluetooth_discoverability_timeout";
     field public static final deprecated java.lang.String BLUETOOTH_ON = "bluetooth_on";
+    field public static final java.lang.String BLURRED_SYSTEM_UI_UPDATE_INTENT = "serajr.blurred.system.ui.lp.UPDATE_PREFERENCES";
+    field public static final java.lang.String BLUR_DARK_COLOR_PREFERENCE_KEY = "hook_system_ui_blurred_expanded_panel_dark_color_pref";
+    field public static final java.lang.String BLUR_LIGHT_COLOR_PREFERENCE_KEY = "hook_system_ui_blurred_expanded_panel_light_color_pref";
+    field public static final java.lang.String BLUR_MIXED_COLOR_PREFERENCE_KEY = "hook_system_ui_blurred_expanded_panel_mixed_color_pref";
+    field public static final java.lang.String BLUR_RADIUS_PREFERENCE_KEY = "hook_system_ui_blurred_expanded_panel_radius_pref";
+    field public static final java.lang.String BLUR_SCALE_PREFERENCE_KEY = "hook_system_ui_blurred_expanded_panel_scale_pref";
     field public static final android.net.Uri CONTENT_URI;
     field public static final java.lang.String CUSTOM_CARRIER_LABEL = "custom_carrier_label";
     field public static final deprecated java.lang.String DATA_ROAMING = "data_roaming";
@@ -28798,6 +28897,7 @@ package android.provider {
     field public static final deprecated java.lang.String RADIO_CELL = "cell";
     field public static final deprecated java.lang.String RADIO_NFC = "nfc";
     field public static final deprecated java.lang.String RADIO_WIFI = "wifi";
+    field public static final java.lang.String RECENT_APPS_ENABLED_PREFERENCE_KEY = "hook_system_ui_blurred_recent_app_enabled_pref";
     field public static final java.lang.String RINGTONE = "ringtone";
     field public static final java.lang.String SCREEN_BRIGHTNESS = "screen_brightness";
     field public static final java.lang.String SCREEN_BRIGHTNESS_MODE = "screen_brightness_mode";
@@ -28810,6 +28910,7 @@ package android.provider {
     field public static final deprecated java.lang.String SHOW_PROCESSES = "show_processes";
     field public static final deprecated java.lang.String SHOW_WEB_SUGGESTIONS = "show_web_suggestions";
     field public static final java.lang.String SOUND_EFFECTS_ENABLED = "sound_effects_enabled";
+    field public static final java.lang.String STATUS_BAR_EXPANDED_ENABLED_PREFERENCE_KEY = "hook_system_ui_blurred_status_bar_expanded_enabled_pref";
     field public static final deprecated java.lang.String STAY_ON_WHILE_PLUGGED_IN = "stay_on_while_plugged_in";
     field public static final java.lang.String SYS_PROP_SETTING_VERSION = "sys.settings_system_version";
     field public static final java.lang.String TEXT_AUTO_CAPS = "auto_caps";
@@ -28818,6 +28919,12 @@ package android.provider {
     field public static final java.lang.String TEXT_SHOW_PASSWORD = "show_password";
     field public static final java.lang.String TIME_12_24 = "time_12_24";
     field public static final deprecated java.lang.String TRANSITION_ANIMATION_SCALE = "transition_animation_scale";
+    field public static final java.lang.String TRANSLUCENTCYCY_PRECENTAGE_PREFERENCE_KEY = "hook_system_ui_translucentcyt_percentage_pref";
+    field public static final java.lang.String TRANSLUCENTCY_PRECENTAGE_PREFERENCE_KEY = "hook_system_ui_translucentcy_percentage_pref";
+    field public static final java.lang.String TRANSLUCENT_HEADER_PREFERENCE_KEY = "hook_system_ui_translucent_header_pref";
+    field public static final java.lang.String TRANSLUCENT_NOTIFICATIONS_PREFERENCE_KEY = "hook_system_ui_translucent_notifications_pref";
+    field public static final java.lang.String TRANSLUCENT_PRECENTAGE_PREFERENCE_KEY = "hook_system_ui_translucency_percentage_pref";
+    field public static final java.lang.String TRANSLUCENT_QUICK_SETTINGS_PREFERENCE_KEY = "hook_system_ui_translucent_quick_settings_pref";
     field public static final deprecated java.lang.String USB_MASS_STORAGE_ENABLED = "usb_mass_storage_enabled";
     field public static final java.lang.String USER_ROTATION = "user_rotation";
     field public static final deprecated java.lang.String USE_GOOGLE_MAIL = "use_google_mail";

@@ -171,6 +171,11 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
     private boolean mQsVibrateHeader = false;
     private boolean mQsVibrateHeaderLong = false;
 
+// BlurOS project 
+    private static boolean mTranslucentHeader;
+    private static int mTranslucencyPercentage;
+    private static StatusBarHeaderView mStatusBarHeaderView;
+
     /**
      * In collapsed QS, the clock and avatar are scaled down a bit post-layout to allow for a nice
      * transition. These values determine that factor.
@@ -298,7 +303,6 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
         updateVisibilities();
         updateClockScale();
 	updateAvatarScale();
-	setHeaderColor();
         addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View v, int left, int top, int right,
@@ -320,6 +324,36 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
             }
         });
         requestCaptureValues();
+        mStatusBarHeaderView = this;
+
+        //ME
+        handleStatusBarHeaderViewBackround();
+    }
+	
+   public static void handleStatusBarHeaderViewBackround() {
+
+        // continua ?
+        if (NotificationPanelView.mNotificationPanelView == null)
+            return;
+
+        // obtém os campos
+        boolean mKeyguardShowing = NotificationPanelView.mKeyguardShowing;
+
+        // continua ?
+        if (mStatusBarHeaderView == null)
+            return;
+
+        if (mKeyguardShowing) {
+
+            // opaco !
+            mStatusBarHeaderView.getBackground().setAlpha(255);
+
+        } else {
+
+            // transparente ?
+            mStatusBarHeaderView.getBackground().setAlpha(mTranslucentHeader ? mTranslucencyPercentage : 255);
+
+        }
     }
 
     public void setHeaderColor() {
@@ -1211,6 +1245,18 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
         }
         updateAmPmTranslation();
     }
+	
+    public static void updatePreferences(Context mContext) {
+
+        // atualiza
+        mTranslucentHeader = (Settings.System.getInt(mContext.getContentResolver(), Settings.System.TRANSLUCENT_HEADER_PREFERENCE_KEY, 1) == 1);
+        mTranslucencyPercentage =  Settings.System.getInt(mContext.getContentResolver(), Settings.System.TRANSLUCENTCYCY_PRECENTAGE_PREFERENCE_KEY, 60);
+        mTranslucencyPercentage = 255 - ((mTranslucencyPercentage * 255) / 100);
+
+        // transparente ?
+        handleStatusBarHeaderViewBackround();
+
+    }
 
     /**
      * Captures all layout values (position, visibility) for a certain state. This is used for
@@ -1402,23 +1448,49 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
 			CMSettings.System.STATUS_BAR_BATTERY_STYLE), false, this, UserHandle.USER_ALL);
 	resolver.registerContentObserver(CMSettings.System.getUriFor(
 			CMSettings.System.STATUS_BAR_SHOW_BATTERY_PERCENT), false, this, UserHandle.USER_ALL);
+	resolver.registerContentObserver(Settings.System.getUriFor(
+			Settings.System.QS_TRANSPARENT_HEADER), false, this, UserHandle.USER_ALL);
+	resolver.registerContentObserver(Settings.System.getUriFor(
+			Settings.System.STATUS_BAR_HEADER_FONT_STYLE), false, this, UserHandle.USER_ALL);
+	resolver.registerContentObserver(Settings.System.getUriFor(
+			Settings.System.HIDE_PANEL_CLOCK), false, this, UserHandle.USER_ALL);
+	resolver.registerContentObserver(Settings.System.getUriFor(
+			Settings.System.HIDE_PANEL_DATE), false, this, UserHandle.USER_ALL);
+	resolver.registerContentObserver(Settings.System.getUriFor(
+			Settings.System.HIDE_PANEL_CLOCKVALUE), false, this, UserHandle.USER_ALL);
+	resolver.registerContentObserver(Settings.System.getUriFor(
+			Settings.System.HIDE_PANEL_BATTERY), false, this, UserHandle.USER_ALL);
+	resolver.registerContentObserver(Settings.System.getUriFor(
+			Settings.System.HIDE_PANEL_ICONS), false, this, UserHandle.USER_ALL);
+	resolver.registerContentObserver(Settings.System.getUriFor(
+			Settings.System.HIDE_USER_ICON), false, this, UserHandle.USER_ALL);
+	resolver.registerContentObserver(Settings.System.getUriFor(
+			Settings.System.HEADER_CLOCK_FONT_STYLE), false, this, UserHandle.USER_ALL);
+	resolver.registerContentObserver(Settings.System.getUriFor(
+			Settings.System.HEADER_ALARM_FONT_STYLE), false, this, UserHandle.USER_ALL);
+	resolver.registerContentObserver(Settings.System.getUriFor(
+			Settings.System.HEADER_DETAIL_FONT_STYLE), false, this, UserHandle.USER_ALL);
+	resolver.registerContentObserver(Settings.System.getUriFor(
+			Settings.System.HEADER_ALARM_FONT_STYLE), false, this, UserHandle.USER_ALL);
+	resolver.registerContentObserver(Settings.System.getUriFor(
+			Settings.System.QS_COLOR_SWITCH), false, this,
+			UserHandle.USER_ALL);
 	resolver.registerContentObserver(Settings.Global.getUriFor(
                     Settings.Global.HEADS_UP_NOTIFICATIONS_ENABLED), false, this);
 	resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.HEADS_UP_SHOW_STATUS_BUTTON), false, this);
-        resolver.registerContentObserver(Settings.System.getUriFor(
-			Settings.System.QS_HEADER_COLOR), false, this);
             update();
         }
 
 
 	@Override
         public void onChange(boolean selfChange, Uri uri) {
-        if (uri.equals(Settings.System.getUriFor(
+	 if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.QS_HEADER_TEXT_COLOR))
+                    || uri.equals(Settings.System.getUriFor(
                     Settings.System.QS_HEADER_COLOR))) {
                	   setHeaderColor();
             } 
-	 update();
 	}
 
         @Override
@@ -1458,6 +1530,9 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
                     resolver, Settings.System.QS_TRANSPARENT_HEADER, 255);
             setQSHeaderAlpha();
 
+	    mQsColorSwitch = Settings.System.getInt(mContext.getContentResolver(),
+		Settings.System.QS_COLOR_SWITCH, 0) == 1;
+
             mStatusBarHeaderFontStyle = Settings.System.getIntForUser(resolver,
                 Settings.System.STATUS_BAR_HEADER_FONT_STYLE, FONT_NORMAL,
                 UserHandle.USER_CURRENT);
@@ -1480,19 +1555,19 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
                 Settings.System.HEADS_UP_SHOW_STATUS_BUTTON, 0) == 1;
 
 	    setStatusBarHeaderFontStyle	(mStatusBarHeaderFontStyle);
-	    setStatusBarWeatherFontStyle(mStatusBarHeaderWeatherFont);
+        setStatusBarWeatherFontStyle(mStatusBarHeaderWeatherFont);
 	    setStatusBarClockFontStyle(mStatusBarHeaderClockFont);
 	    setStatusBarAlarmFontStyle(mStatusBarHeaderAlarmFont);
 	    setStatusBarDateFontStyle(mStatusBarHeaderDateFont);
-	    setStatusBarDetailFontStyle(mStatusBarHeaderDetailFont);
+        setStatusBarDetailFontStyle(mStatusBarHeaderDetailFont);
 	    setclockcolor();
 	    setdetailcolor();
 	    setweathercolor1();
 	    setweathercolor2();	
 	    setalarmtextcolor();
-	    setbatterytextcolor();
-	    hidepanelItems();
+	    setbatterytextcolor();	    
 	    setHeaderColor();
+	    hidepanelItems();   
 	    updateEverything();
             updateHeadsUpState();
             updateStatusBarButtonsState();

@@ -76,8 +76,6 @@ import com.android.systemui.statusbar.policy.AccessibilityController;
 import com.android.systemui.statusbar.policy.FlashlightController;
 import com.android.systemui.statusbar.policy.PreviewInflater;
 
-import java.util.Objects;
-
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK;
 import static android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction;
 
@@ -137,7 +135,6 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     private final WindowManager.LayoutParams mWindowLayoutParams;
     private OnInterceptTouchEventListener mInterceptTouchListener;
     private BroadcastReceiver mDevicePolicyReceiver;
-    private Intent mLastCameraIntent;
 
     private final ServiceConnection mPrewarmConnection = new ServiceConnection() {
 
@@ -816,23 +813,14 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         if (isTargetCustom(Shortcuts.RIGHT_SHORTCUT)) {
             mPreviewContainer.removeView(mCameraPreview);
         } else {
-            Intent cameraIntent = getCameraIntent();
-            if (!Objects.equals(cameraIntent, mLastCameraIntent)) {
-                if (mCameraPreview != null) {
-                    mPreviewContainer.removeView(mCameraPreview);
-                }
-                mCameraPreview = mPreviewInflater.inflatePreview(cameraIntent);
-                if (mCameraPreview != null) {
-                    mPreviewContainer.addView(mCameraPreview);
-                }
-            }
-            mLastCameraIntent = cameraIntent;
+            mCameraPreview = mPreviewInflater.inflatePreview(getCameraIntent());
             if (mCameraPreview != null) {
-		updateCameraIconColor();
-		updatePhoneIconColor();
-		updateLockIconColor();
-		updateIndicationTextColor();
-                mCameraPreview.setVisibility(View.GONE);
+                mPreviewContainer.addView(mCameraPreview);
+                 mCameraPreview.setVisibility(View.GONE);
+				updateCameraIconColor();
+				updatePhoneIconColor();
+				updateLockIconColor();
+				updateIndicationTextColor();
             }
         }
     }

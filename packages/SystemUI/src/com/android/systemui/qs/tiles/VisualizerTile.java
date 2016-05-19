@@ -44,7 +44,7 @@ import com.pheelicks.visualizer.AudioData;
 import com.pheelicks.visualizer.FFTData;
 import com.pheelicks.visualizer.VisualizerView;
 import com.pheelicks.visualizer.renderer.Renderer;
-
+import com.android.systemui.navigation.pulse.PulseController;
 
 import org.cyanogenmod.internal.logging.CMMetricsLogger;
 
@@ -59,7 +59,7 @@ public class VisualizerTile extends QSTile<QSTile.BooleanState>  implements Keyg
     private boolean mLinked;
     private boolean mListening;
     private boolean mPowerSaveModeEnabled;
-    public boolean isPulseEnabled;
+    private PulseController Pulse;
 
     private MediaMonitor mMediaMonitor;
 
@@ -68,8 +68,6 @@ public class VisualizerTile extends QSTile<QSTile.BooleanState>  implements Keyg
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            isPulseEnabled = Settings.Secure.getInt(mContext.getContentResolver(),
-                Settings.Secure.FLING_PULSE_ENABLED, 0) == 1;
             if (PowerManager.ACTION_POWER_SAVE_MODE_CHANGING.equals(intent.getAction())) {
                 mPowerSaveModeEnabled = intent.getBooleanExtra(PowerManager.EXTRA_POWER_SAVE_MODE,
                         false);
@@ -79,9 +77,7 @@ public class VisualizerTile extends QSTile<QSTile.BooleanState>  implements Keyg
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            if(!isPulseEnabled) {
-			       doLinkage();
-			    }
+                            doLinkage();
                         }
                     });
                     mHandler.removeCallbacks(mRefreshStateRunnable);
@@ -97,10 +93,7 @@ public class VisualizerTile extends QSTile<QSTile.BooleanState>  implements Keyg
         mMediaMonitor = new MediaMonitor(mContext) {
             @Override
             public void onPlayStateChanged(boolean playing) {
-                isPulseEnabled = Settings.Secure.getInt(mContext.getContentResolver(),
-                Settings.Secure.FLING_PULSE_ENABLED, 0) == 1;
-                if(!isPulseEnabled) {
-                doLinkage(); }
+                doLinkage();
 
                 mHandler.removeCallbacks(mRefreshStateRunnable);
                 mHandler.postDelayed(mRefreshStateRunnable, 50);
@@ -201,7 +194,7 @@ public class VisualizerTile extends QSTile<QSTile.BooleanState>  implements Keyg
 
     @Override
     protected void handleUpdateState(BooleanState state, Object arg) {
-        isPulseEnabled = Settings.Secure.getInt(mContext.getContentResolver(),
+    	boolean isPulseEnabled = Settings.Secure.getInt(mContext.getContentResolver(),
                 Settings.Secure.FLING_PULSE_ENABLED, 0) == 1;
         if (isPulseEnabled) {         
         state.visible = false;
@@ -220,27 +213,19 @@ public class VisualizerTile extends QSTile<QSTile.BooleanState>  implements Keyg
 
     @Override
     public void setListening(boolean listening) {
-        isPulseEnabled = Settings.Secure.getInt(mContext.getContentResolver(),
-                Settings.Secure.FLING_PULSE_ENABLED, 0) == 1;
         if (mListening == listening) return;
-        mListening = listening;    
-        if(!isPulseEnabled) {
+        mListening = listening;
         doLinkage();
-        }
         // refresh state is called by QSPanel right after calling into this.
     }
 
     @Override
     protected void handleDestroy() {
-        isPulseEnabled = Settings.Secure.getInt(mContext.getContentResolver(),
-                Settings.Secure.FLING_PULSE_ENABLED, 0) == 1;
         mDestroyed = true;
         mMediaMonitor.setListening(false);
         mMediaMonitor = null;
         super.handleDestroy();
-        if(!isPulseEnabled) {
         doLinkage();
-        }
 
         mKeyguardMonitor.removeCallback(this);
         mContext.unregisterReceiver(mReceiver);
@@ -248,11 +233,7 @@ public class VisualizerTile extends QSTile<QSTile.BooleanState>  implements Keyg
 
     @Override
     public void onKeyguardChanged() {
-       isPulseEnabled = Settings.Secure.getInt(mContext.getContentResolver(),
-                Settings.Secure.FLING_PULSE_ENABLED, 0) == 1;
-        if(!isPulseEnabled) {
         doLinkage();
-        }
         refreshState();
     }
 

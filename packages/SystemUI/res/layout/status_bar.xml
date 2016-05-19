@@ -94,7 +94,13 @@
                     android:visibility="gone"
                     android:singleLine="true"
                     />
-                    
+           
+                 <include android:id="@+id/signal_cluster" 
+					android:layout_width="wrap_content" 
+					android:layout_height="wrap_content" 
+					android:layout_marginStart="2.5dip" 
+					layout="@layout/signal_cluster_view" />     
+					              
                  <com.android.systemui.statusbar.policy.Clock
                     android:id="@+id/left_clock"
                     android:textAppearance="@style/TextAppearance.StatusBar.Clock"
@@ -196,7 +202,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:singleLine="true"
-                android:paddingStart="3dp"
+                android:paddingStart="7dp"
                 android:gravity="center_vertical|start"
                 />
 

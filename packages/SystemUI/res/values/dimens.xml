@@ -139,6 +139,8 @@
     <!-- Height of the status bar header bar when on Keyguard -->
     <dimen name="status_bar_header_height_keyguard">40dp</dimen>
 
+    <dimen name="status_bar_expanded_header_elevation">0.0dp</dimen>
+
     <!-- Width for the notification panel and related windows -->
     <dimen name="match_parent">-1px</dimen>
     <dimen name="standard_notification_panel_width">416dp</dimen><!-- includes notification_side_padding on each side -->
@@ -218,7 +220,7 @@
     <dimen name="recents_task_view_application_icon_size">48dp</dimen>
 
     <!-- The radius of the rounded corners on a task view. -->
-    <dimen name="recents_task_view_rounded_corners_radius">2dp</dimen>
+    <dimen name="recents_task_view_rounded_corners_radius">0dp</dimen>
 
     <!-- The min translation in the Z index for the last task. -->
     <dimen name="recents_task_view_z_min">20dp</dimen>
@@ -282,7 +284,7 @@
     <dimen name="top_stack_slow_down_length">12dp</dimen>
 
     <!-- The side padding of the notifications-->
-    <dimen name="notification_side_padding">8dp</dimen>
+    <dimen name="notification_side_padding">0dp</dimen>
 
     <!-- Z distance between notifications if they are in the stack -->
     <dimen name="z_distance_between_notifications">1dp</dimen>
@@ -291,7 +293,9 @@
     <dimen name="notification_padding_dimmed">0dp</dimen>
 
     <!-- The padding between the individual notification cards. -->
-    <dimen name="notification_padding">4dp</dimen>
+    <dimen name="notification_padding">0dp</dimen>
+
+    <dimen name="notifications_top_padding">0.0dip</dimen>
 
     <!-- The minimum amount of top overscroll to go to the quick settings. -->
     <dimen name="min_top_overscroll_to_qs">36dp</dimen>
@@ -311,7 +315,7 @@
     <!-- Falsing threshold used when dismissing notifications from the lockscreen. -->
     <dimen name="swipe_helper_falsing_threshold">70dp</dimen>
 
-    <dimen name="notifications_top_padding">8dp</dimen>
+    <dimen name="notifications_top_padding">0dp</dimen>
     
     <!-- Minimum distance the user has to drag down to go to the full shade. -->
     <dimen name="keyguard_drag_down_min_distance">100dp</dimen>
@@ -358,7 +362,7 @@
     <dimen name="edge_tap_area_width">48dp</dimen>
 
     <!-- radius of the corners of the material rounded rect background -->
-    <dimen name="notification_material_rounded_rect_radius">2dp</dimen>
+    <dimen name="notification_material_rounded_rect_radius">0dp</dimen>
 
     <!-- radius of the corners of the material rounded rect background but negative-->
     <dimen name="notification_material_rounded_rect_radius_negative">-2dp</dimen>
@@ -432,7 +436,7 @@
     <dimen name="qs_date_collapsed_size">14sp</dimen>
 
     <!-- Battery level text padding end when in expanded QS and on Keyguard -->
-    <dimen name="battery_level_padding_end">2dp</dimen>
+    <dimen name="battery_level_padding_end">4dp</dimen>
 
     <!-- The top padding of the clear all button -->
     <dimen name="clear_all_padding_top">12dp</dimen>
@@ -445,10 +449,16 @@
     <dimen name="keyguard_carrier_text_margin">16dp</dimen>
 
     <!-- Margin on the left side of the battery % in the header. -->
-    <dimen name="header_battery_margin_expanded">6dp</dimen>
+    <dimen name="header_battery_margin_expanded">5.5dp</dimen> 
+
+    <!-- Margin on the left side of the battery somc in the header. -->
+    <dimen name="header_battery_somc_expanded">5.5dp</dimen>
 
     <!-- Margin on the left side of the battery % when on Keyguard. -->
-    <dimen name="header_battery_margin_keyguard">6dp</dimen>
+    <dimen name="header_battery_margin_keyguard">5.5dp</dimen>
+
+    <!-- Margin on the left side of the battery somc when on Keyguard. -->
+    <dimen name="header_battery_somc_keyguard">5.5dp</dimen>
 
     <!-- Margin on the right side of the system icon group on Keyguard. -->
     <dimen name="system_icons_keyguard_padding_end">4dp</dimen>
@@ -490,7 +500,7 @@
     <dimen name="keyguard_indication_margin_bottom">65dp</dimen>
 
     <!-- The text size for battery level -->
-    <dimen name="battery_level_text_size">12sp</dimen>
+    <dimen name="battery_level_text_size">10sp</dimen>
 
     <!-- TrustDrawable: Minimum inner radius of the breathing animation -->
     <dimen name="trust_circle_inner_radius_visible_min">22dp</dimen>
@@ -534,7 +544,7 @@
     <dimen name="fake_shadow_size">8dp</dimen>
 
     <!-- Padding between signal cluster and battery icon -->
-    <dimen name="signal_cluster_battery_padding">3dp</dimen>
+    <dimen name="signal_cluster_battery_padding">7dp</dimen>
 
     <!-- Padding for signal cluster and battery icon when there are not icons in signal cluster -->
     <dimen name="no_signal_cluster_battery_padding">3dp</dimen>
