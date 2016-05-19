@@ -1764,14 +1764,13 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         setAreThereNotifications();
 
         mIconController = new StatusBarIconController(
-                mContext, mStatusBarView, mKeyguardStatusBar, this);      
+                mContext, mStatusBarView, mKeyguardStatusBar, this);     
 
 	mTileView = new QSTileView (mContext);
 	mQsDetail = new QSDetailItems(mContext);
 	mSignalView = new SignalTileView(mContext);
 
         mQsPanel = new QSPanel(mContext);
-
         // Background thread for any controllers that need it.
         mHandlerThread = new HandlerThread(TAG, Process.THREAD_PRIORITY_BACKGROUND);
         mHandlerThread.start();
@@ -2057,11 +2056,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         if (mQSPanel != null) {
             if (mQSTileHost == null) {
                 mQSTileHost = new QSTileHost(mContext, this,
-                        mBluetoothController, mLocationController, mRotationLockController,
-                        mNetworkController, mZenModeController, mHotspotController,
-                        mCastController, mFlashlightController,
-                        mUserSwitcherController, mKeyguardMonitor,
-                        mSecurityController);
+                    mBluetoothController, mLocationController, mRotationLockController,
+                    mNetworkController, mZenModeController, mHotspotController,
+                    mCastController, mFlashlightController,
+                    mUserSwitcherController, mKeyguardMonitor,
+                    mSecurityController, mBatteryController);
             }
             mQSPanel.setHost(mQSTileHost);
             mQSPanel.setTiles(mQSTileHost.getTiles());
@@ -3348,6 +3347,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
    public void updateQsColors() {		
 	mHeader.setHeaderColor();
 	mQSPanel.updateicons();
+	mQsPanel.updatecolors();
 	mNotificationPanel.setQSBackgroundColor();
 	mNotificationPanel.setQSColors();
 	mStatusBarHeaderMachine.doUpdateStatusHeaderObservers(true);
