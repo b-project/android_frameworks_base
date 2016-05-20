@@ -22,31 +22,32 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:androidprv="http://schemas.android.com/apk/res-auto"
     android:id="@+id/keyguard_status_view"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     androidprv:layout_maxWidth="@dimen/keyguard_security_width"
     androidprv:layout_maxHeight="@dimen/keyguard_security_height"
-    android:gravity="top">
-    <GridLayout
+    android:gravity="center_horizontal|top">
+    <LinearLayout
         android:id="@+id/keyguard_clock_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="left"
-        android:orientation="vertical"
-        android:layout_column="2">
-
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|top"
+        android:orientation="vertical" >
         <TextClock
             android:id="@+id/clock_view"
             android:layout_width="wrap_content"
-            android:layout_height="139dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:textColor="@color/clock_white"
             android:singleLine="true"
             style="@style/widget_big_thin"
             android:format12Hour="@string/keyguard_widget_12_hours_format"
             android:format24Hour="@string/keyguard_widget_24_hours_format"
-            />
+            android:layout_marginBottom="@dimen/bottom_text_spacing_digital" />
 
+        <include layout="@layout/keyguard_status_area" />
+        <include layout="@layout/keyguard_weather_view" />
         <TextView
             android:id="@+id/owner_info"
             android:layout_marginLeft="16dp"
@@ -66,10 +67,5 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"/>
 
-        <include layout="@layout/keyguard_weather_view"
-            android:layout_row="0"
-            android:layout_column="3"
-            android:layout_width="179dp" />
-
-    </GridLayout>
+    </LinearLayout>
 </com.android.keyguard.KeyguardStatusView>

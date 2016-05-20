@@ -509,8 +509,7 @@ public class TaskManager {
         if ("com.android.stk".equals(psPackageName)
                 || "com.android.settings".equals(psPackageName)
                 || "com.android.bluetooth".equals(psPackageName)
-                || "com.android.systemui".equals(psPackageName)
-                || "co.bluros.launcher".equals(psPackageName)) {
+                || "com.android.systemui".equals(psPackageName)) {
             return true;
         } else {
             for (DetailProcess detailProcess : showTaskList) {
