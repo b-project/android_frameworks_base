@@ -3998,6 +3998,13 @@ public final class Settings {
          * the setting value. See an example above. */
 
         /**
+         * Should the alarm be shown in fullscreen instead of heads-up
+         *
+         * @hide
+         */
+        public static final String SHOW_ALARM_FULLSCREEN = "show_alarm_fullscreen";
+
+        /**
          * Whether to use gesture anywhere feature.
          * @hide
          */
