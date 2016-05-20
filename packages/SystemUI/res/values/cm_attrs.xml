@@ -17,7 +17,6 @@
 <resources>
     <declare-styleable name="BatteryMeterViewDrawable">
         <attr name="android:gravity"/>
-
         <!-- Blending mode used for drawing charging bolt and percentage text -->
         <attr name="blendMode">
             <!-- [0, 0] -->
