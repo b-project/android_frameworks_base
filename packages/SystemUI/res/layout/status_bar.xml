@@ -96,9 +96,12 @@
                     />
            
                  <include android:id="@+id/signal_cluster" 
-					android:layout_width="wrap_content" 
-					android:layout_height="wrap_content" 
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
 					android:layout_marginStart="2.5dip" 
+					android:layout_gravity="center_vertical"
+                    android:paddingEnd="4dip"
+                    android:singleLine="true"
 					layout="@layout/signal_cluster_view" />     
 					              
                  <com.android.systemui.statusbar.policy.Clock
