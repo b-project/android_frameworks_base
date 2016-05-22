@@ -175,6 +175,8 @@ public class ThemesTile extends QSTile<QSTile.BooleanState> implements ThemeMana
         @Override
         public View createDetailView(Context context, View convertView, ViewGroup parent) {
             mItemsList = QSDetailItemsList.convertOrInflate(context, convertView, parent);
+            mAdapter = new QSDetailItemsList.QSDetailListAdapter(context, items);
+            mAdapter.setBiggerHeight(false);
             ListView listView = mItemsList.getListView();
             listView.setDivider(null);
             listView.setOnItemClickListener(this);
@@ -216,11 +218,6 @@ public class ThemesTile extends QSTile<QSTile.BooleanState> implements ThemeMana
             intent.addCategory(CATEGORY_THEME_CHOOSER);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             return intent;
-        }
-
-    	@Override
-        public StatusBarPanelCustomTile getCustomTile() {
-            return null;
         }
 
         @Override

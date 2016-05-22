@@ -128,10 +128,7 @@
     </string>
 
     <!-- The tiles to display in QuickSettings -->
-
-    <string name="quick_settings_tiles" translatable="false">wifi,bt,cell,airplane,dnd,rotation,flashlight,location,hotspot</string>
-    <!-- The tiles to display in QuickSettings -->
-    <string name="quick_settings_tiles" translatable="false">default</string>
+    <string name="quick_settings_tiles" translatable="false">wifi,bt,cell,airplane,dnd,rotation,flashlight,location,hotspot,gesture_anywhere,live_display,ambient_display,expanded_desktop,performance,brightness,profiles,compass,sync,appcirclebar,float_mode</string>
 
     <!-- Whether or not the RSSI tile is capitalized or not. -->
     <bool name="quick_settings_rssi_tile_capitalization">true</bool>

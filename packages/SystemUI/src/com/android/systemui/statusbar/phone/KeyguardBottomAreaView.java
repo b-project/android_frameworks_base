@@ -1120,5 +1120,4 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         }
         return super.onInterceptTouchEvent(ev);
     }
-
 }
