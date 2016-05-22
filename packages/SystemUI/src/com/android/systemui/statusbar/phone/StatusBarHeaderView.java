@@ -324,6 +324,14 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
             }
         });
         requestCaptureValues();
+
+        // RenderThread is doing more harm than good when touching the header (to expand quick
+        // settings), so disable it for this view
+
+         ((RippleDrawable) getBackground()).setForceSoftware(true);
+         ((RippleDrawable) mSettingsButton.getBackground()).setForceSoftware(true);
+         ((RippleDrawable) mSystemIconsSuperContainer.getBackground()).setForceSoftware(true);
+
         mStatusBarHeaderView = this;
 
         //ME
@@ -416,6 +424,7 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
         FontSizeUtils.updateFontSize(this, R.id.empty_time_view, R.dimen.qs_time_expanded_size);
 
         mEmergencyCallsOnly.setText(com.android.internal.R.string.emergency_calls_only);
+
         mClockCollapsedSize = getResources().getDimensionPixelSize(R.dimen.qs_time_collapsed_size);
         mClockExpandedSize = getResources().getDimensionPixelSize(R.dimen.qs_time_expanded_size);
         mClockCollapsedScaleFactor = (float) mClockCollapsedSize / (float) mClockExpandedSize;
@@ -1576,9 +1585,9 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
 
     private void updateStatusBarButtonsState() {
         mShowHeadsUpButton = Settings.System.getIntForUser(getContext().getContentResolver(),
-                Settings.System.HEADS_UP_SHOW_STATUS_BUTTON, 0, ActivityManager.getCurrentUser()) == 1;
+                Settings.System.HEADS_UP_SHOW_STATUS_BUTTON, 1, ActivityManager.getCurrentUser()) == 1;
         mShowTaskManager = Settings.System.getIntForUser(getContext().getContentResolver(),
-                Settings.System.ENABLE_TASK_MANAGER, 0, ActivityManager.getCurrentUser()) == 1;
+                Settings.System.ENABLE_TASK_MANAGER, 1, ActivityManager.getCurrentUser()) == 1;
     }
 
     private void updateHeadsUpState() {
