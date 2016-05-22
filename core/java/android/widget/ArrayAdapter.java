@@ -395,14 +395,10 @@ public class ArrayAdapter<T> extends BaseAdapter implements Filterable, ThemedSp
         }
 
         T item = getItem(position);
-        if (item == null) {
-          text.setText("");
+        if (item instanceof CharSequence) {
+            text.setText((CharSequence)item);
         } else {
-            if (item instanceof CharSequence) {
-                text.setText((CharSequence)item);
-            } else {
-                text.setText(item.toString());
-            }
+            text.setText(item.toString());
         }
 
         return view;

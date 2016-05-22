@@ -124,7 +124,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.PathInterpolator;
-import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -165,7 +164,8 @@ import com.android.systemui.keyguard.KeyguardViewMediator;
 import com.android.systemui.navigation.NavigationController;
 import com.android.systemui.navigation.Navigator;
 import com.android.systemui.omni.StatusBarHeaderMachine;
-import com.android.systemui.qs.QSDetailItemsList;
+import com.android.systemui.qs.QSDragPanel;
+import com.android.systemui.qs.QSDetailItems;
 import com.android.systemui.qs.QSPanel;
 import com.android.systemui.qs.QSTile;
 import com.android.systemui.qs.QSTileView;
@@ -406,7 +406,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
     private boolean mQsColorSwitch = false;
     public boolean mColorSwitch = false ;
+    public QSTileView mTileView;
     private  View mIcon;
+    public QSDetailItems mQsDetail;
     public SignalTileView mSignalView;	
     public boolean mNavSwitch = false ;
 
@@ -423,8 +425,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     View mExpandedContents;
     TextView mNotificationPanelDebugText;
 
-
-    private QSPanel mQSPanel;
+    // settings
+    private QSDragPanel mQSPanel;
+    private QSPanel mQsPanel;
 
     private QSTileHost mQSTileHost;
 
@@ -628,7 +631,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             super(handler);
         }
 
-
         @Override
         protected void observe() {
             super.observe();
@@ -759,9 +761,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 	resolver.registerContentObserver(Settings.System.getUriFor(
 			Settings.System.CLEAR_RECENTS_STYLE_ENABLE),
 			false, this, UserHandle.USER_ALL);
-	resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.QS_NUM_TILE_COLUMNS), false, this,
-                    UserHandle.USER_ALL);
         resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.BATTERY_SAVER_MODE_COLOR),
                     false, this, UserHandle.USER_ALL);
@@ -1057,8 +1056,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
 
             boolean showTaskManager = Settings.System.getIntForUser(resolver,
-                    Settings.System.ENABLE_TASK_MANAGER, 0, UserHandle.USER_CURRENT) == 1;
-            if (mShowTaskManager != showTaskManager) {
+                    Settings.System.ENABLE_TASK_MANAGER, 1, UserHandle.USER_CURRENT) == 1;
+	    if (mShowTaskManager != showTaskManager) {
                 if (!mShowTaskManager) {
                     // explicitly reset click state when disabled
                     mShowTaskList = false;
@@ -1099,7 +1098,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     Settings.System.STATUS_BAR_WEATHER_FONT_STYLE, FONT_NORMAL, mCurrentUserId);
 
             mBlurRadius = Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.LOCKSCREEN_BLUR_RADIUS, 14);
+                    Settings.System.LOCKSCREEN_BLUR_RADIUS, 25);
 
             mMaxKeyguardNotifConfig = Settings.System.getIntForUser(resolver,
                     Settings.System.LOCKSCREEN_MAX_NOTIF_CONFIG, 5, mCurrentUserId);
@@ -1265,10 +1264,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             }
             if (mIconPolicy != null) {
                 mIconPolicy.setCurrentUserSetup(mUserSetup);
-            }
-
-            if (mQSPanel != null) {
-                mQSPanel.updateNumColumns();
             }
         }
     };
@@ -1647,7 +1642,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 mNotificationPanel);
         mNotificationPanel.setLiveController(mLiveLockScreenController);
 
-        mHeadsUpManager = new HeadsUpManager(context, mStatusBarWindow);
+        if (mHeadsUpManager == null) {
+            mHeadsUpManager = new HeadsUpManager(context, mStatusBarWindow);
+        }
         mHeadsUpManager.setBar(this);
         mHeadsUpManager.addListener(this);
         mHeadsUpManager.addListener(mNotificationPanel);
@@ -1677,7 +1674,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             addAppCircleSidebar();
         }
 
-        mAssistManager = new AssistManager(this, context);    
+
+        if (mAssistManager == null) {
+            mAssistManager = new AssistManager(this, context);
+        }
+        
         if (mNavigationBarView == null) {
             mAssistManager.onConfigurationChanged();
         }
@@ -1763,16 +1764,27 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         setAreThereNotifications();
 
         mIconController = new StatusBarIconController(
-                mContext, mStatusBarView, mKeyguardStatusBar, this);     
-	
+                mContext, mStatusBarView, mKeyguardStatusBar, this);      
+
+	mTileView = new QSTileView (mContext);
+	mQsDetail = new QSDetailItems(mContext);
+	mSignalView = new SignalTileView(mContext);
+
+        mQsPanel = new QSPanel(mContext);
+
         // Background thread for any controllers that need it.
         mHandlerThread = new HandlerThread(TAG, Process.THREAD_PRIORITY_BACKGROUND);
         mHandlerThread.start();
 
         // Other icons
+        if (mLocationController == null) {
             mLocationController = new LocationControllerImpl(mContext,
                     mHandlerThread.getLooper()); // will post a notification
+        }
+        if (mBatteryManager == null) {
             mBatteryManager = (BatteryManager) mContext.getSystemService(Context.BATTERY_SERVICE);
+        }
+        if (mBatteryController == null) {
             mBatteryController = new BatteryController(mContext, mHandler);
             mBatteryController.addStateChangedCallback(new BatteryStateChangeCallback() {
                 @Override
@@ -1794,27 +1806,42 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     // noop
                 }
             });
+        }
         if (mBatteryManager.isDockBatterySupported()) {
             if (mDockBatteryController == null) {
                 mDockBatteryController = new DockBatteryController(mContext, mHandler);
             }
         }
+        if (mNetworkController == null) {
             mNetworkController = new NetworkControllerImpl(mContext, mHandlerThread.getLooper());
+        }
+        if (mHotspotController == null) {
             mHotspotController = new HotspotControllerImpl(mContext);
+        }
+        if (mBluetoothController == null) {
             mBluetoothController = new BluetoothControllerImpl(mContext,
                     mHandlerThread.getLooper());
-            mSecurityController = new SecurityControllerImpl(mContext);
-        if (mContext.getResources().getBoolean(R.bool.config_showRotationLock)) {
-                mRotationLockController = new RotationLockControllerImpl(mContext);
         }
+        if (mSecurityController == null) {
+            mSecurityController = new SecurityControllerImpl(mContext);
+        }
+        if (mContext.getResources().getBoolean(R.bool.config_showRotationLock)) {
+            if (mRotationLockController == null) {
+                mRotationLockController = new RotationLockControllerImpl(mContext);
+            }
+        }
+        if (mUserInfoController == null) {
             mUserInfoController = new UserInfoController(mContext);
+        }
         mVolumeComponent = getComponent(VolumeComponent.class);
         if (mVolumeComponent != null) {
             if (mZenModeController == null) {
                 mZenModeController = mVolumeComponent.getZenController();
             }
         }
+        if (mCastController == null) {
             mCastController = new CastControllerImpl(mContext);
+        }
         if (mSuController == null) {
             mSuController = new SuControllerImpl(mContext);
         }
@@ -1837,17 +1864,28 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         if (isAPhone) {
             mNetworkController.addEmergencyListener(mHeader);
         }
-        mFlashlightController = new FlashlightController(mContext);
+
+        if (mFlashlightController == null) {
+            mFlashlightController = new FlashlightController(mContext);
+        }
         mKeyguardBottomArea.setFlashlightController(mFlashlightController);
         mKeyguardBottomArea.setPhoneStatusBar(this);
         mKeyguardBottomArea.setUserSetupComplete(mUserSetup);
-        mAccessibilityController = new AccessibilityController(mContext);
+        if (mAccessibilityController == null) {
+            mAccessibilityController = new AccessibilityController(mContext);
+        }
         mKeyguardBottomArea.setAccessibilityController(mAccessibilityController);
-        mNextAlarmController = new NextAlarmController(mContext);
-        mKeyguardMonitor = new KeyguardMonitor(mContext);
+        if (mNextAlarmController == null) {
+            mNextAlarmController = new NextAlarmController(mContext);
+        }
+        if (mKeyguardMonitor == null) {
+            mKeyguardMonitor = new KeyguardMonitor(mContext);
+        }
         if (UserSwitcherController.isUserSwitcherAvailable(UserManager.get(mContext))) {
+            if (mUserSwitcherController == null) {
                 mUserSwitcherController = new UserSwitcherController(mContext, mKeyguardMonitor,
                         mHandler);
+            }
         }
 
         mWeatherTempStyle = Settings.System.getIntForUser(
@@ -1870,6 +1908,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 UserHandle.USER_CURRENT);
         if (mWeatherController == null) {
             mWeatherController = new WeatherControllerImpl(mContext);
+            mWeatherController.addCallback(new WeatherController.Callback() {
+                @Override
+                public void onWeatherChanged(WeatherInfo temp) {
+                    updateWeatherTextState(temp.temp, mWeatherTempColor, mWeatherTempSize, mWeatherTempFontStyle);
+                }
+            });
         }
  	updateTempView();
         mWeatherController.addCallback(new WeatherController.Callback() {
@@ -2009,21 +2053,92 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
 
         // Set up the quick settings tile panel
-        mQSPanel = (QSPanel) mStatusBarWindowContent.findViewById(R.id.quick_settings_panel);
-	if (mQSPanel != null) {
-            final QSTileHost qsh = new QSTileHost(mContext, this,
-                    mBluetoothController, mLocationController, mRotationLockController,
-                    mNetworkController, mZenModeController, mHotspotController,
-                    mCastController, mFlashlightController,
-                    mUserSwitcherController, mKeyguardMonitor,
-                    mSecurityController, mBatteryController);
-            mQSPanel.setHost(qsh);
-            mQSPanel.setTiles(qsh.getTiles());
+        mQSPanel = (QSDragPanel) mStatusBarWindowContent.findViewById(R.id.quick_settings_panel);
+        if (mQSPanel != null) {
+            if (mQSTileHost == null) {
+                mQSTileHost = new QSTileHost(mContext, this,
+                        mBluetoothController, mLocationController, mRotationLockController,
+                        mNetworkController, mZenModeController, mHotspotController,
+                        mCastController, mFlashlightController,
+                        mUserSwitcherController, mKeyguardMonitor,
+                        mSecurityController);
+            }
+            mQSPanel.setHost(mQSTileHost);
+            mQSPanel.setTiles(mQSTileHost.getTiles());
             mHeader.setQSPanel(mQSPanel);
-            qsh.setCallback(new QSTileHost.Callback() {
+            mQSTileHost.setCallback(new QSTileHost.Callback() {
                 @Override
                 public void onTilesChanged() {
-                    mQSPanel.setTiles(qsh.getTiles());
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mQSPanel.setTiles(mQSTileHost.getTiles());
+                        }
+                    });
+                }
+
+                @Override
+                public void setEditing(final boolean editing) {
+                    if (mState != StatusBarState.SHADE) {
+                        return;
+                    }
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mQSPanel.setEditing(editing);
+                            mHeader.setEditing(editing);
+                        }
+                    });
+                }
+
+                @Override
+                public boolean isEditing() {
+                    return mQSPanel.isEditing();
+                }
+
+                @Override
+                public void goToSettingsPage() {
+                    if (mState != StatusBarState.SHADE) {
+                        return;
+                    }
+                    setEditing(true);
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mQSPanel.goToSettingsPage();
+                        }
+                    }, 500);
+                }
+
+                @Override
+                public void resetTiles() {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mQSPanel.setEditing(false);
+                            mHeader.setEditing(false);
+
+                            // unregister custom tile service while we reset to not get
+                            // callbacks from custom tiles
+                            try {
+                                mCustomTileListenerService.unregisterAsSystemService();
+                            } catch (RemoteException e) {
+                                Log.e(TAG, "Unable to unregister custom tile listener", e);
+                            }
+
+                            mQSTileHost.resetTiles();
+
+                            // reregister service
+                            try {
+                                mCustomTileListenerService.registerAsSystemService(mContext,
+                                        new ComponentName(mContext.getPackageName(),
+                                                PhoneStatusBar.this.getClass().getCanonicalName()),
+                                        UserHandle.USER_ALL);
+                            } catch (RemoteException e) {
+                                Log.e(TAG, "Unable to register custom tile listener", e);
+                            }
+                        }
+                    });
                 }
             });
         }
@@ -2047,6 +2162,18 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             mNotificationPanel.setTaskManagerEnabled(mShowTaskManager);
             mShowTaskList = false;
         }
+
+
+        // Set up the initial custom tile listener state.
+        try {
+            mCustomTileListenerService.registerAsSystemService(mContext,
+                    new ComponentName(mContext.getPackageName(), getClass().getCanonicalName()),
+                    UserHandle.USER_ALL);
+        } catch (RemoteException e) {
+            Log.e(TAG, "Unable to register custom tile listener", e);
+        }
+
+        mQSPanel.getHost().setCustomTileListenerService(mCustomTileListenerService);
 
         // User info. Trigger first load.
         mHeader.setUserInfoController(mUserInfoController);
@@ -2285,9 +2412,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         // Decrease the delay for every row we animate to give the sense of
         // accelerating the swipes
-        int rowDelayDecrement = 10;
-        int currentDelay = 140;
-        int totalDelay = 180;
+        int rowDelayDecrement = 9;
+        int currentDelay = 120;
+        int totalDelay = 160;
         int numItems = hideAnimatedList.size();
         for (int i = numItems - 1; i >= 0; i--) {
             View view = hideAnimatedList.get(i);
@@ -2296,7 +2423,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 endRunnable = animationFinishAction;
             }
             mStackScroller.dismissViewAnimated(view, endRunnable, totalDelay, 240);
-            currentDelay = Math.max(50, currentDelay - rowDelayDecrement);
+            currentDelay = Math.max(45, currentDelay - rowDelayDecrement);
             totalDelay += currentDelay;
         }
     }
@@ -2341,6 +2468,40 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         return mNaturalBarHeight;
     }
 
+    private final CustomTileListenerService mCustomTileListenerService =
+            new CustomTileListenerService() {
+                @Override
+                public void onListenerConnected() {
+                    //Connected
+                }
+                @Override
+                public void onCustomTilePosted(final StatusBarPanelCustomTile sbc) {
+                    if (DEBUG) Log.d(TAG, "onCustomTilePosted: " + sbc.getCustomTile());
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            boolean isUpdate = mQSPanel.getHost().getCustomTileData()
+                                    .get(sbc.getKey()) != null;
+                            if (isUpdate) {
+                                mQSPanel.getHost().updateCustomTile(sbc);
+                            } else {
+                                mQSPanel.getHost().addCustomTile(sbc);
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void onCustomTileRemoved(final StatusBarPanelCustomTile sbc) {
+                    if (DEBUG) Log.d(TAG, "onCustomTileRemoved: " + sbc.getCustomTile());
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mQSPanel.getHost().removeCustomTileSysUi(sbc.getKey());
+                        }
+                    });
+                }
+            };
 
     private void awakenDreams() {
         if (mDreamManager != null) {
@@ -3186,8 +3347,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
    public void updateQsColors() {		
 	mHeader.setHeaderColor();
+	mQSPanel.updateicons();
 	mNotificationPanel.setQSBackgroundColor();
 	mNotificationPanel.setQSColors();
+	mStatusBarHeaderMachine.doUpdateStatusHeaderObservers(true);
 	}
 
     private void updateStatusIconsColor() {
@@ -4858,6 +5021,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         networkController.removeSignalCallback(signalCluster);
         networkController.removeSignalCallback(signalClusterKeyguard);
         networkController.removeSignalCallback(signalClusterQs);
+
+        if (signalCluster != null) signalCluster.setSecurityController(null);
+        if (signalClusterKeyguard != null) signalClusterKeyguard.setSecurityController(null);
+        if (signalClusterQs != null) signalClusterQs.setSecurityController(null);
     }
 
     private void recreateStatusBar() {
@@ -4865,6 +5032,19 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         if (mNetworkController != null) {
             removeSignalCallbacks(mNetworkController);
+            if (mNetworkController.hasVoiceCallingFeature()) {
+                mNetworkController.removeEmergencyListener(mHeader);
+            }
+        }
+        if (mHeadsUpManager != null) {
+            mHeadsUpManager.removeListener(mNotificationPanel);
+            mHeadsUpManager.removeListener(mScrimController);
+        }
+        if (mIconController != null) {
+            mIconController.cleanup();
+        }
+        if (mKeyguardIndicationController != null) {
+            mKeyguardIndicationController.cleanup();
         }
         if (mLiveLockScreenController != null) {
             mLiveLockScreenController.cleanup();
@@ -4889,11 +5069,22 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         // extract notifications.
         RankingMap rankingMap = mNotificationData.getRankingMap();
         int nNotifs = mNotificationData.size();
-        ArrayList<Pair<String, StatusBarNotification>> notifications =
-                new ArrayList<Pair<String, StatusBarNotification>>(nNotifs);
+        ArrayList<Pair<String, StatusBarNotification>> notifications = new ArrayList<>(nNotifs);
         copyNotifications(notifications, mNotificationData);
         // now remove all the notifications since we'll be re-creating these with the copied data
         mNotificationData.clear();
+
+        if (mCustomTileListenerService != null) {
+            try {
+                mCustomTileListenerService.unregisterAsSystemService();
+            } catch (RemoteException e) {
+                Log.e(TAG, "Unable to unregister custom tile listener", e);
+            }
+        }
+
+        mQSPanel.getHost().setCustomTileListenerService(null);
+        mQSPanel.setListening(false);
+
         makeStatusBarView();
         repositionNavigationBar();
 
@@ -4919,9 +5110,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         // Stop the command queue until the new status bar container settles and has a layout pass
         mCommandQueue.pause();
+
         // fix notification panel being shifted to the left by calling
         // instantCollapseNotificationPanel()
         instantCollapseNotificationPanel();
+
         mStatusBarWindow.requestLayout();
         mStatusBarWindow.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -4961,17 +5154,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 removeAllViews((ViewGroup) child);
             }
         }
-        if (parent instanceof AdapterView) {
-            //We know that when it's AdapterView it's from CM's QS detail items list
-            try {
-            QSDetailItemsList.QSDetailListAdapter adapter =
-                    (QSDetailItemsList.QSDetailListAdapter) ((AdapterView) parent).getAdapter();	    
-            adapter.clear();
-            adapter.notifyDataSetInvalidated();
-            } catch (ClassCastException e) { /*Catch it*/}
-        } else {
-            parent.removeAllViews();
-        }
+        parent.removeAllViews();
     }
 
     /**
@@ -4990,6 +5173,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         if (newTheme != null) mCurrentTheme = (ThemeConfig) newTheme.clone();
         if (updateStatusBar) {
 	    DontStressOnRecreate();
+            recreateStatusBar();
+            updateNotificationShadeForChildren();
+            mTmpChildOrderMap.clear();
             if (mNavigationBarView != null) {
                 mNavigationBarView.onRecreateStatusbar();
             }
@@ -5016,6 +5202,11 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
     private void DontStressOnRecreate() {
         recreateStatusBar();
+        RemoveViews();
+
+    }   
+
+    private void RemoveViews() {
         updateRowStates();
         updateSpeedbump();
         checkBarModes();
@@ -5025,8 +5216,19 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mStackScroller.setAnimationsEnabled(true);
         mNotificationPanel.setTouchDisabled(false);
         updateVisibleToUser();
-
-    }   
+        clearNotificationEffects();
+        updateDozingState();
+        updatePublicMode();
+        updateNotifications();
+        updateMediaMetaData(true);
+        resetQsPanelVisibility();
+        updateQsExpansionEnabled();
+        mShadeUpdates.check();
+        mQSPanel.refreshAllTiles();
+        mNotificationPanel.resetViews();
+        updateNotificationShadeForChildren();
+        mTmpChildOrderMap.clear();
+    }
 
     /**
      * Determines if we need to recreate the status bar due to a theme change.  We currently
@@ -6036,8 +6238,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mWakeUpComingFromTouch = false;
         mWakeUpTouchLocation = null;
         mStackScroller.setAnimationsEnabled(false);
+        mStatusBarWindowManager.setHeadsUpShowing(false);
+        RemoveViews();
         updateVisibleToUser();
-        mVisualizerView.setVisible(false);
+        if (mQSTileHost.isEditing()) {
+            mQSTileHost.setEditing(false);
+        }
         if (mLaunchCameraOnFinishedGoingToSleep) {
             mLaunchCameraOnFinishedGoingToSleep = false;
 
@@ -6056,6 +6262,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mDeviceInteractive = true;
         mStackScroller.setAnimationsEnabled(true);
         mNotificationPanel.setTouchDisabled(false);
+        RemoveViews();
         updateVisibleToUser();
     }
 

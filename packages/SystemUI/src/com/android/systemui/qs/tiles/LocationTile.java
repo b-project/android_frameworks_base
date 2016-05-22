@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
 import android.view.LayoutInflater;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -281,6 +280,11 @@ public class LocationTile extends QSTile<QSTile.BooleanState> {
         }
 
         @Override
+        public StatusBarPanelCustomTile getCustomTile() {
+            return null;
+        }
+
+        @Override
         public void setToggleState(boolean state) {
             mController.setLocationEnabled(state);
             rebuildLocationList(state);
@@ -303,7 +307,6 @@ public class LocationTile extends QSTile<QSTile.BooleanState> {
             final ListView list = mDetails.getListView();
             list.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
             list.setOnItemClickListener(this);
-            mDetails.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
 
             return mDetails;
         }

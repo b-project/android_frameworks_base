@@ -128,6 +128,7 @@ public class ClockController {
         }
     }
     
+
     public void cleanup() {
         mSettingsObserver.unobserve();
     }

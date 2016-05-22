@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
 import android.text.TextUtils;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -57,6 +56,11 @@ public class BluetoothTile extends QSTile<QSTile.BooleanState>  {
         super(host);
         mController = host.getBluetoothController();
         mDetailAdapter = new BluetoothDetailAdapter();
+    }
+
+    @Override
+    public boolean hasDualTargetsDetails() {
+        return true;
     }
 
     @Override
@@ -197,6 +201,11 @@ public class BluetoothTile extends QSTile<QSTile.BooleanState>  {
         }
 
         @Override
+        public StatusBarPanelCustomTile getCustomTile() {
+            return null;
+        }
+
+        @Override
         public void setToggleState(boolean state) {
             MetricsLogger.action(mContext, MetricsLogger.QS_BLUETOOTH_TOGGLE, state);
             mController.setBluetoothEnabled(state);
@@ -214,7 +223,6 @@ public class BluetoothTile extends QSTile<QSTile.BooleanState>  {
             ListView listView = mItemsList.getListView();
             listView.setDivider(null);
             listView.setOnItemClickListener(this);
-            mItemsList.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
             listView.setAdapter(mAdapter =
                     new QSDetailItemsList.QSDetailListAdapter(context, mBluetoothItems));
             mAdapter.setCallback(this);
