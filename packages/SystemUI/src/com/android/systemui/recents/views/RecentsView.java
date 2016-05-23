@@ -399,7 +399,7 @@ public  class RecentsView extends FrameLayout implements TaskStackView.TaskStack
                     Settings.System.SYSTEMUI_RECENTS_MEM_DISPLAY, 1) == 1;
 
 	mClearStyle = Settings.System.getIntForUser(
-                    resolver, Settings.System.CLEAR_RECENTS_STYLE, 0,
+                    resolver, Settings.System.CLEAR_RECENTS_STYLE, 6,
                     UserHandle.USER_CURRENT);
 	checkstyle(mClearStyle); 	
         
@@ -432,7 +432,7 @@ public  class RecentsView extends FrameLayout implements TaskStackView.TaskStack
         updateTimeVisibility();
 
         boolean showClearAllRecents = Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.SHOW_CLEAR_ALL_RECENTS, 0, UserHandle.USER_CURRENT) != 0;
+                Settings.System.SHOW_CLEAR_ALL_RECENTS, 1, UserHandle.USER_CURRENT) != 0;
 
         Rect taskStackBounds = new Rect();
         mConfig.getAvailableTaskStackBounds(width, height, mConfig.systemInsets.top,
@@ -504,7 +504,7 @@ public  class RecentsView extends FrameLayout implements TaskStackView.TaskStack
 
     private boolean showMemDisplay() {
         boolean enableMemDisplay = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.SYSTEMUI_RECENTS_MEM_DISPLAY, 0) == 1;
+                Settings.System.SYSTEMUI_RECENTS_MEM_DISPLAY, 1) == 1;
 
         if (!enableMemDisplay) {
             mMemText.setVisibility(View.GONE);

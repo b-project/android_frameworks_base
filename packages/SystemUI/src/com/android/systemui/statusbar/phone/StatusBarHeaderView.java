@@ -618,7 +618,7 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
             mDockBatteryLevel.setForceShown(mExpanded && mShowBatteryTextExpanded);
             mDockBatteryLevel.setVisibility(View.VISIBLE);
         }
-         applyHeaderBackgroundShadow();
+      //   applyHeaderBackgroundShadow();
     }
 
 	public void hidepanelItems() {
@@ -1722,7 +1722,7 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
         } else {
             mBackgroundImage.setImageDrawable(dw);
         }
-        applyHeaderBackgroundShadow();
+         // applyHeaderBackgroundShadow();
     }
 
     private void applyHeaderBackgroundShadow() {
@@ -2077,7 +2077,7 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
                 break;
         }
 
-        applyHeaderBackgroundShadow();
+       // applyHeaderBackgroundShadow();
     }
 
     private void setStatusBarClockFontStyle(int font) {
