@@ -4554,13 +4554,13 @@ public abstract class AbsListView extends AdapterView<ListAdapter> implements Te
             mLastScrollState = newState;
             if (newState == OnScrollListener.SCROLL_STATE_IDLE) {
                 mListAnimationModeSet = false;
-                mListAnimationMode = 1;
+                mListAnimationMode = 0;
             } else if (!mListAnimationModeSet) {
                 mListAnimationModeSet = true;
                 mListAnimationMode = Settings.System.getIntForUser(
                         mContext.getContentResolver(),
                         Settings.System.LISTVIEW_ANIMATION,
-                        1, UserHandle.USER_CURRENT_OR_SELF);
+                        0, UserHandle.USER_CURRENT_OR_SELF);
                 if (mListAnimationMode != 0) {
                     mListAnimationInterpolatorMode = Settings.System.getIntForUser(
                             mContext.getContentResolver(),

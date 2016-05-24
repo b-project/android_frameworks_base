@@ -106,10 +106,10 @@
     <integer name="config_recent_item_min_alpha">3</integer>
 
     <!-- The number of columns in the QuickSettings -->
-    <integer name="quick_settings_num_columns">3</integer>
+    <integer name="quick_settings_num_columns">5</integer>
 
     <!-- The maximum number of rows in the QuickSettings -->
-    <integer name="quick_settings_max_rows">3</integer>
+    <integer name="quick_settings_max_rows">5</integer>
 
     <!-- The maximum number of rows in the QuickSettings when on the keyguard -->
     <integer name="quick_settings_max_rows_keyguard">3</integer>
@@ -128,7 +128,7 @@
     <integer name="quick_settings_brightness_dialog_long_timeout">4000</integer>
 
     <!-- The maximum number of items to be displayed in quick settings -->
-    <integer name="quick_settings_detail_max_item_count">6</integer>
+    <integer name="quick_settings_detail_max_item_count">7</integer>
 
     <!-- Whether or not we also show rsrp level for LTE. -->
     <bool name="config_showRsrpSignalLevelforLTE">false</bool>
