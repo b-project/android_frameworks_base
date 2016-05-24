@@ -82,7 +82,7 @@ public class DaylightHeaderProvider implements
         mContext = context;
 
         final boolean customHeader = Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.STATUS_BAR_CUSTOM_HEADER, 0,
+                Settings.System.STATUS_BAR_CUSTOM_HEADER, 1,
                 UserHandle.USER_CURRENT) == 1;
 
         if (customHeader) {

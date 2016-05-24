@@ -119,7 +119,7 @@ public class StatusBarHeaderMachine {
         public void onChange(boolean selfChange) {
             doUpdateStatusHeaderObservers(true); // simplest way to update poly headers without clobbering API
             final boolean customHeader = Settings.System.getIntForUser(mContext.getContentResolver(),
-                    Settings.System.STATUS_BAR_CUSTOM_HEADER, 0,
+                    Settings.System.STATUS_BAR_CUSTOM_HEADER, 1,
                     UserHandle.USER_CURRENT) == 1;
 
             if (customHeader) {
@@ -215,7 +215,7 @@ public class StatusBarHeaderMachine {
 
     public void updateEnablement() {
         final boolean customHeader = Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.STATUS_BAR_CUSTOM_HEADER, 0,
+                Settings.System.STATUS_BAR_CUSTOM_HEADER, 1,
                 UserHandle.USER_CURRENT) == 1;
         // TODO when we support switching providers this must be done properly here
         // unregister old provider first
