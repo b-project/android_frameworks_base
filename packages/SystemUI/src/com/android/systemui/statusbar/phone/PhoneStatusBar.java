@@ -799,6 +799,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 		}  else if (uri.equals(Settings.System.getUriFor(
 		Settings.System.BATTERY_ICON_COLOR))) {
 		updatebatterycolor(); 
+		DontStressOnRecreate();
 		} else if (uri.equals(Settings.System.getUriFor(
 		Settings.System.BATTERY_TEXT_COLOR))) {
 		updatebatterycolor(); 
@@ -3023,8 +3024,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     }
     
     public void updatebatterycolor() {
-    int mBatteryIconColor = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.BATTERY_ICON_COLOR, 0xFFFFFFFF);
       if (mIconController != null) {
      mIconController.applyIconTint(); 
      }
