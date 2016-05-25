@@ -1248,41 +1248,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
         }
         broadcastPreciseCallStateChanged(ringingCallState, foregroundCallState, backgroundCallState,
                 DisconnectCause.NOT_VALID,
-                PreciseDisconnectCause.NOT_VALID, SubscriptionManager.INVALID_SUBSCRIPTION_ID);
-    }
-
-    public void notifyPreciseCallStateForSubscriber(int subId, int ringingCallState,
-            int foregroundCallState, int backgroundCallState) {
-        if (!checkNotifyPermission("notifyPreciseCallStateForSubscriber()")) {
-            return;
-        }
-        synchronized (mRecords) {
-            int phoneId = SubscriptionManager.getPhoneId(subId);
-            if (validatePhoneId(phoneId)) {
-                mRingingCallState = ringingCallState;
-                mForegroundCallState = foregroundCallState;
-                mBackgroundCallState = backgroundCallState;
-                mPreciseCallState = new PreciseCallState(ringingCallState, foregroundCallState,
-                        backgroundCallState,
-                        DisconnectCause.NOT_VALID,
-                        PreciseDisconnectCause.NOT_VALID);
-                for (Record r : mRecords) {
-                    if (r.matchPhoneStateListenerEvent(PhoneStateListener.LISTEN_PRECISE_CALL_STATE)
-                            && ((r.subId == subId) ||
-                            (r.subId == SubscriptionManager.DEFAULT_SUBSCRIPTION_ID))) {
-                        try {
-                            r.callback.onPreciseCallStateChanged(mPreciseCallState);
-                        } catch (RemoteException ex) {
-                            mRemoveList.add(r.binder);
-                        }
-                    }
-                }
-            }
-            handleRemoveListLocked();
-        }
-        broadcastPreciseCallStateChanged(ringingCallState, foregroundCallState, backgroundCallState,
-                DisconnectCause.NOT_VALID,
-                PreciseDisconnectCause.NOT_VALID, subId);
+                PreciseDisconnectCause.NOT_VALID);
     }
 
     public void notifyDisconnectCause(int disconnectCause, int preciseDisconnectCause) {
@@ -1304,8 +1270,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
             handleRemoveListLocked();
         }
         broadcastPreciseCallStateChanged(mRingingCallState, mForegroundCallState,
-                mBackgroundCallState, disconnectCause, preciseDisconnectCause,
-                SubscriptionManager.INVALID_SUBSCRIPTION_ID);
+                mBackgroundCallState, disconnectCause, preciseDisconnectCause);
     }
 
     public void notifyPreciseDataConnectionFailed(String reason, String apnType,
@@ -1545,16 +1510,13 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
     }
 
     private void broadcastPreciseCallStateChanged(int ringingCallState, int foregroundCallState,
-            int backgroundCallState, int disconnectCause, int preciseDisconnectCause, int subId) {
+            int backgroundCallState, int disconnectCause, int preciseDisconnectCause) {
         Intent intent = new Intent(TelephonyManager.ACTION_PRECISE_CALL_STATE_CHANGED);
         intent.putExtra(TelephonyManager.EXTRA_RINGING_CALL_STATE, ringingCallState);
         intent.putExtra(TelephonyManager.EXTRA_FOREGROUND_CALL_STATE, foregroundCallState);
         intent.putExtra(TelephonyManager.EXTRA_BACKGROUND_CALL_STATE, backgroundCallState);
         intent.putExtra(TelephonyManager.EXTRA_DISCONNECT_CAUSE, disconnectCause);
         intent.putExtra(TelephonyManager.EXTRA_PRECISE_DISCONNECT_CAUSE, preciseDisconnectCause);
-        if (subId != SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
-            intent.putExtra(PhoneConstants.SUBSCRIPTION_KEY, subId);
-        }
         mContext.sendBroadcastAsUser(intent, UserHandle.ALL,
                 android.Manifest.permission.READ_PRECISE_PHONE_STATE);
     }
