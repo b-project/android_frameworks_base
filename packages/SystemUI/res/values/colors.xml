@@ -42,14 +42,14 @@
     <color name="system_warning_color">#fff4511e</color><!-- deep orange 600 -->
     <color name="qs_text">@color/primary_text_color</color>
     <color name="qs_tile_divider">#290c0c0c</color>
-    <color name="qs_tile_text">#b30c0c0c</color>
+    <color name="qs_tile_text">#FFFFFF</color>
     <color name="qs_subhead">@color/primary_text_color</color>
     <color name="qs_detail_empty">#2451D9BD</color>
     <color name="qs_detail_button">#FFB0BEC5</color><!-- 100% blue grey 200 -->
     <color name="qs_detail_button_white">#B3FFFFFF</color><!-- 70% white -->
     <color name="qs_detail_transition">#66FFFFFF</color>
-	<color name="primary_text_color">#ff0c0c0c</color>
-	<color name="secondary_text_color">#a30c0c0c</color>
+	<color name="primary_text_color">#FFFFFFFF</color>
+	<color name="secondary_text_color">#FFFFFFFF</color>
     <color name="qs_detail_progress_track">@*android:color/material_deep_teal_500</color><!-- Pumpkin -->
     <color name="data_usage_secondary">#99FFFFFF</color><!-- 60% white -->
     <color name="data_usage_graph_track">#33FFFFFF</color><!-- 20% white -->
