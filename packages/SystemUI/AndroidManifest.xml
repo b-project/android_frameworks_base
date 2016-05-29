@@ -445,6 +445,25 @@
                 <action android:name="com.android.systemui.action.CLEAR_TUNER" />
             </intent-filter>
         </receiver>
+       <activity android:name=".DaylightHeaderDefault"
+                android:label="Default" >
+            <intent-filter>
+                <action android:name="org.omnirom.DaylightHeaderPack" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
+        <activity
+            android:name=".cm.LockscreenShortcutsActivity"
+            android:icon="@drawable/tuner"
+            android:label="@string/lockscreen_targets_message"
+            android:theme="@android:style/Theme.Material.Settings"
+            android:exported="true">
+        </activity>
+
+        <service
+            android:name=".screenshot.ScreenshotEditor"
+            android:enabled="true"
+            android:exported="true" />
     </application>
 </manifest>
