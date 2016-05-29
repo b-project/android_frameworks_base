@@ -52,7 +52,7 @@
             android:clickable="true"
             android:contentDescription="@string/accessibility_desc_close"
             android:scaleType="center"
-            android:src="@drawable/fab_clear"
+            android:src="@drawable/ic_close"
             android:tint="@color/zen_ic_close_tint_color" />
 
         <TextView
