@@ -99,9 +99,9 @@ import com.android.systemui.statusbar.policy.KeyguardUserSwitcher;
 import com.android.systemui.statusbar.policy.LiveLockScreenController;
 import com.android.systemui.statusbar.stack.NotificationStackScrollLayout;
 import com.android.systemui.statusbar.stack.StackStateAnimator;
-import org.cyanogenmod.internal.util.CmLockPatternUtils;
+import org.bluros.internal.util.CmLockPatternUtils;
 
-import cyanogenmod.providers.CMSettings;
+import bluros.providers.CMSettings;
 
 import java.util.List;
 import java.util.Objects;
@@ -589,7 +589,7 @@ public class NotificationPanelView extends PanelView implements
                 UserHandle.USER_CURRENT) == 1;
             setQSBackgroundColor();
             
-       mLockPatternUtils = new CmLockPatternUtils(getContext());
+			mLockPatternUtils = new CmLockPatternUtils(getContext());
  		// BlurOS Project        
             mNotificationPanelView = this;
 
@@ -629,8 +629,8 @@ public class NotificationPanelView extends PanelView implements
         if (mKeyguardShowing) {
 
         //    // opaco !
-            mQsContainer.getBackground().setAlpha(255);
-
+            //mQsContainer.getBackground().setAlpha(255);
+			 mQsContainer.getBackground().setAlpha(mTranslucentQuickSettings ? mTranslucencyPercentage : 255);
         } else {
 
             // transparente ?
@@ -3100,11 +3100,9 @@ public class NotificationPanelView extends PanelView implements
     @Override
     public void onHeadsUpPinnedModeChanged(final boolean inPinnedMode) {
         if (inPinnedMode) {
-			mHeadsUpShowing = true;
             mHeadsUpExistenceChangedRunnable.run();
             updateNotificationTranslucency();
         } else {
-			mHeadsUpShowing = false;
             mHeadsUpAnimatingAway = true;
             mNotificationStackScroller.runAfterAnimationFinished(
                     mHeadsUpExistenceChangedRunnable);
@@ -3282,7 +3280,7 @@ public class NotificationPanelView extends PanelView implements
                     resolver, Settings.Secure.STATUS_BAR_LOCKED_ON_SECURE_KEYGUARD, 1,
                     UserHandle.USER_CURRENT) == 1;
             mDoubleTapToSleepAnywhere = Settings.System.getIntForUser(resolver,
-                    Settings.System.DOUBLE_TAP_SLEEP_ANYWHERE, 0, UserHandle.USER_CURRENT) == 1;
+                    Settings.System.DOUBLE_TAP_SLEEP_ANYWHERE, 1, UserHandle.USER_CURRENT) == 1;
         mQsColorSwitch = Settings.System.getIntForUser(mContext.getContentResolver(),
                 Settings.System.QS_COLOR_SWITCH, 0,
                 UserHandle.USER_CURRENT) == 1;

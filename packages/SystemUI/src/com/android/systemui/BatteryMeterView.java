@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2013-14 The Android Open Source Project
- * Copyright (C) 2016 The CyanogenMod Project
+ * Copyright (C) 2016 The BlurOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ import android.provider.Settings;
 import com.android.systemui.statusbar.policy.BatteryController;
 import com.android.systemui.statusbar.policy.BatteryStateRegistar;
 
-import org.cyanogenmod.graphics.drawable.StopMotionVectorDrawable;
+import org.bluros.graphics.drawable.StopMotionVectorDrawable;
 
 public class BatteryMeterView extends View implements DemoMode,
         BatteryController.BatteryStateChangeCallback {

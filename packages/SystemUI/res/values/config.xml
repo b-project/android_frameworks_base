@@ -34,7 +34,7 @@
     <bool name="config_recents_use_hardware_layers">false</bool>
 
     <!-- The number of app thumbnails we keep in memory -->
-    <integer name="config_recents_max_thumbnail_count">10</integer>
+    <integer name="config_recents_max_thumbnail_count">30</integer>
 
     <!-- The number of app icons we keep in memory -->
     <integer name="config_recents_max_icon_count">20</integer>

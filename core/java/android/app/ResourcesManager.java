@@ -610,7 +610,7 @@ public class ResourcesManager {
             }
             piAndroid = getPackageManager().getPackageInfo("android", 0,
                     UserHandle.getCallingUserId());
-            piCm = getPackageManager().getPackageInfo("cyanogenmod.platform", 0,
+            piCm = getPackageManager().getPackageInfo("bluros.platform", 0,
                     UserHandle.getCallingUserId());
         } catch (RemoteException e) {
         }

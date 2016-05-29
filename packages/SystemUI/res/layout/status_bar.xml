@@ -91,7 +91,15 @@
 					android:layout_gravity="center_vertical"
                     android:paddingEnd="4dip"
                     android:singleLine="true"
-					layout="@layout/signal_cluster_view" />     
+					layout="@layout/signal_cluster_view" />    
+					
+				<com.android.systemui.statusbar.policy.NetworkTraffic
+					android:id="@+id/networkTraffic"
+					android:layout_width="wrap_content"
+					android:layout_height="match_parent"
+					android:singleLine="false"
+					android:fontFamily="sans-serif-condensed"
+					android:gravity="right|center_vertical"/> 
 					              
                  <com.android.systemui.statusbar.policy.Clock
                     android:id="@+id/left_clock"
@@ -138,15 +146,6 @@
             android:layout_height="match_parent"
             android:orientation="horizontal"
             >
-            <com.android.systemui.statusbar.policy.NetworkTraffic
-                android:id="@+id/networkTraffic"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:singleLine="false"
-                android:fontFamily="sans-serif-condensed"
-                android:gravity="right|center_vertical"/>
-
-
             <TextView
                 android:id="@+id/weather_temp"
                 android:layout_width="wrap_content"
@@ -167,10 +166,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="@dimen/header_battery_margin_keyguard"
                 android:textColor="@color/status_bar_battery_level_text_color"
-                android:textSize="@dimen/battery_level_text_size"
-                android:background="@drawable/somc_sys_battery_percent_am"
-                android:paddingStart="@dimen/header_battery_somc_keyguard"
-                android:gravity="center|start" />
+                android:textSize="@dimen/battery_level_text_size" />
 
             <com.android.systemui.BatteryLevelTextView android:id="@+id/dock_battery_level_text"
                 android:layout_width="wrap_content"
@@ -179,16 +175,13 @@
                 android:layout_marginStart="@dimen/header_battery_margin_keyguard"
                 android:textColor="@color/status_bar_battery_level_text_color"
                 android:textSize="@dimen/battery_level_text_size"
-                android:visibility="gone"
-                android:background="@drawable/somc_sys_battery_percent_am"
-                android:paddingStart="@dimen/header_battery_somc_keyguard"
-                android:gravity="center|start" />
+                android:visibility="gone" />
 
             <com.android.systemui.statusbar.policy.Clock
                 android:id="@+id/clock"
                 android:textAppearance="@style/TextAppearance.StatusBar.Clock"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_width="0.0dp"
+                android:layout_height="0.0dp"
                 android:singleLine="true"
                 android:paddingStart="3dp"
                 android:gravity="center_vertical|start"

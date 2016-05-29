@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 The CyanogenMod Project
+ * Copyright (C) 2014 The BlurOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,15 +23,15 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Handler;
 import android.util.Log;
-import cyanogenmod.providers.WeatherContract;
-import cyanogenmod.weather.util.WeatherUtils;
+import bluros.providers.WeatherContract;
+import bluros.weather.util.WeatherUtils;
 
 import java.util.ArrayList;
 
-import static cyanogenmod.providers.WeatherContract.WeatherColumns.CURRENT_CITY;
-import static cyanogenmod.providers.WeatherContract.WeatherColumns.CURRENT_CONDITION;
-import static cyanogenmod.providers.WeatherContract.WeatherColumns.CURRENT_TEMPERATURE;
-import static cyanogenmod.providers.WeatherContract.WeatherColumns.CURRENT_TEMPERATURE_UNIT;
+import static bluros.providers.WeatherContract.WeatherColumns.CURRENT_CITY;
+import static bluros.providers.WeatherContract.WeatherColumns.CURRENT_CONDITION;
+import static bluros.providers.WeatherContract.WeatherColumns.CURRENT_TEMPERATURE;
+import static bluros.providers.WeatherContract.WeatherColumns.CURRENT_TEMPERATURE_UNIT;
 
 public class WeatherControllerImpl implements WeatherController {
 
@@ -41,9 +41,9 @@ public class WeatherControllerImpl implements WeatherController {
     private Handler mHandler;
 
     public static final ComponentName COMPONENT_WEATHER_FORECAST = new ComponentName(
-            "com.cyanogenmod.lockclock", "com.cyanogenmod.lockclock.weather.ForecastActivity");
+            "com.bluros.lockclock", "com.bluros.lockclock.weather.ForecastActivity");
     public static final String ACTION_FORCE_WEATHER_UPDATE
-            = "com.cyanogenmod.lockclock.action.FORCE_WEATHER_UPDATE";
+            = "com.bluros.lockclock.action.FORCE_WEATHER_UPDATE";
     private static final String[] WEATHER_PROJECTION = new String[]{
             CURRENT_TEMPERATURE,
             CURRENT_TEMPERATURE_UNIT,

@@ -169,7 +169,7 @@ public class TaskStackView extends FrameLayout implements TaskStack.TaskStackCal
         if( mShakeSensorManager == null)
             return;
         if (enableShakeClean) {
-            mShakeSensorManager.enable(20);
+            mShakeSensorManager.enable(10);
         } else {
             mShakeSensorManager.disable();
         }

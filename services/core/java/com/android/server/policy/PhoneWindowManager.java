@@ -91,7 +91,7 @@ import android.telecom.TelecomManager;
 import android.service.gesture.EdgeGestureManager;
 import com.android.internal.os.DeviceKeyHandler;
 import com.android.internal.util.cm.ActionUtils;
-import cyanogenmod.providers.CMSettings;
+import bluros.providers.CMSettings;
 import dalvik.system.DexClassLoader;
 import android.text.Html;
 import android.util.DisplayMetrics;
@@ -162,7 +162,7 @@ import static android.view.WindowManagerPolicy.WindowManagerFuncs.LID_CLOSED;
 import static android.view.WindowManagerPolicy.WindowManagerFuncs.CAMERA_LENS_COVER_ABSENT;
 import static android.view.WindowManagerPolicy.WindowManagerFuncs.CAMERA_LENS_UNCOVERED;
 import static android.view.WindowManagerPolicy.WindowManagerFuncs.CAMERA_LENS_COVERED;
-import static org.cyanogenmod.platform.internal.Manifest.permission.THIRD_PARTY_KEYGUARD;
+import static org.bluros.platform.internal.Manifest.permission.THIRD_PARTY_KEYGUARD;
 
 /**
  * WindowManagerPolicy implementation for the Android phone UI.  This

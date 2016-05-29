@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 The CyanogenMod Project
+ * Copyright (C) 2015 The BlurOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package com.android.systemui.qs.tiles;
 
-import static cyanogenmod.hardware.LiveDisplayManager.FEATURE_MANAGED_OUTDOOR_MODE;
-import static cyanogenmod.hardware.LiveDisplayManager.MODE_DAY;
-import static cyanogenmod.hardware.LiveDisplayManager.MODE_OUTDOOR;
+import static bluros.hardware.LiveDisplayManager.FEATURE_MANAGED_OUTDOOR_MODE;
+import static bluros.hardware.LiveDisplayManager.MODE_DAY;
+import static bluros.hardware.LiveDisplayManager.MODE_OUTDOOR;
 
 import android.content.Intent;
 import android.content.res.Resources;
@@ -31,10 +31,10 @@ import com.android.internal.util.ArrayUtils;
 import com.android.systemui.R;
 import com.android.systemui.qs.QSTile;
 
-import org.cyanogenmod.internal.logging.CMMetricsLogger;
+import org.bluros.internal.logging.CMMetricsLogger;
 
-import cyanogenmod.hardware.LiveDisplayManager;
-import cyanogenmod.providers.CMSettings;
+import bluros.hardware.LiveDisplayManager;
+import bluros.providers.CMSettings;
 
 /** Quick settings tile: LiveDisplay mode switcher **/
 public class LiveDisplayTile extends QSTile<LiveDisplayTile.LiveDisplayState> {
@@ -84,10 +84,10 @@ public class LiveDisplayTile extends QSTile<LiveDisplayTile.LiveDisplayState> {
 
     private void updateEntries() {
         Resources res = mContext.getResources();
-        mEntries = res.getStringArray(org.cyanogenmod.platform.internal.R.array.live_display_entries);
+        mEntries = res.getStringArray(org.bluros.platform.internal.R.array.live_display_entries);
         mDescriptionEntries = res.getStringArray(R.array.live_display_description);
         mAnnouncementEntries = res.getStringArray(R.array.live_display_announcement);
-        mValues = res.getStringArray(org.cyanogenmod.platform.internal.R.array.live_display_values);
+        mValues = res.getStringArray(org.bluros.platform.internal.R.array.live_display_values);
     }
 
     @Override

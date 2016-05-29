@@ -13,7 +13,7 @@ import com.android.systemui.R;
 import com.android.systemui.cm.UserContentObserver;
 import com.android.systemui.statusbar.policy.Clock;
 
-import cyanogenmod.providers.CMSettings;
+import bluros.providers.CMSettings;
 
 /**
  * To control your...clock
@@ -86,7 +86,7 @@ public class ClockController {
             case STYLE_CLOCK_RIGHT:
             case STYLE_HIDE_CLOCK:
             default:
-                clockForAlignment = mRightClock;
+                clockForAlignment = mCenterClock;
                 break;
         }
         return clockForAlignment;

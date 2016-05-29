@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 The CyanogenMod Project
+ * Copyright (C) 2015 The BlurOS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import com.android.systemui.R;
-import cyanogenmod.providers.CMSettings;
+import bluros.providers.CMSettings;
 
 /**
  * The guts of a media notification revealed when performing a long press.

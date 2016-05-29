@@ -138,7 +138,7 @@ import com.android.systemui.statusbar.policy.HeadsUpManager;
 import com.android.systemui.statusbar.policy.PreviewInflater;
 import com.android.systemui.statusbar.stack.NotificationStackScrollLayout;
 import com.android.systemui.recents.RecentsActivity;
-import cyanogenmod.providers.CMSettings;
+import bluros.providers.CMSettings;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

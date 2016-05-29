@@ -16,11 +16,11 @@ import com.android.systemui.statusbar.StatusBarState;
 import com.android.systemui.statusbar.phone.NotificationPanelView;
 import com.android.systemui.statusbar.phone.PhoneStatusBar;
 
-import cyanogenmod.app.CMContextConstants;
-import cyanogenmod.app.ILiveLockScreenChangeListener;
-import cyanogenmod.app.ILiveLockScreenManager;
-import cyanogenmod.app.LiveLockScreenInfo;
-import cyanogenmod.externalviews.KeyguardExternalView;
+import bluros.app.CMContextConstants;
+import bluros.app.ILiveLockScreenChangeListener;
+import bluros.app.ILiveLockScreenManager;
+import bluros.app.LiveLockScreenInfo;
+import bluros.externalviews.KeyguardExternalView;
 
 import java.util.Objects;
 

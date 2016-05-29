@@ -68,7 +68,7 @@ import com.android.systemui.statusbar.phone.NotificationPanelView;
 import com.android.systemui.statusbar.phone.NavigationBarView;
 import com.android.systemui.statusbar.phone.PhoneStatusBar;
 import com.android.systemui.recents.views.TaskStackView;
-import cyanogenmod.providers.CMSettings;
+import bluros.providers.CMSettings;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;

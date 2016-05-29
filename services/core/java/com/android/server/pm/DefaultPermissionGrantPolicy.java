@@ -574,7 +574,7 @@ final class DefaultPermissionGrantPolicy {
 
 	    // LockClock
 	    PackageParser.Package lockClock = getDefaultProviderAuthorityPackageLPr(
-		    "com.cyanogenmod.lockclock", userId);
+		    "com.bluros.lockclock", userId);
 	    if (lockClock != null) {
 		grantRuntimePermissionsLPw(lockClock, LOCATION_PERMISSIONS, true, userId);
 	    }

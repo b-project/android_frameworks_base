@@ -50,7 +50,7 @@ public class NetworkTraffic extends TextView {
         decimalFormat.setMaximumFractionDigits(1);
     }
 
-    private int mState = 0;
+    private int mState = 3;
     private boolean mAttached;
     private long totalRxBytes;
     private long totalTxBytes;

@@ -144,7 +144,7 @@
     <uses-permission android:name="android.permission.HARDWARE_ABSTRACTION_ACCESS" />
 
     <!-- Weather -->
-    <uses-permission android:name="com.cyanogenmod.lockclock.permission.READ_WEATHER" />
+    <uses-permission android:name="com.bluros.lockclock.permission.READ_WEATHER" />
 
     <!-- Action target -->
     <uses-permission android:name="android.permission.FORCE_STOP_PACKAGES" />
@@ -163,9 +163,9 @@
     <uses-permission android:name="android.permission.RECOVERY" />
 
     <!-- Themes tile -->
-    <uses-permission android:name="cyanogenmod.permission.ACCESS_THEME_MANAGER" />
-    <uses-permission android:name="cyanogenmod.permission.READ_THEMES" />
-    <uses-permission android:name="cyanogenmod.permission.WRITE_THEMES" />
+    <uses-permission android:name="bluros.permission.ACCESS_THEME_MANAGER" />
+    <uses-permission android:name="bluros.permission.READ_THEMES" />
+    <uses-permission android:name="bluros.permission.WRITE_THEMES" />
 
     <!-- Visualizer -->
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
@@ -557,60 +557,6 @@
 		 <activity
 			android:name=".n2"
 			android:label="Dots" >
-			<intent-filter>
-				<action android:name="org.omnirom.DaylightHeaderPack1" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-		</activity>
-		<activity
-			android:name=".rr1"
-			android:label="PitchBlack" >
-			<intent-filter>
-				<action android:name="org.omnirom.DaylightHeaderPack1" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-		</activity>
-		<activity
-			android:name=".rr"
-			android:label="RR-1" >
-			<intent-filter>
-				<action android:name="org.omnirom.DaylightHeaderPack1" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-		</activity>
-		<activity
-			android:name=".rr2"
-			android:label="RR-2" >
-			<intent-filter>
-				<action android:name="org.omnirom.DaylightHeaderPack1" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-		</activity>
-		<activity
-			android:name=".rr3"
-			android:label="RR-3" >
-			<intent-filter>
-				<action android:name="org.omnirom.DaylightHeaderPack1" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-		</activity>
-		<activity
-			android:name=".rr4"
-			android:label="RR-4" >
-			<intent-filter>
-				<action android:name="org.omnirom.DaylightHeaderPack1" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-		</activity>
-		<activity
-			android:name=".rr5"
-			android:label="RR-5" >
 			<intent-filter>
 				<action android:name="org.omnirom.DaylightHeaderPack1" />
 
