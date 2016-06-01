@@ -5867,6 +5867,7 @@ public final class Settings {
             PUBLIC_SETTINGS.add(SOUND_EFFECTS_ENABLED);
             PUBLIC_SETTINGS.add(HAPTIC_FEEDBACK_ENABLED);
             PUBLIC_SETTINGS.add(SHOW_WEB_SUGGESTIONS);
+            PUBLIC_SETTINGS.add(SHOW_ALARM_FULLSCREEN);
             PUBLIC_SETTINGS.add(POWER_OFF_ALARM_MODE);
         }
 
