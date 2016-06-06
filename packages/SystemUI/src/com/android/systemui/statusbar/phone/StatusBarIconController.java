@@ -56,6 +56,7 @@ import com.android.systemui.statusbar.StatusBarIconView;
 import com.android.systemui.statusbar.policy.Clock;
 import com.android.systemui.tuner.TunerService;
 import com.android.systemui.tuner.TunerService.Tunable;
+import com.android.systemui.statusbar.policy.NetworkTraffic;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -134,6 +135,8 @@ public class StatusBarIconController implements Tunable {
 
     private TextView mCarrierLabel;
     private int mCarrierLabelMode;
+    
+    private NetworkTraffic mNetworkTraffic;
 
     private final ArraySet<String> mIconBlacklist = new ArraySet<>();
 
@@ -174,6 +177,8 @@ public class StatusBarIconController implements Tunable {
 
         mClockController = new ClockController(statusBar, mNotificationIcons, mHandler);
         mCenterClockLayout = statusBar.findViewById(R.id.center_clock_layout);
+        
+        mNetworkTraffic = (NetworkTraffic) statusBar.findViewById(R.id.networkTraffic);
 
         SettingsObserver settingsObserver = new SettingsObserver(mHandler);
         settingsObserver.observe();
@@ -563,6 +568,7 @@ public class StatusBarIconController implements Tunable {
         }
         mBatteryMeterView.setDarkIntensity(mDarkIntensity);
         mClockController.setTextColor(mIconTint);
+        mNetworkTraffic.setTextColor(mIconTint);
         applyNotificationIconsTint();	
     }
 

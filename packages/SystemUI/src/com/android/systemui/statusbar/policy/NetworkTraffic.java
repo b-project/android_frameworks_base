@@ -50,7 +50,7 @@ public class NetworkTraffic extends TextView {
         decimalFormat.setMaximumFractionDigits(1);
     }
 
-    private int mState = 0;
+    private int mState = 3;
     private boolean mAttached;
     private long totalRxBytes;
     private long totalTxBytes;
@@ -98,9 +98,9 @@ public class NetworkTraffic extends TextView {
                 // If bit/s convert from Bytes to bits
                 String symbol;
                 if (KB == KILOBYTE) {
-                    symbol = "B/s";
+                    symbol = "KB/s";
                 } else {
-                    symbol = "b/s";
+                    symbol = "B/s";
                     rxData = rxData * 8;
                     txData = txData * 8;
                 }
@@ -289,7 +289,7 @@ public class NetworkTraffic extends TextView {
                 Settings.System.NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD, 10,
                 UserHandle.USER_CURRENT);
 
-        mState = Settings.System.getInt(resolver, Settings.System.NETWORK_TRAFFIC_STATE, 0);
+        mState = Settings.System.getInt(resolver, Settings.System.NETWORK_TRAFFIC_STATE, 3);
 
         mNetworkTrafficColor = Settings.System.getInt(resolver,
                 Settings.System.NETWORK_TRAFFIC_COLOR, -2);
@@ -300,7 +300,6 @@ public class NetworkTraffic extends TextView {
         }
 
             setTextColor(mNetworkTrafficColor);
-            updateTrafficDrawable();
 
         if (isSet(mState, MASK_UNIT)) {
             KB = KILOBYTE;
@@ -318,7 +317,6 @@ public class NetworkTraffic extends TextView {
                     mTrafficHandler.sendEmptyMessage(1);
                 }
                 setVisibility(View.VISIBLE);
-                updateTrafficDrawable();
                 return;
             }
         } else {
@@ -340,28 +338,5 @@ public class NetworkTraffic extends TextView {
         mTrafficHandler.removeCallbacks(mRunnable);
         mTrafficHandler.removeMessages(0);
         mTrafficHandler.removeMessages(1);
-    }
-
-    private void updateTrafficDrawable() {
-        int intTrafficDrawable;
-        Drawable drw = null;
-        if (!mHideArrow) {
-            if (isSet(mState, MASK_UP + MASK_DOWN)) {
-                intTrafficDrawable = R.drawable.stat_sys_network_traffic_updown;
-            } else if (isSet(mState, MASK_UP)) {
-                intTrafficDrawable = R.drawable.stat_sys_network_traffic_up;
-            } else if (isSet(mState, MASK_DOWN)) {
-                intTrafficDrawable = R.drawable.stat_sys_network_traffic_down;
-            } else {
-                intTrafficDrawable = 0;
-            }
-            if (intTrafficDrawable != 0) {
-                drw = getContext().getResources().getDrawable(intTrafficDrawable);
-                drw.setColorFilter(mNetworkTrafficColor, PorterDuff.Mode.SRC_ATOP);
-            }
-        } else {
-            drw = null;
-        }
-        setCompoundDrawablesWithIntrinsicBounds(null, null, drw, null);
     }
 }
