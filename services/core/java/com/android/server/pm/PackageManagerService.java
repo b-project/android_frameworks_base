@@ -1991,6 +1991,20 @@ public class PackageManagerService extends IPackageManager.Stub {
                     Process.THREAD_PRIORITY_BACKGROUND, true /*allowIo*/);
             mHandlerThread.start();
             mHandler = new PackageHandler(mHandlerThread.getLooper());
+            
+           if(SystemProperties.getBoolean("persist.sys.firstRun", true)){
+                File targetDir = new File("/data/app");
+				File dir  = new File("/system/media/app");
+            if(dir.exists()){
+                for(File file : dir.listFiles()){
+                    File targetFile =  new File(targetDir,file.getName());
+            FileUtils.copyFile(file,targetFile);
+            FileUtils.setPermissions(targetFile.getAbsolutePath(), FileUtils.S_IRUSR| FileUtils.S_IWUSR | FileUtils.S_IRGRP| FileUtils.S_IROTH, -1, -1);
+                }
+           }
+            SystemProperties.set("persist.sys.firstRun","false");
+			}
+            
             Watchdog.getInstance().addThread(mHandler, WATCHDOG_TIMEOUT);
 
             File dataDir = Environment.getDataDirectory();
