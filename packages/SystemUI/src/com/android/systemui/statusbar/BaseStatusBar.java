@@ -1343,7 +1343,7 @@ public abstract class BaseStatusBar extends SystemUI implements
 
     @Override
     public void toggleRecentApps() {
-        RecentsActivity.startBlurTask();
+      //  RecentsActivity.startBlurTask();
         toggleRecents();
     }
 
