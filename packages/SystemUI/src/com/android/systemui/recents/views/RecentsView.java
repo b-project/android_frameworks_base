@@ -582,7 +582,7 @@ public  class RecentsView extends FrameLayout implements TaskStackView.TaskStack
     public void checkstyle(int style) {
 	final ContentResolver resolver = mContext.getContentResolver();
 	mButtonsRotation =  Settings.System.getInt(mContext.getContentResolver(),
-				 Settings.System.RECENTS_ROTATE_FAB, 0) == 1;	
+				 Settings.System.RECENTS_ROTATE_FAB, 1) == 1;	
 	mClearStyle = Settings.System.getIntForUser(
                     resolver, Settings.System.CLEAR_RECENTS_STYLE, 0,
                     UserHandle.USER_CURRENT);	
@@ -884,12 +884,12 @@ public  class RecentsView extends FrameLayout implements TaskStackView.TaskStack
 		Animation animation16 = AnimationUtils.loadAnimation(mContext, R.anim.rotate_super_slow);
 	        Animation animationdefault = AnimationUtils.loadAnimation(mContext, R.anim.fab_deault);
 		mButtonsRotation =  Settings.System.getInt(mContext.getContentResolver(),
-				 Settings.System.RECENTS_ROTATE_FAB, 0) == 1;	
+				 Settings.System.RECENTS_ROTATE_FAB, 1) == 1;	
 		int mAnimStyle =  Settings.System.getIntForUser(
-                    resolver, Settings.System.FAB_ANIMATION_STYLE, 0,
+                    resolver, Settings.System.FAB_ANIMATION_STYLE, 1,
                     UserHandle.USER_CURRENT);
                 boolean ClearallTasks =   Settings.System.getInt(mContext.getContentResolver(),
-		     Settings.System.RECENTS_CLEAR_ALL_DISMISS_ALL, 0) == 1;	
+		     Settings.System.RECENTS_CLEAR_ALL_DISMISS_ALL, 1) == 1;	
 		if(mButtonsRotation) {	
 			if (mAnimStyle ==0) {	
 			mFloatingButton.startAnimation(animation);
@@ -976,7 +976,7 @@ public  class RecentsView extends FrameLayout implements TaskStackView.TaskStack
         boolean showDate = Settings.System.getIntForUser(mContext.getContentResolver(),
                 Settings.System.RECENTS_FULL_SCREEN_DATE, 0, UserHandle.USER_CURRENT) != 0;
         boolean fullscreenEnabled = Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.IMMERSIVE_RECENTS, 0, UserHandle.USER_CURRENT) != 0;
+                Settings.System.IMMERSIVE_RECENTS, 1, UserHandle.USER_CURRENT) != 0;
 
         if (fullscreenEnabled) {
             if (showClock) {
@@ -1219,7 +1219,7 @@ public  class RecentsView extends FrameLayout implements TaskStackView.TaskStack
         final Runnable launchRunnable = new Runnable() {
             @Override
             public void run() {
-                TaskStackView.enableShake(false);
+				TaskStackView.enableShake(false);
                 if (task.isActive) {
                     // Bring an active task to the foreground
                     ssp.moveTaskToFront(task.key.id, launchOpts);
