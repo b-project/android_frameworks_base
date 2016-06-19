@@ -473,7 +473,6 @@ public class QSPanel extends ViewGroup {
             public void onClick(View v) {
                 r.tile.click();
                 setAnimationTile(r);
-                vibrateTile(20);
             }
         };
         final View.OnClickListener clickSecondary = new View.OnClickListener() {
@@ -481,7 +480,6 @@ public class QSPanel extends ViewGroup {
             public void onClick(View v) {
                 r.tile.secondaryClick();
                 setAnimationTile(r);
-                vibrateTile(20);
             }
         };
         final View.OnLongClickListener longClick = new View.OnLongClickListener() {
@@ -489,7 +487,6 @@ public class QSPanel extends ViewGroup {
             public boolean onLongClick(View v) {
                 r.tile.longClick();
                 setAnimationTile(r);
-                vibrateTile(20);
                 return true;
             }
         };

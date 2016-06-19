@@ -108,6 +108,8 @@
     <!-- The number of columns in the QuickSettings -->
     <integer name="quick_settings_num_columns">3</integer>
 
+	<integer name="quick_settings_num_rows">3</integer>
+	
     <!-- The maximum number of rows in the QuickSettings -->
     <integer name="quick_settings_max_rows">3</integer>
 
@@ -119,7 +121,7 @@
 
     <!-- The default tiles to display in QuickSettings -->
     <string name="quick_settings_tiles_default" translatable="false">
-        wifi,bt,inversion,cell,airplane,dnd,rotation,flashlight,location,cast,hotspot,adb_network,compass,nfc,float_mode,pie,profiles,sync,volume_panel,usb_tether,screen_timeout,performance,ambient_display,live_display,music,brightness,screen_off,screenshot,expanded_desktop,reboot,configurations,heads_up,lte,themes,navbar,appcirclebar,kernel_adiutor,screenrecord,gesture_anywhere,battery_saver,power_menu,app_picker,kill_app,caffeine,hw_keys,pulse,sound,visualizer,lockscreen
+        wifi,bt,inversion,cell,airplane,dnd,rotation,flashlight,location,cast,hotspot,adb_network,compass,nfc,float_mode,pie,profiles,sync,volume_panel,usb_tether,screen_timeout,performance,ambient_display,live_display,music,brightness,screen_off,screenshot,expanded_desktop,reboot,configurations,heads_up,lte,themes,navbar,appcirclebar,screenrecord,gesture_anywhere,battery_saver,power_menu,app_picker,kill_app,caffeine,hw_keys,pulse,sound,lockscreen
     </string>
 
     <!-- The default tiles to reset to in QuickSettings -->

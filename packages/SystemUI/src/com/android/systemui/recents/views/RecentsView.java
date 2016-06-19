@@ -441,7 +441,7 @@ public  class RecentsView extends FrameLayout implements TaskStackView.TaskStack
         if (mFloatingButton != null && showClearAllRecents) {
             int clearRecentsLocation = Settings.System.getIntForUser(
                 mContext.getContentResolver(), Settings.System.RECENTS_CLEAR_ALL_LOCATION,
-            Constants.DebugFlags.App.RECENTS_CLEAR_ALL_BOTTOM_RIGHT, UserHandle.USER_CURRENT);
+            Constants.DebugFlags.App.RECENTS_CLEAR_ALL_BOTTOM_CENTER, UserHandle.USER_CURRENT);
 
             FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)
                     mFloatingButton.getLayoutParams();
@@ -550,7 +550,7 @@ public  class RecentsView extends FrameLayout implements TaskStackView.TaskStack
 	final ContentResolver resolver = mContext.getContentResolver();
         mFloatingButton = ((View)getParent()).findViewById(R.id.floating_action_button);
 	mClearStyle = Settings.System.getIntForUser(
-                    resolver, Settings.System.CLEAR_RECENTS_STYLE, 0,
+                    resolver, Settings.System.CLEAR_RECENTS_STYLE, 1,
                     UserHandle.USER_CURRENT);
         mClearStyleSwitch  = Settings.System.getInt(mContext.getContentResolver(),
 				 Settings.System.CLEAR_RECENTS_STYLE_ENABLE, 0) == 1;
@@ -584,11 +584,11 @@ public  class RecentsView extends FrameLayout implements TaskStackView.TaskStack
 	mButtonsRotation =  Settings.System.getInt(mContext.getContentResolver(),
 				 Settings.System.RECENTS_ROTATE_FAB, 1) == 1;	
 	mClearStyle = Settings.System.getIntForUser(
-                    resolver, Settings.System.CLEAR_RECENTS_STYLE, 0,
+                    resolver, Settings.System.CLEAR_RECENTS_STYLE, 1,
                     UserHandle.USER_CURRENT);	
         final Resources res = getContext().getResources();
         mClearStyleSwitch  = Settings.System.getInt(mContext.getContentResolver(),
-				 Settings.System.CLEAR_RECENTS_STYLE_ENABLE, 0) == 1;	
+				 Settings.System.CLEAR_RECENTS_STYLE_ENABLE, 1) == 1;	
 	mfabcolor = Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.FAB_BUTTON_COLOR, 0xffDC4C3C);	
 	int mbarcolor = Settings.System.getInt(mContext.getContentResolver(),

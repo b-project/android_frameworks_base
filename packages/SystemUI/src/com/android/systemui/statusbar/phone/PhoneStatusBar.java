@@ -722,21 +722,27 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 	resolver.registerContentObserver(Settings.System.getUriFor(
 			Settings.System.CLEAR_RECENTS_STYLE_ENABLE),
 			false, this, UserHandle.USER_ALL);
-        resolver.registerContentObserver(Settings.System.getUriFor(
+    resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.BATTERY_SAVER_MODE_COLOR),
                     false, this, UserHandle.USER_ALL);
-        resolver.registerContentObserver(Settings.System.getUriFor(
+    resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAVBAR_TINT_SWITCH),
                     false, this, UserHandle.USER_ALL);
 	resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAVBAR_BUTTON_COLOR),
                     false, this, UserHandle.USER_ALL);
-        resolver.registerContentObserver(Settings.Secure.getUriFor(
+    resolver.registerContentObserver(Settings.Secure.getUriFor(
                     Settings.Secure.FLING_PULSE_ENABLED),
                     false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
+    resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SHAKE_CLEAN_NOTIFICATION),
-                    false, this, UserHandle.USER_ALL);                   
+                    false, this, UserHandle.USER_ALL);  
+	resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_NUM_TILE_COLUMNS), false, this,
+                    UserHandle.USER_ALL);    
+	resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_NUM_TILE_ROWS), false, this,
+                    UserHandle.USER_ALL);             
 		    update();
         }
 
@@ -1100,6 +1106,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             }
             if (mIconPolicy != null) {
                 mIconPolicy.setCurrentUserSetup(mUserSetup);
+            }
+            if (mQSPanel != null) {
+                mQSPanel.updateQSLayout();
             }
         }
     };
