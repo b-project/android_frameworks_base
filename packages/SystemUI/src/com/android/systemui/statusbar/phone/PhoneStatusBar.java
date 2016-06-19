@@ -431,7 +431,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
     private QSTileHost mQSTileHost;
 
-
     // task manager
     private TaskManager mTaskManager;
     private LinearLayout mTaskManagerPanel;
@@ -1518,7 +1517,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             addAppCircleSidebar();
         }
 
-
         if (mAssistManager == null) {
             mAssistManager = new AssistManager(this, context);
         }
@@ -1619,7 +1617,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         // Background thread for any controllers that need it.
         mHandlerThread = new HandlerThread(TAG, Process.THREAD_PRIORITY_BACKGROUND);
         mHandlerThread.start();
-
+        
         // Other icons
         if (mLocationController == null) {
             mLocationController = new LocationControllerImpl(mContext,
@@ -1650,12 +1648,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     // noop
                 }
             });
-        }
+        }    
         if (mBatteryManager.isDockBatterySupported()) {
             if (mDockBatteryController == null) {
                 mDockBatteryController = new DockBatteryController(mContext, mHandler);
             }
-        }
+		}
         if (mNetworkController == null) {
             mNetworkController = new NetworkControllerImpl(mContext, mHandlerThread.getLooper());
         }
@@ -1731,6 +1729,12 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                         mHandler);
             }
         }
+        mKeyguardUserSwitcher = new KeyguardUserSwitcher(mContext,
+                (ViewStub) mStatusBarWindowContent.findViewById(R.id.keyguard_user_switcher),
+                mKeyguardStatusBar, mNotificationPanel, mUserSwitcherController);
+        if (mWeatherController == null) {
+            mWeatherController = new WeatherControllerImpl(mContext);
+        }
 
         mWeatherTempStyle = Settings.System.getIntForUser(
                 mContext.getContentResolver(), Settings.System.STATUS_BAR_WEATHER_TEMP_STYLE, 0,
@@ -1778,8 +1782,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         mKeyguardUserSwitcher = new KeyguardUserSwitcher(mContext,
                 (ViewStub) mStatusBarWindowContent.findViewById(R.id.keyguard_user_switcher),
                 mKeyguardStatusBar, mNotificationPanel, mUserSwitcherController);
-
-
         // Set up the quick settings tile panel
         mQSPanel = (QSDragPanel) mStatusBarWindowContent.findViewById(R.id.quick_settings_panel);
         if (mQSPanel != null) {
@@ -1871,7 +1873,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 }
             });
         }
-
 
         // Task manager
         mTaskManagerPanel =
@@ -4609,6 +4610,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 mNetworkController.removeEmergencyListener(mHeader);
             }
         }
+        if (mLiveLockScreenController != null) {
+            mLiveLockScreenController.cleanup();
+        }    
         if (mHeadsUpManager != null) {
             mHeadsUpManager.removeListener(mNotificationPanel);
             mHeadsUpManager.removeListener(mScrimController);
@@ -4618,9 +4622,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
         }
         if (mKeyguardIndicationController != null) {
             mKeyguardIndicationController.cleanup();
-        }
-        if (mLiveLockScreenController != null) {
-            mLiveLockScreenController.cleanup();
         }
 
         mKeyguardBottomArea.cleanup();
@@ -4636,7 +4637,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             StatusBarIconView iconView = (StatusBarIconView) statusIcons.getChildAt(i);
             icons.add(iconView.getStatusBarIcon());
             iconSlots.add(iconView.getStatusBarSlot());
-        }	
+        }
+
         removeAllViews(mStatusBarWindowContent);
 
         // extract notifications.
