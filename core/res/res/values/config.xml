@@ -2588,18 +2588,6 @@
          true will use SystemClock.elapsedRealtimeNanos() to set timestamp. -->
     <bool name="config_useSystemClockforSensors">false</bool>
 
-<<<<<<< HEAD
     <!-- Whether to persist the notification for when a usb drive device is plugged in -->
     <bool name="config_persistUsbDriveNotification">false</bool>
-=======
-         The default value is false which represents AOSP behavior. -->
-    <bool name="config_smsUseExpectMore">false</bool>
-
-    <!-- Automatic power profile management per app.
-         Each item should list the fully-qualified activity
-         name and the power profile id, separated by a comma. -->
-    <string-array name="config_auto_perf_activities" translatable="false">
-    </string-array>
-
->>>>>>> 7695fad... perf: Improve performance profiles
 </resources>
