@@ -493,7 +493,6 @@
 
         <service
             android:name=".screenshot.ScreenshotEditor"
-            android:theme="@style/ScreenshotEditorStyle"
             android:enabled="true"
             android:exported="true" />
 
