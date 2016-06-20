@@ -43,6 +43,7 @@ import android.graphics.PointF;
 import android.media.MediaActionSound;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -292,16 +293,26 @@ class SaveImageInBackgroundTask extends AsyncTask<SaveImageInBackgroundData, Voi
                         r.getString(com.android.internal.R.string.share),
                         PendingIntent.getActivity(context, 0, chooserIntent,
                                 PendingIntent.FLAG_CANCEL_CURRENT));
+                // Create an edit action for the notification
+                final Intent editIntent = new Intent(context, GlobalScreenshot.EditScreenshotActivity.class);
+                editIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        | Intent.FLAG_ACTIVITY_NEW_TASK);
+                final PendingIntent editAction = PendingIntent.getActivity(context,  0,
+                        editIntent.putExtra(GlobalScreenshot.CANCEL_ID, mNotificationId)
+                                .putExtra(GlobalScreenshot.SCREENSHOT_FILE_PATH, mImageFilePath),
+                        PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_ONE_SHOT);
+                mNotificationBuilder.addAction(R.drawable.ic_image_edit,
+                        r.getString(R.string.action_edit), editAction);
 
-            // Create a delete action for the notification
-            final PendingIntent deleteAction = PendingIntent.getBroadcast(context,  0,
-                    new Intent(context, GlobalScreenshot.DeleteScreenshotReceiver.class)
-                            .putExtra(GlobalScreenshot.CANCEL_ID, mNotificationId)
-                            .putExtra(GlobalScreenshot.SCREENSHOT_URI_ID, uri.toString()),
-                    PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_ONE_SHOT);
-            mNotificationBuilder.addAction(R.drawable.ic_screenshot_delete,
-                    r.getString(com.android.internal.R.string.delete), deleteAction);
-
+                // Create a delete action for the notification
+                final PendingIntent deleteAction = PendingIntent.getBroadcast(context,  0,
+                        new Intent(context, GlobalScreenshot.DeleteScreenshotReceiver.class)
+                                .putExtra(GlobalScreenshot.CANCEL_ID, mNotificationId)
+                                .putExtra(GlobalScreenshot.SCREENSHOT_URI_ID, uri.toString()),
+                        PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_ONE_SHOT);
+                mNotificationBuilder.addAction(R.drawable.ic_screenshot_delete,
+                        r.getString(com.android.internal.R.string.delete), deleteAction);
+            }
             params[0].imageUri = uri;
             params[0].image = null;
             params[0].result = 0;
@@ -414,8 +425,7 @@ class GlobalScreenshot {
 
     static final String CANCEL_ID = "android:cancel_id";
     static final String SCREENSHOT_URI_ID = "android:screenshot_uri_id";
-    public static final String SCREENSHOT_FILE_PATH = "android:screenshot_file_path";
-
+    static final String SCREENSHOT_FILE_PATH = "android:screenshot_file_path";
     private static final int SCREENSHOT_FLASH_TO_PEAK_DURATION = 130;
     private static final int SCREENSHOT_DELAY = 250;
     private static final int SCREENSHOT_DROP_IN_DURATION = 430;
@@ -901,7 +911,7 @@ class GlobalScreenshot {
             nm.cancel(id);
 
             Intent startIntent = new Intent(this, com.android.systemui.screenshot.ScreenshotEditor.class);
-            startIntent.putExtra(SCREENSHOT_FILE_PATH, imageFilePath);
+            startIntent.putExtra(ScreenshotEditor.SCREENSHOT_FILE_PATH, imageFilePath);
             startService(startIntent);
             finish();
         }
