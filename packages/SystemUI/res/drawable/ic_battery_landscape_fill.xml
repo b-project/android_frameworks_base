@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Copyright (C) 2016 The BlurOS Project
+    Copyright (C) 2016 The CyanogenMod Project
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="26dp"
-    android:height="22dp"
+    android:height="24dp"
     android:viewportWidth="26"
-    android:viewportHeight="22">
+    android:viewportHeight="24">
 
     <clip-path
         android:name="mask"

@@ -15,4 +15,4 @@
      limitations under the License.
 -->
 <bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-     android:src="@drawable/qs_pie" />
+     android:src="@drawable/ic_qs_pie_off_alpha" />
