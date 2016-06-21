@@ -58,7 +58,7 @@ import com.android.systemui.qs.tiles.FloatingWindowsTile;
 import com.android.systemui.qs.tiles.HeadsUpTile;
 import com.android.systemui.qs.tiles.HotspotTile;
 import com.android.systemui.qs.tiles.IntentTile;
-import com.android.systemui.qs.tiles.LiveDisplayTile;
+// import com.android.systemui.qs.tiles.LiveDisplayTile;
 import com.android.systemui.qs.tiles.LocationTile;
 import com.android.systemui.qs.tiles.PieTile;
 import com.android.systemui.qs.tiles.AppCircleBarTile;
@@ -408,7 +408,7 @@ public class QSTileHost implements QSTile.Host, Tunable {
 	else if (tileSpec.equals("performance")) return new PerfProfileTile(this);
 	else if (tileSpec.equals("lockscreen")) return  new LockscreenToggleTile(this);
 	else if (tileSpec.equals("ambient_display")) return new AmbientDisplayTile(this);
-	else if (tileSpec.equals("live_display")) return new LiveDisplayTile(this);
+//	else if (tileSpec.equals("live_display")) return new LiveDisplayTile(this);
 	else if (tileSpec.equals("brightness")) return new BrightnessTile(this);
 	else if (tileSpec.equals("screen_off")) return new ScreenOffTile(this);
 	else if (tileSpec.equals("screenshot")) return new ScreenshotTile(this);
@@ -525,7 +525,7 @@ public class QSTileHost implements QSTile.Host, Tunable {
         else if (spec.equals("performance")) return R.string.qs_tile_performance;
         else if (spec.equals("lockscreen")) return R.string.quick_settings_lockscreen_label;
         else if (spec.equals("ambient_display")) return R.string.quick_settings_ambient_display_label;
-        else if (spec.equals("live_display")) return R.string.live_display_title;
+     //   else if (spec.equals("live_display")) return R.string.live_display_title;
         else if (spec.equals("music")) return R.string.quick_settings_music_label;
         else if (spec.equals("brightness")) return R.string.quick_settings_brightness_label;
         else if (spec.equals("screen_off")) return R.string.quick_settings_screen_off_label;
@@ -576,7 +576,7 @@ public class QSTileHost implements QSTile.Host, Tunable {
         else if (spec.equals("performance")) return R.drawable.ic_qs_perf_profile;
         else if (spec.equals("lockscreen")) return R.drawable.ic_qs_lock_screen_on;
         else if (spec.equals("ambient_display")) return R.drawable.ic_qs_ambientdisplay_on;
-        else if (spec.equals("live_display")) return R.drawable.ic_livedisplay_auto;
+      //  else if (spec.equals("live_display")) return R.drawable.ic_livedisplay_auto;
         else if (spec.equals("music")) return R.drawable.ic_qs_media_play;
         else if (spec.equals("brightness")) return R.drawable.ic_qs_brightness_auto_on;
         else if (spec.equals("screen_off")) return R.drawable.ic_qs_power;
@@ -599,7 +599,7 @@ public class QSTileHost implements QSTile.Host, Tunable {
         else if (spec.equals("caffeine")) return R.drawable.ic_qs_caffeine_on;
 		else if (spec.equals("hw_keys")) return R.drawable.ic_qs_hwkeys_on;
         else if (spec.equals("sound")) return R.drawable.ic_qs_ringer_silent;
-        else if (spec.equals("sound")) return R.drawable.ic_qs_dolby_title;
+        else if (spec.equals("dolby")) return R.drawable.ic_qs_dolby_title;
         return 0;
     }
 
