@@ -1244,6 +1244,7 @@ public class TaskStackView extends FrameLayout implements TaskStack.TaskStackCal
         // Announce for accessibility
         String msg = getContext().getString(R.string.accessibility_recents_all_items_dismissed);
         announceForAccessibility(msg);
+
     }
 
     @Override
