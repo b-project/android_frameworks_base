@@ -2465,6 +2465,11 @@ public final class Settings {
          * Chinese date view
          * @hide
          */
+        public static final String CHINESE_DATE_VIEW = "chinese_date_view";
+        /**
+         * Chinese date view
+         * @hide
+         */
         public static final String SWIPE_BACK_GESTURE_EDGE = "swipe_back_gesture_edge";
 
 		public static final String BLURRED_SYSTEM_UI_UPDATE_INTENT = "serajr.blurred.system.ui.lp.UPDATE_PREFERENCES";
