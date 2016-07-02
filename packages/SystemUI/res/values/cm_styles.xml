@@ -57,8 +57,5 @@
     <style name="BatteryMeterViewDrawable.Circle">
         <item name="blendMode">overlay</item>
     </style>
-    
-    <style name="ScreenshotEditorStyle" parent="@android:style/Theme.Material" >
-	</style>
 
 </resources>
