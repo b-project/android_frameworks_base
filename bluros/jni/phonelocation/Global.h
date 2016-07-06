@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2012 - 2015 The MoKee OpenSource Project
- * Copyright (C) 2015 The BlurOS Project 
+ * Copyright (C) 2015 The SudaMod Project 
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
 #define _MPGLOBAL_INCLUDED_
 #pragma pack(1)
 
-//链表节点类
 class StringNode {
   public:
     unsigned short cityCode;
@@ -34,7 +33,6 @@ class StringNode {
     ~StringNode();
 };
 
-//索引表节点类
 class IndexNode {
   public:
     int NumStart;
@@ -46,14 +44,12 @@ class IndexNode {
     IndexNode(int ns, int ne, StringNode *ad = NULL);
 };
 
-//索引记录结构体
 typedef struct _IndexStruct {
     int NumStart;
     int NumEnd;
     unsigned short Offset;
 } IndexStruct;
 
-//手机归属地结构体类型
 typedef struct _MpLocation {
     int NumStart;
     int NumEnd;

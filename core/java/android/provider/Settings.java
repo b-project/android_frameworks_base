@@ -2465,7 +2465,7 @@ public final class Settings {
          * Chinese date view
          * @hide
          */
-        public static final String CHINESE_DATE_VIEW = "chinese_date_view";
+        public static final String VIETNAM_DATE_VIEW = "vietnam_date_view";
         /**
          * Chinese date view
          * @hide

@@ -1274,9 +1274,8 @@ android.media.midi.MidiManager
 android.media.projection.MediaProjectionManager
 android.media.session.MediaSessionManager
 android.media.tv.TvInputManager
-android.suda.hardware.ProximitySensorManager
-android.suda.location.PhoneLocation
-android.suda.utils.SudaUtils
+android.bluros.location.PhoneLocation
+android.bluros.utils.SudaUtils
 android.mtp.MtpDatabase
 android.mtp.MtpDevice
 android.mtp.MtpDeviceInfo

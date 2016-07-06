@@ -1,6 +1,6 @@
 /*
- * 
- * Copyright (C) 2016 The BlurOS Project  
+ * Copyright (C) 2012 - 2015 The MoKee OpenSource Project
+ * Copyright (C) 2015 The SudaMod Project  
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,7 +105,7 @@ public class SolarTerm {
         0xA5,   0xC3,   0xA5,   0xB5,   0xA6,   0xA6,   0x87,   0x88,   0x78,   0x78,   0x87,   0x87};      //2050
 
     public static String getSolarTermStr (int year, int month, int day) {
-        String [] solarArrayStr = Constant.SOLAR_TERM_VN;
+        String [] solarArrayStr = Constant.SOLAR_TERM_CN;
         String SolarTermStr="";
         int temp;
         int result = 0;

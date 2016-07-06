@@ -70,6 +70,7 @@ public class KeyguardStatusView extends GridLayout implements
     //Set initial value to false to skip the above case.
     private boolean mEnableRefresh = false;
 
+	private TextView mVietnamDate;
     private View mWeatherView;
     private TextView mWeatherCity;
     private ImageView mWeatherConditionImage;
@@ -105,6 +106,9 @@ public class KeyguardStatusView extends GridLayout implements
         @Override
         public void onStartedWakingUp() {
             setEnableMarquee(true);
+			boolean mShow = Settings.System.getIntForUser(getContext().getContentResolver(),
+                  Settings.System.VIETNAM_DATE_VIEW, 1, UserHandle.USER_CURRENT) == 1;
+            mVietnamDate.setVisibility(mShow ? View.VISIBLE : View.GONE);
             mEnableRefresh = true;
             refresh();
         }
@@ -112,6 +116,9 @@ public class KeyguardStatusView extends GridLayout implements
         @Override
         public void onFinishedGoingToSleep(int why) {
             setEnableMarquee(false);
+			boolean mShow = Settings.System.getIntForUser(getContext().getContentResolver(),
+                  Settings.System.VIETNAM_DATE_VIEW, 1, UserHandle.USER_CURRENT) == 1;
+            mVietnamDate.setVisibility(mShow ? View.VISIBLE : View.GONE);
             mEnableRefresh = false;
         }
 
@@ -152,6 +159,7 @@ public class KeyguardStatusView extends GridLayout implements
         mDateView.setShowCurrentUserTime(true);
         mClockView.setShowCurrentUserTime(true);
         mOwnerInfo = (TextView) findViewById(R.id.owner_info);
+		mVietnamDate = (TextView) findViewById(R.id.date_vietnam);
         mWeatherView = findViewById(R.id.keyguard_weather_view);
         mWeatherCity = (TextView) findViewById(R.id.city);
         mWeatherConditionImage = (ImageView) findViewById(R.id.weather_image);

@@ -3102,9 +3102,11 @@ public class NotificationPanelView extends PanelView implements
     @Override
     public void onHeadsUpPinnedModeChanged(final boolean inPinnedMode) {
         if (inPinnedMode) {
+			mHeadsUpShowing = true;
             mHeadsUpExistenceChangedRunnable.run();
             updateNotificationTranslucency();
         } else {
+			mHeadsUpShowing = false;
             mHeadsUpAnimatingAway = true;
             mNotificationStackScroller.runAfterAnimationFinished(
                     mHeadsUpExistenceChangedRunnable);

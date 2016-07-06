@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The BlurOS Project
+ * Copyright (C) 2015 The SudaMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ public final class PhoneLocation {
     public static String getFamily(String number) {
         for(String temp : familyArray) {
             if (temp.equals(number)) {
-                return "Số gia đình";
+                return "亲情号码";
             }
         }
         return null;

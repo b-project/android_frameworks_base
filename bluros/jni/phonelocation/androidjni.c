@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2012 - 2015 The MoKee OpenSource Project
- * Copyright (C) 2015 The BlurOS Project
+ * 
+ * Copyright (C) 2016 The BlurOS Project
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,7 @@
 /*
  * Global header for android jni call
  *
- * Created by cytown martincz bluros
- * Last edited 2015.02.12
+ * Created by LinhPhi
  *
  */
 

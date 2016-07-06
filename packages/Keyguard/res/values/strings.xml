@@ -354,5 +354,6 @@
 
     <!-- Fingerprint hint message when finger was not recognized.-->
     <string name="fingerprint_not_recognized">Not recognized</string>
-
+	<string name="semi_colon">:</string>
+	
 </resources>

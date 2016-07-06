@@ -1,6 +1,6 @@
 /*
- * 
- * Copyright (C) 2015 The BlurOS Project 
+ * Copyright (C) 2012 - 2015 The MoKee OpenSource Project
+ * Copyright (C) 2015 The SudaMod Project 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,8 +94,8 @@ public class Lunar {
     }
 
     private String cyclicalm(int num) {
-        final String[] Gan = Constant.GAN_VN;
-        final String[] Zhi = Constant.ZHI_VN;
+        final String[] Gan = Constant.GAN_CN;
+        final String[] Zhi = Constant.ZHI_CN;
         return (Gan[num % 10] + Zhi[num % 12]);
     }
 
@@ -108,13 +108,13 @@ public class Lunar {
         int yearCyl, monCyl, dayCyl;
         int leapMonth = 0;
         mCalendar = cal;
-        chineseNumber = Constant.VIETNAM_NUMBER_VN;
-        lunarMonthName = Constant.LUNAR_MONTH_NAME_VN;
-        String format1 = Constant.STATUS_FORMAT_1_VN;
+        chineseNumber = Constant.CHINESE_NUMBER_CN;
+        lunarMonthName = Constant.LUNAR_MONTH_NAME_CN;
+        String format1 = Constant.STATUS_FORMAT_1_CN;
         chineseDateFormat = new SimpleDateFormat(format1);
         Date baseDate = null;
         try {
-            String format2 = Constant.STATUS_FORMAT_2_VN;
+            String format2 = Constant.STATUS_FORMAT_2_CN;
             baseDate = chineseDateFormat.parse(format2);
         } catch (ParseException e) {
             e.printStackTrace();
@@ -170,24 +170,24 @@ public class Lunar {
     }
 
     public String getChinaDayString(int day) {
-        String chineseTen[] = Constant.VIETNAM_TEN_VN ;
+        String chineseTen[] = Constant.CHINESE_TEN_CN ;
         int n = day % 10 == 0 ? 9 : day % 10 - 1;
         if (day > 30)
             return "";
         else if (day == 10)
-            return  Constant.STATUS_CHUSHI_VN;
+            return  Constant.STATUS_CHUSHI_CN;
         else if (day == 20)
-            return Constant.STATUS_ERSHI_VN;
+            return Constant.STATUS_ERSHI_CN;
         else if (day == 30)
-            return Constant.STATUS_SANSHI_VN;
+            return Constant.STATUS_SANSHI_CN;
         else
             return chineseTen[day / 10] + chineseNumber[n];
     }
 
     public String toString() {
-        String year1 = Constant.STATUS_YEAR_VN;
+        String year1 = Constant.STATUS_YEAR_CN;
         String run1 =  Constant. getLeap();
-        String month1 = Constant.STATUS_MONTH_VN;
+        String month1 = Constant.STATUS_MONTH_CN;
         return cyclical() + animalsYear() + year1 + (leap ? run1 : "") + lunarMonthName[month - 1]
                 + month1
                 + getChinaDayString(day);

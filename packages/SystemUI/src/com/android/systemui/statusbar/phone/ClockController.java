@@ -69,7 +69,7 @@ public class ClockController {
         mNotificationIcons = notificationIcons;
         mContext = statusBar.getContext();
 
-        mActiveClock = mCenterClock;
+        mActiveClock = mRightClock;
         mSettingsObserver = new SettingsObserver(handler);
         mSettingsObserver.observe();
     }

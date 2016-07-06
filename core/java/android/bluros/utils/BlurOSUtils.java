@@ -1,6 +1,6 @@
 /*
- *
- * Copyright (C) 2015 The BlurOS Project  
+ * Copyright (C) 2012 - 2015 The MoKee OpenSource Project
+ * Copyright (C) 2015 The SudaMod Project  
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,19 +42,12 @@ public class BlurOSUtils {
         System.loadLibrary(LIBNAME);
     }
 
-    //Ngày lễ theo 2016 
     private static int[] JANH = {1, 2, 3};
-    // Tháng hai
     private static int[] FEBH = {7, 8, 9, 10, 11, 12, 13};
-    //tháng tư
     private static int[] APRH = {2, 3, 4, 30};
-    // Có thể
     private static int[] MAYH = {1, 2};
-    //
     private static int[] JUNH = {9, 10, 11};
-    //
     private static int[] SEPH = {15, 16, 17};
-    //
     private static int[] OCTH = {1, 2, 3, 4, 5, 6, 7};
 
     public static native boolean isSupportLanguage(boolean excludeTW);
