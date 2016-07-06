@@ -349,6 +349,7 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
         d = mSystemIconsSuperContainer.getBackground();
         if (d instanceof RippleDrawable) {
             ((RippleDrawable) d).setForceSoftware(true);
+		}
 
         mStatusBarHeaderView = this;
 
