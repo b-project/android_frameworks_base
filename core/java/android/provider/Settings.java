@@ -4820,13 +4820,6 @@ public final class Settings {
          */
         public static final String ENABLE_HW_KEYS = "enable_hw_keys";
 
- 	/**
-         * Three Finger Gesture from Oppo
-         *
-         * @hide
-         */
-        public static final String THREE_FINGER_GESTURE = "three_finger_gesture";
-
         /**
          * Boolean value whether to link ringtone and notification volume
          *
@@ -5151,6 +5144,12 @@ public final class Settings {
          * @hide
          */
         public static final String RECENT_CARD_BG_COLOR = "recent_card_bg_color";
+
+          /**
+         * Two Finger Gesture from BlurOS
+         * @hide
+         */
+        public static final String TWO_FINGER_GESTURE = "two_finger_gesture";
 
         /**
          * Recent card text color
@@ -8193,6 +8192,13 @@ public final class Settings {
          * @hide
          */
         public static final String NAVIGATION_BAR_VISIBLE = "navigation_bar_visible";
+        
+        /**
+         * Three Finger Gesture from Oppo
+         *
+         * @hide
+         */
+        public static final String THREE_FINGER_GESTURE = "three_finger_gesture";
         
         /**
          * The current night mode that has been selected by the user.  Owned

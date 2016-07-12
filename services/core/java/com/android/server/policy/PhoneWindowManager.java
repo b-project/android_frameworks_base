@@ -139,6 +139,8 @@ import com.android.internal.util.gesture.EdgeServiceConstants;
 import com.android.internal.view.RotationPolicy;
 import com.android.internal.utils.du.DUActionUtils;
 import com.android.internal.utils.du.ActionHandler;
+import com.android.internal.utils.du.Config.ActionConfig;
+import com.android.internal.utils.du.Config.ButtonConfig;
 import com.android.internal.utils.du.DUSystemReceiver;
 import com.android.internal.widget.PointerLocationView;
 import com.android.server.GestureLauncherService;
@@ -753,6 +755,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     private int mCurrentUserId;
     private boolean haveEnableGesture = false;
+    private boolean haveEnableTwoGesture = false;
 
     // Maps global key codes to the components that will handle them.
     private GlobalKeyManager mGlobalKeyManager;
@@ -793,6 +796,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private boolean mIsTorchActive;
     private boolean mWasTorchActive;
     private boolean mShowKeyguardOnLeftSwipe;
+    
+    private String m3FingerGesture = ActionHandler.SYSTEMUI_TASK_NO_ACTION;
 
     private class PolicyHandler extends Handler {
         @Override
@@ -994,12 +999,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             resolver.registerContentObserver(CMSettings.System.getUriFor(
                     CMSettings.System.NAVBAR_LEFT_IN_LANDSCAPE), false, this,
                     UserHandle.USER_ALL);
-	    resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.THREE_FINGER_GESTURE), false, this,
+			resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.TWO_FINGER_GESTURE), false, this,
                     UserHandle.USER_ALL);
-	    resolver.registerContentObserver(Settings.System.getUriFor(
+			resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.ANSWER_VOLUME_BUTTON_BEHAVIOR_ANSWER), false, this);
-	    resolver.registerContentObserver(Settings.System.getUriFor(
+			resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.HOLD_BACK_TO_KILL_TIMEOUT), false, this,
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
@@ -1008,7 +1013,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             resolver.registerContentObserver(Settings.Secure.getUriFor(
                     Settings.System.ENABLE_HW_KEYS), false, this,
                      UserHandle.USER_ALL);
-	    resolver.registerContentObserver(Settings.Secure.getUriFor(
+			resolver.registerContentObserver(Settings.Secure.getUriFor(
                     Settings.Secure.NAVIGATION_BAR_VISIBLE), false, this,
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.Secure.getUriFor(
@@ -1022,6 +1027,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 		    UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.PA_PIE_STATE), false, this,
+                    UserHandle.USER_ALL);
+			resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.Secure.THREE_FINGER_GESTURE), false, this,
                     UserHandle.USER_ALL);
                     
             updateSettings();
@@ -1086,6 +1094,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private SystemGesturesPointerEventListener mSystemGestures;
 
     private OPGesturesListener mOPGestures;
+    private OPTWOGesturesListener mOPTWOGestures;
 
     private EdgeGestureManager.EdgeGestureActivationListener mEdgeGestureActivationListener
             = new EdgeGestureManager.EdgeGestureActivationListener() {
@@ -1797,6 +1806,14 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         return mContext.getResources().getConfiguration().isScreenRound();
     }
 
+    private void updateSwipeThreeFingerGestures() {
+        ButtonConfig config = ButtonConfig.getButton(mContext,
+                Settings.Secure.THREE_FINGER_GESTURE, true);
+        m3FingerGesture = config == null ? ActionHandler.SYSTEMUI_TASK_NO_ACTION : config
+                .getActionConfig(
+                        ActionConfig.PRIMARY).getAction();
+    }
+
     /** {@inheritDoc} */
     @Override
     public void init(Context context, IWindowManager windowManager,
@@ -1815,9 +1832,20 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         mOPGestures = new OPGesturesListener(context, new OPGesturesListener.Callbacks() {
                    @Override
                     public void onSwipeThreeFinger() {
-                        mHandler.post(mScreenshotRunnable);
+                        if (!keyguardOn()) {
+                    final String action = UserHandle.getCallingUserId() == UserHandle.USER_OWNER ? m3FingerGesture
+                            : ActionHandler.SYSTEMUI_TASK_NO_ACTION;
+                    ActionHandler.performTask(mContext, action);
+                }
                     }
                 });
+                
+        mOPTWOGestures = new OPTWOGesturesListener(context, new OPTWOGesturesListener.Callbacks() {
+            @Override
+            public void onSwipeTwoFinger() {
+                mHandler.post(mScreenshotRunnable);
+            }
+        });
 
         mPowerManagerInternal = LocalServices.getService(PowerManagerInternal.class);
 
@@ -2117,18 +2145,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     }
 
-    private void enableSwipeThreeFingerGesture(boolean enable){
-        if (enable) {
-            if (haveEnableGesture) return;
-            haveEnableGesture = true;
-            mWindowManagerFuncs.registerPointerEventListener(mOPGestures);
-        } else {
-	    if (!haveEnableGesture) return;
-            haveEnableGesture = false;
-            mWindowManagerFuncs.unregisterPointerEventListener(mOPGestures);
-        }
-    }
-
     private void updateKeyAssignments() {
         int activeHardwareKeys = mDeviceHardwareKeys;
 
@@ -2221,6 +2237,18 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
 
         mHasPermanentMenuKey = hasPermanentMenu;
+    }
+    
+     private void enableSwipeTwoFingerGesture(boolean enable){
+        if (enable) {
+            if (haveEnableTwoGesture) return;
+            haveEnableTwoGesture = true;
+            mWindowManagerFuncs.registerPointerEventListener(mOPTWOGestures);
+        } else {
+            if (!haveEnableTwoGesture) return;
+            haveEnableTwoGesture = false;
+            mWindowManagerFuncs.unregisterPointerEventListener(mOPTWOGestures);
+        }
     }
 
     @Override
@@ -2395,9 +2423,13 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 if (!mUsingEdgeGestureServiceForGestures && useEdgeService) {
                     mUsingEdgeGestureServiceForGestures = true;
                     mWindowManagerFuncs.unregisterPointerEventListener(mSystemGestures);
+					haveEnableGesture = true;
+                    mWindowManagerFuncs.registerPointerEventListener(mOPGestures);
                 } else if (mUsingEdgeGestureServiceForGestures && !useEdgeService) {
                     mUsingEdgeGestureServiceForGestures = false;
                     mWindowManagerFuncs.registerPointerEventListener(mSystemGestures);
+                    haveEnableGesture = false;
+                    mWindowManagerFuncs.unregisterPointerEventListener(mOPGestures);
                 }
                 updateEdgeGestureListenerState();
             }
@@ -2437,12 +2469,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             }
 
             mUserRotationAngles = Settings.System.getInt(resolver,
-                    Settings.System.ACCELEROMETER_ROTATION_ANGLES, -1);
+                    Settings.System.ACCELEROMETER_ROTATION_ANGLES, -1);             
 
-	     //Three Finger Gesture
-            boolean threeFingerGesture = Settings.System.getIntForUser(resolver,
-                    Settings.System.THREE_FINGER_GESTURE, 1, UserHandle.USER_CURRENT) == 1;
-            enableSwipeThreeFingerGesture(threeFingerGesture);
+			boolean twoFingerGesture = Settings.System.getIntForUser(resolver,
+                    Settings.System.TWO_FINGER_GESTURE, 1, UserHandle.USER_CURRENT) == 1;
+			enableSwipeTwoFingerGesture(twoFingerGesture);
 
             if (mSystemReady) {
                 int pointerLocation = Settings.System.getIntForUser(resolver,
