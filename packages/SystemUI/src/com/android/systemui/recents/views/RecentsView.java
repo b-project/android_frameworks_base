@@ -550,7 +550,7 @@ public class RecentsView extends FrameLayout implements TaskStackView.TaskStackV
         mAm.getMemoryInfo(memInfo);
             int available = (int)(memInfo.availMem / 1048576L);
             int max = (int)(getTotalMemory() / 1048576L);
-            mMemText.setText("Free RAM: " + String.valueOf(available) + "MB");
+            mMemText.setText("Free: " + String.valueOf(available) + "MB");
             mMemBar.setMax(max);
             mMemBar.setProgress(available);
     }
@@ -574,7 +574,7 @@ public class RecentsView extends FrameLayout implements TaskStackView.TaskStackV
 	final ContentResolver resolver = mContext.getContentResolver();
         mFloatingButton = ((View)getParent()).findViewById(R.id.floating_action_button);
 	mClearStyle = Settings.System.getIntForUser(
-                    resolver, Settings.System.CLEAR_RECENTS_STYLE, 1,
+                    resolver, Settings.System.CLEAR_RECENTS_STYLE, 0,
                     UserHandle.USER_CURRENT);
         mClearStyleSwitch  = Settings.System.getInt(mContext.getContentResolver(),
 				 Settings.System.CLEAR_RECENTS_STYLE_ENABLE, 0) == 1;
@@ -608,13 +608,13 @@ public class RecentsView extends FrameLayout implements TaskStackView.TaskStackV
 	mButtonsRotation =  Settings.System.getInt(mContext.getContentResolver(),
 				 Settings.System.RECENTS_ROTATE_FAB, 1) == 1;	
 	mClearStyle = Settings.System.getIntForUser(
-                    resolver, Settings.System.CLEAR_RECENTS_STYLE, 1,
+                    resolver, Settings.System.CLEAR_RECENTS_STYLE, 0,
                     UserHandle.USER_CURRENT);	
         final Resources res = getContext().getResources();
         mClearStyleSwitch  = Settings.System.getInt(mContext.getContentResolver(),
-				 Settings.System.CLEAR_RECENTS_STYLE_ENABLE, 1) == 1;	
+				 Settings.System.CLEAR_RECENTS_STYLE_ENABLE, 0) == 1;	
 	mfabcolor = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.FAB_BUTTON_COLOR, 0xffDC4C3C);	
+                Settings.System.FAB_BUTTON_COLOR, 0xff009688);	
 	int mbarcolor = Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.MEM_BAR_COLOR, 0xff009688);	
 	int mtextcolor = Settings.System.getInt(mContext.getContentResolver(),

@@ -69,7 +69,7 @@ public class ClockController {
         mNotificationIcons = notificationIcons;
         mContext = statusBar.getContext();
 
-        mActiveClock = mRightClock;
+        mActiveClock = mCenterClock;
         mSettingsObserver = new SettingsObserver(handler);
         mSettingsObserver.observe();
     }
@@ -77,16 +77,16 @@ public class ClockController {
     private Clock getClockForCurrentLocation() {
         Clock clockForAlignment;
         switch (mClockLocation) {
-            case STYLE_CLOCK_CENTER:
-                clockForAlignment = mCenterClock;
+            case STYLE_CLOCK_RIGHT:
+                clockForAlignment = mRightClock;
                 break;
             case STYLE_CLOCK_LEFT:
                 clockForAlignment = mLeftClock;
                 break;
-            case STYLE_CLOCK_RIGHT:
+            case STYLE_CLOCK_CENTER:
             case STYLE_HIDE_CLOCK:
             default:
-                clockForAlignment = mRightClock;
+                clockForAlignment = mCenterClock;
                 break;
         }
         return clockForAlignment;
@@ -112,7 +112,7 @@ public class ClockController {
                 CMSettings.System.STATUS_BAR_AM_PM, Clock.AM_PM_STYLE_GONE,
                 UserHandle.USER_CURRENT);
         mClockLocation = CMSettings.System.getIntForUser(
-                resolver, CMSettings.System.STATUS_BAR_CLOCK, STYLE_CLOCK_RIGHT,
+                resolver, CMSettings.System.STATUS_BAR_CLOCK, STYLE_CLOCK_CENTER,
                 UserHandle.USER_CURRENT);
         updateActiveClock();
     }

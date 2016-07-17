@@ -306,6 +306,10 @@
     <!-- Content description of the visualizer tile in quick settings (not shown on the screen). [CHAR LIMIT=NONE] -->
     <string name="accessibility_quick_settings_visualizer">Visualizer.</string>
     
+    <string name="hct_memreyInfoStr">Free:</string>
+    <string name="hct_clear_memrey_toast">The release of %sM memory</string>
+    <string name="hct_clear_memrey_all_locked">Your mobile phone has the best condition</string>
+    
     <string name="pulse_toast_message">Visualizer Tile will not work with pulse enabled</string>
   
 </resources>

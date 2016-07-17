@@ -87,5 +87,7 @@
     <color name="battery_juice_critical">#ff4444</color>
     <color name="battery_background">#ffffff</color>
     <color name="status">#ffffff</color>
+    
+    <color name="hct_freeMemreyInfoColor">#ff59d5c8</color>
 
 </resources>

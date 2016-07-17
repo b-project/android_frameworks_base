@@ -480,7 +480,7 @@ public class TaskView extends FrameLayout implements Task.TaskCallbacks,
                 }
             }
         }, delayed);
-    }
+    }   
 
     /**
      * Returns whether this view should be clipped, or any views below should clip against this

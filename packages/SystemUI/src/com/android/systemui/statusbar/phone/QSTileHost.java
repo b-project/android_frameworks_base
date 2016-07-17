@@ -123,7 +123,7 @@ public class QSTileHost implements QSTile.Host, Tunable {
     private static final String TAG = "QSTileHost";
     private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
 
-    public static final int TILES_PER_PAGE = 8;
+    public static final int TILES_PER_PAGE = 12;
 
     private final Context mContext;
     private final PhoneStatusBar mStatusBar;

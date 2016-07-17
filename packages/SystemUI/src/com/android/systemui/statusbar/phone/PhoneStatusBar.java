@@ -939,7 +939,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     Settings.System.STATUS_BAR_WEATHER_FONT_STYLE, FONT_NORMAL, mCurrentUserId);
 
             mBlurRadius = Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.LOCKSCREEN_BLUR_RADIUS, 24);
+                    Settings.System.LOCKSCREEN_BLUR_RADIUS, 25);
 
             mMaxKeyguardNotifConfig = Settings.System.getIntForUser(resolver,
                     Settings.System.LOCKSCREEN_MAX_NOTIF_CONFIG, 5, mCurrentUserId);
@@ -2010,7 +2010,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                             return;
                         }
                         // recents
-                        // RecentsActivity.onConfigurationChanged();
+                        RecentsActivity.onConfigurationChanged();
 
                         // ----------------------------------------------------------------------
                         // se na rotação do celular o mod estiver habilitado e o painel expandido
@@ -2045,7 +2045,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             this.mContext.registerReceiver(receiver, intent);
 
             // inicia
-          //  RecentsActivity.init(this.mContext);
+           RecentsActivity.init(this.mContext);
 
             // atualizam as preferências
             updatePreferences(this.mContext);
@@ -2065,7 +2065,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         // atualiza
         NotificationPanelView.updatePreferences(context);
-      //  RecentsActivity.updatePreferences(context);
+        RecentsActivity.updatePreferences(context);
         NotificationBackgroundView.updatePreferences(context);
         StatusBarHeaderView.updatePreferences(context);
         BaseStatusBar.updatePreferences();

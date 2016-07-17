@@ -50,7 +50,7 @@ public class NetworkTraffic extends TextView {
         decimalFormat.setMaximumFractionDigits(1);
     }
 
-    private int mState = 3;
+    private int mState = 0;
     private boolean mAttached;
     private long totalRxBytes;
     private long totalTxBytes;
@@ -98,9 +98,9 @@ public class NetworkTraffic extends TextView {
                 // If bit/s convert from Bytes to bits
                 String symbol;
                 if (KB == KILOBYTE) {
-                    symbol = "KB/s";
-                } else {
                     symbol = "B/s";
+                } else {
+                    symbol = "b/s";
                     rxData = rxData * 8;
                     txData = txData * 8;
                 }
@@ -289,7 +289,7 @@ public class NetworkTraffic extends TextView {
                 Settings.System.NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD, 10,
                 UserHandle.USER_CURRENT);
 
-        mState = Settings.System.getInt(resolver, Settings.System.NETWORK_TRAFFIC_STATE, 3);
+        mState = Settings.System.getInt(resolver, Settings.System.NETWORK_TRAFFIC_STATE, 0);
 
         mNetworkTrafficColor = Settings.System.getInt(resolver,
                 Settings.System.NETWORK_TRAFFIC_COLOR, -2);
