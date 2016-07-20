@@ -29,7 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-<LinearLayout
+		<LinearLayout
         android:id="@+id/task_manager_panel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -46,4 +46,9 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" />
     </LinearLayout>
+    
+    <!-- brightness -->
+    <include android:id="@+id/brightness_container"
+             layout="@layout/quick_settings_brightness_dialog"/>
+    
 </com.android.systemui.qs.QSContainer>

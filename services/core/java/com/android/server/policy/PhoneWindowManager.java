@@ -1028,7 +1028,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.PA_PIE_STATE), false, this,
                     UserHandle.USER_ALL);
-			resolver.registerContentObserver(Settings.System.getUriFor(
+			resolver.registerContentObserver(Settings.Secure.getUriFor(
                     Settings.Secure.THREE_FINGER_GESTURE), false, this,
                     UserHandle.USER_ALL);
                     

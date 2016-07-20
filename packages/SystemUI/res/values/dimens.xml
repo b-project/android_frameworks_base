@@ -168,9 +168,9 @@
     <dimen name="qs_tile_text_size">12sp</dimen>
     <dimen name="qs_tile_divider_height">1dp</dimen>
     <dimen name="qs_panel_padding">0dp</dimen>
-    <dimen name="qs_dual_tile_height">112dp</dimen>
-    <dimen name="qs_dual_tile_padding_vertical">8dp</dimen>
-    <dimen name="qs_dual_tile_padding_horizontal">6dp</dimen>
+    <dimen name="qs_dual_tile_height">100dp</dimen>
+    <dimen name="qs_dual_tile_padding_vertical">0dp</dimen>
+    <dimen name="qs_dual_tile_padding_horizontal">0dp</dimen>
     <dimen name="qs_tile_padding_top">0dp</dimen>
     <dimen name="qs_tile_padding_top_large_text">4dp</dimen>
     <dimen name="qs_tile_padding_below_icon">0dp</dimen>
@@ -218,7 +218,7 @@
     <dimen name="recents_task_view_application_icon_size">48dp</dimen>
 
     <!-- The radius of the rounded corners on a task view. -->
-    <dimen name="recents_task_view_rounded_corners_radius">10dp</dimen>
+    <dimen name="recents_task_view_rounded_corners_radius">0dp</dimen>
 
     <!-- The min translation in the Z index for the last task. -->
     <dimen name="recents_task_view_z_min">20dp</dimen>
@@ -251,7 +251,7 @@
     <item name="recents_stack_overscroll_percentage" format="float" type="dimen">0.0875</item>
 
     <!-- The top offset for the task stack. -->
-    <dimen name="recents_stack_top_padding">16dp</dimen>
+    <dimen name="recents_stack_top_padding">32dp</dimen>
 
     <!-- The dimesnsions of the dismiss all recents button. -->
     <dimen name="recents_dismiss_all_button_size">48dp</dimen>

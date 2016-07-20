@@ -65,7 +65,7 @@ public class TaskStackViewLayoutAlgorithm {
     HashMap<Task.TaskKey, Float> mTaskProgressMap = new HashMap<Task.TaskKey, Float>();
 
     // Log function
-    static final float XScale = 1.75f;  // The large the XScale, the longer the flat area of the curve
+    static final float XScale = 2.0f;  // The large the XScale, the longer the flat area of the curve
     static final float LogBase = 3000;
     static final int PrecisionSteps = 250;
     static float[] xp;
@@ -91,13 +91,18 @@ public class TaskStackViewLayoutAlgorithm {
         mStackRect.inset(widthPadding, heightPadding);
 
         // Compute the task rect
+ /*       int size = mStackRect.width();
+        int sizeY = mStackRect.height();
+        int left = mStackRect.left + (mStackRect.width() - size) / 2;
+            mTaskRect.set(left, mStackRect.top,
+                    left + size, mStackRect.top + sizeY); */
+        // Compute the task rect
         int size = mStackRect.width();
         int left = mStackRect.left + (mStackRect.width() - size) / 2;
         mTaskRect.set(left, mStackRect.top,
                 left + size, mStackRect.top + size);
-
         // Update the affiliation offsets
-        float visibleTaskPct = 0.5f;
+        float visibleTaskPct = 0.8f;
         mWithinAffiliationOffset = mConfig.taskBarHeight;
         mBetweenAffiliationOffset = (int) (visibleTaskPct * mTaskRect.height());
     }
@@ -363,10 +368,7 @@ public class TaskStackViewLayoutAlgorithm {
 
     /** Converts from the progress along the curve to a scale. */
     float curveProgressToScale(float p) {
-        if (p < 0) return StackPeekMinScale;
-        if (p > 1) return 1f;
-        float scaleRange = (1f - StackPeekMinScale);
-        float scale = StackPeekMinScale + (p * scaleRange);
+	   float scale = 1;
         return scale;
     }
 

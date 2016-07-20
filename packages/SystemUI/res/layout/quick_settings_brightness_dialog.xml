@@ -17,6 +17,10 @@
     xmlns:systemui="http://schemas.android.com/apk/res-auto"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
+    android:layout_centerHorizontal="true"
+    android:layout_marginTop="10dp"
+    android:layout_gravity="bottom"
+    android:layout_alignParentBottom="true"
     style="@style/BrightnessDialogContainer">
 
     <ImageView

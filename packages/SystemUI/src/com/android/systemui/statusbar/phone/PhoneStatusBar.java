@@ -130,6 +130,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+import android.widget.AdapterView;
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.statusbar.NotificationVisibility;
 import com.android.internal.statusbar.IStatusBarService;
@@ -170,6 +171,7 @@ import com.android.systemui.qs.QSPanel;
 import com.android.systemui.qs.QSTile;
 import com.android.systemui.qs.QSTileView;
 import com.android.systemui.qs.SignalTileView;
+import com.android.systemui.qs.QSDetailItemsList;
 import com.android.systemui.recents.RecentsActivity;
 import com.android.systemui.recents.ScreenPinningRequest;
 import com.android.systemui.settings.BrightnessController;
@@ -939,7 +941,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     Settings.System.STATUS_BAR_WEATHER_FONT_STYLE, FONT_NORMAL, mCurrentUserId);
 
             mBlurRadius = Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.LOCKSCREEN_BLUR_RADIUS, 25);
+                    Settings.System.LOCKSCREEN_BLUR_RADIUS, 95);
 
             mMaxKeyguardNotifConfig = Settings.System.getIntForUser(resolver,
                     Settings.System.LOCKSCREEN_MAX_NOTIF_CONFIG, 5, mCurrentUserId);
@@ -2139,9 +2141,9 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         // Decrease the delay for every row we animate to give the sense of
         // accelerating the swipes
-        int rowDelayDecrement = 9;
-        int currentDelay = 120;
-        int totalDelay = 160;
+        int rowDelayDecrement = 10;
+        int currentDelay = 140;
+        int totalDelay = 180;
         int numItems = hideAnimatedList.size();
         for (int i = numItems - 1; i >= 0; i--) {
             View view = hideAnimatedList.get(i);
@@ -2149,8 +2151,8 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             if (i == 0) {
                 endRunnable = animationFinishAction;
             }
-            mStackScroller.dismissViewAnimated(view, endRunnable, totalDelay, 240);
-            currentDelay = Math.max(45, currentDelay - rowDelayDecrement);
+            mStackScroller.dismissViewAnimated(view, endRunnable, totalDelay, 260);
+            currentDelay = Math.max(50, currentDelay - rowDelayDecrement);
             totalDelay += currentDelay;
         }
     }
@@ -4726,8 +4728,18 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 removeAllViews((ViewGroup) child);
             }
         }
-        parent.removeAllViews();
-    }
+        if (parent instanceof AdapterView) {
+            //We know that when it's AdapterView it's from CM's QS detail items list
+            try {
+            QSDetailItemsList.QSDetailListAdapter adapter =
+                    (QSDetailItemsList.QSDetailListAdapter) ((AdapterView) parent).getAdapter();	    
+            adapter.clear();
+            adapter.notifyDataSetInvalidated();
+            } catch (ClassCastException e) { /*Catch it*/}
+        } else {
+            parent.removeAllViews();
+        }
+	}
 
     /**
      * Reload some of our resources when the configuration changes.

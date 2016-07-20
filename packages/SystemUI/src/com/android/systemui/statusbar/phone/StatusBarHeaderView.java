@@ -313,7 +313,7 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
         loadDimens();
         updateVisibilities();
         updateClockScale();
-	updateAvatarScale();
+		updateAvatarScale();
         addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View v, int left, int top, int right,
@@ -1688,7 +1688,7 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
 
     private void updateStatusBarButtonsState() {
         mShowHeadsUpButton = Settings.System.getIntForUser(getContext().getContentResolver(),
-                Settings.System.HEADS_UP_SHOW_STATUS_BUTTON, 1, ActivityManager.getCurrentUser()) == 1;
+                Settings.System.HEADS_UP_SHOW_STATUS_BUTTON, 0, ActivityManager.getCurrentUser()) == 1;
         mShowTaskManager = Settings.System.getIntForUser(getContext().getContentResolver(),
                 Settings.System.ENABLE_TASK_MANAGER, 1, ActivityManager.getCurrentUser()) == 1;
     }
@@ -1751,7 +1751,6 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
              public void run() {
                 // TODO we dont need to do this every time but we dont have
                 // an other place to know right now when custom header is enabled
-                enableTextShadow();
                 doUpdateStatusBarCustomHeader(headerImage, force);
             }
         });
