@@ -127,7 +127,7 @@ public class PieController extends EdgeGestureManager.EdgeGestureActivationListe
 
     private boolean showPie() {
         final boolean pieEnabled = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.PA_PIE_STATE, 0) == 1;
+                Settings.System.PA_PIE_STATE, 1) == 1;
         return pieEnabled;
     }
 
