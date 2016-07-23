@@ -5097,6 +5097,13 @@ public final class Settings {
          * @hide
          */
         public static final String ANIM_TILE_INTERPOLATOR = "anim_tile_interpolator";
+        
+          /**
+         * Transition effect in BlurOS tabs
+         *
+         * @hide
+         */
+        public static final String BLUROS_TABS_EFFECT = "dirty_tweaks_tabs_effect";
 
         /**
          * Whether recent panel gravity is left or right (default = Gravity.RIGHT).

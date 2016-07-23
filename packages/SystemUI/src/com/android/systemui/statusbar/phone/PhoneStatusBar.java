@@ -228,6 +228,7 @@ import com.android.systemui.statusbar.stack.NotificationStackScrollLayout;
 import com.android.systemui.statusbar.stack.NotificationStackScrollLayout.OnChildLocationsChangedListener;
 import com.android.systemui.statusbar.stack.StackStateAnimator;
 import com.android.systemui.statusbar.stack.StackViewState;
+import com.android.systemui.statusbar.pie.PieControlPanel;
 import com.android.systemui.volume.VolumeComponent;
 import bluros.app.CMContextConstants;
 import bluros.app.CustomTileListenerService;
@@ -2067,6 +2068,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
 
         // atualiza
         NotificationPanelView.updatePreferences(context);
+        PieControlPanel.updatePreferences(context);
         RecentsActivity.updatePreferences(context);
         NotificationBackgroundView.updatePreferences(context);
         StatusBarHeaderView.updatePreferences(context);

@@ -46,9 +46,4 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" />
     </LinearLayout>
-    
-    <!-- brightness -->
-    <include android:id="@+id/brightness_container"
-             layout="@layout/quick_settings_brightness_dialog"/>
-    
 </com.android.systemui.qs.QSContainer>

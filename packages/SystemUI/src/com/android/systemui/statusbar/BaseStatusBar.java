@@ -323,7 +323,7 @@ public abstract class BaseStatusBar extends SystemUI implements
         private void update() {
             ContentResolver resolver = mContext.getContentResolver();
             boolean pieEnabled = Settings.System.getIntForUser(resolver,
-                    Settings.System.PA_PIE_STATE, 0, UserHandle.USER_CURRENT) == 1;
+                    Settings.System.PA_PIE_STATE, 1, UserHandle.USER_CURRENT) == 1;
 
             updatePieControls(!pieEnabled);
         }
@@ -833,7 +833,7 @@ public abstract class BaseStatusBar extends SystemUI implements
                 return;
             } else {
                 boolean shouldEnable = Settings.System.getIntForUser(mContext.getContentResolver(),
-                        Settings.System.PA_PIE_STATE, 0, UserHandle.USER_CURRENT) == 1;
+                        Settings.System.PA_PIE_STATE, 1, UserHandle.USER_CURRENT) == 1;
                 if (shouldEnable) {
                     // Re-init Orientation listener for later action
                     getOrientationListener();
