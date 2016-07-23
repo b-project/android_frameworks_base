@@ -5103,7 +5103,7 @@ public final class Settings {
          *
          * @hide
          */
-        public static final String BLUROS_TABS_EFFECT = "dirty_tweaks_tabs_effect";
+        public static final String BLUROS_TABS_EFFECT = "bluros_tabs_effect";
 
         /**
          * Whether recent panel gravity is left or right (default = Gravity.RIGHT).
