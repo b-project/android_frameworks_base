@@ -17,7 +17,6 @@
 package com.android.server.statusbar;
 
 import android.app.StatusBarManager;
-import android.content.Intent;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
@@ -566,7 +565,6 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
         }
     }
 
-
     @Override
     public void setAutoRotate(boolean enabled) {
         if (mBar != null) {
@@ -575,21 +573,6 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
             } catch (RemoteException ex) {}
         }
     }
-	
-	/**
-     * Ask keyguard to invoke a custom intent after dismissing keyguard
-     * @hide
-     */
-    @Override
-    public void showCustomIntentAfterKeyguard(Intent intent) {
-        enforceStatusBarService();
-        if (mBar != null) {
-            try {
-                mBar.showCustomIntentAfterKeyguard(intent);
-                     } catch (RemoteException ex) {}
-        }
-    }
-
     public void toggleLastApp() {
         if (mBar != null) {
             try {
@@ -606,28 +589,13 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
             } catch (RemoteException ex) {}
         }
     }
-    
+
     @Override
     public void toggleScreenshot() {
         if (mBar != null) {
             try {
                 mBar.toggleScreenshot();
             } catch (RemoteException ex) {}
-        }
-    }
-    /**
-     * Let systemui know screen pinning state change. This is independent of the
-     * showScreenPinningRequest() call as it does not reflect state
-     *
-     * @hide
-     */
-    @Override
-    public void screenPinningStateChanged(boolean enabled) {
-        if (mBar != null) {
-            try {
-                mBar.screenPinningStateChanged(enabled);
-            } catch (RemoteException ex) {
-            }
         }
     }
 

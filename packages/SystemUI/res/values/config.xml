@@ -34,7 +34,7 @@
     <bool name="config_recents_use_hardware_layers">false</bool>
 
     <!-- The number of app thumbnails we keep in memory -->
-    <integer name="config_recents_max_thumbnail_count">30</integer>
+    <integer name="config_recents_max_thumbnail_count">10</integer>
 
     <!-- The number of app icons we keep in memory -->
     <integer name="config_recents_max_icon_count">20</integer>
@@ -106,28 +106,19 @@
     <integer name="config_recent_item_min_alpha">3</integer>
 
     <!-- The number of columns in the QuickSettings -->
-    <integer name="quick_settings_num_columns">4</integer>
+    <integer name="quick_settings_num_columns">3</integer>
 
-	<integer name="quick_settings_num_rows">1</integer>
-	
+    <!-- The default number of rows in the QuickSettings -->
+    <integer name="quick_settings_num_rows">3</integer>
+
     <!-- The maximum number of rows in the QuickSettings -->
-    <integer name="quick_settings_max_rows">3</integer>
+    <integer name="quick_settings_max_rows">4</integer>
 
     <!-- The maximum number of rows in the QuickSettings when on the keyguard -->
     <integer name="quick_settings_max_rows_keyguard">3</integer>
 
     <!-- The number of columns that the top level tiles span in the QuickSettings -->
     <integer name="quick_settings_user_time_settings_tile_span">1</integer>
-
-    <!-- The default tiles to display in QuickSettings -->
-    <string name="quick_settings_tiles_default" translatable="false">
-        wifi,bt,dolby,cell,airplane,dnd,rotation,flashlight,location,cast,hotspot,inversion,adb_network,compass,nfc,float_mode,pie,profiles,sync,volume_panel,usb_tether,screen_timeout,performance,ambient_display,live_display,music,brightness,screen_off,screenshot,expanded_desktop,reboot,configurations,heads_up,lte,themes,navbar,appcirclebar,screenrecord,gesture_anywhere,battery_saver,power_menu,app_picker,kill_app,caffeine,hw_keys,pulse,sound,lockscreen
-    </string>
-
-    <!-- The default tiles to reset to in QuickSettings -->
-    <string name="quick_settings_tiles_reset" translatable="false">
-        wifi,bt,inversion,cell,airplane,dnd,rotation,flashlight,location,cast,hotspot
-    </string>
 
     <!-- The tiles to display in QuickSettings -->
     <string name="quick_settings_tiles" translatable="false">default</string>
@@ -141,6 +132,9 @@
 
     <!-- The maximum number of items to be displayed in quick settings -->
     <integer name="quick_settings_detail_max_item_count">7</integer>
+
+    <!-- Should "4G" be shown instead of "LTE" when the network is NETWORK_TYPE_LTE? -->
+    <bool name="config_show4GForLTE">true</bool>
 
     <!-- Whether or not we also show rsrp level for LTE. -->
     <bool name="config_showRsrpSignalLevelforLTE">false</bool>
@@ -189,7 +183,7 @@
      from home. -->
     <integer name="recents_task_enter_from_home_duration">225</integer>
 
-    <!-- The stagger for each task when animating the task from the bottom of the screen when
+    <!-- The stagger for each task when animating the task from the bottom of the screen when 
      transitioning from home. -->
     <integer name="recents_task_enter_from_home_stagger_delay">12</integer>
 
@@ -201,7 +195,7 @@
     <integer name="recents_nav_bar_scrim_enter_duration">400</integer>
 
     <!-- The animation duration for animating the removal of a task view. -->
-    <integer name="recents_animate_task_view_remove_duration">250</integer>
+    <integer name="recents_animate_task_view_remove_duration">450</integer>
 
     <!-- The animation duration for scrolling the stack to a particular item. -->
     <integer name="recents_animate_task_stack_scroll_duration">225</integer>
@@ -306,10 +300,8 @@
     <!-- Duration of the expansion animation in the volume dialog -->
     <item name="volume_expand_animation_duration" type="integer">300</item>
 
-    <!-- Default value how much apps show the app screenshot on recents view entry -->
-    <integer name="expanded_items_default">2</integer>
-
     <!-- Allow Flashlight service to use wakelock -->
     <bool name="flashlight_use_wakelock">false</bool>
 
 </resources>
+

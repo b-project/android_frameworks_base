@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 The BlurOS Project
+ * Copyright (C) 2015 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,21 @@
 package com.android.systemui.qs.tiles;
 
 import android.content.Context;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.provider.Settings;
 import android.provider.Settings.Global;
 
-import com.android.internal.logging.MetricsLogger;
 import com.android.systemui.qs.GlobalSetting;
 import com.android.systemui.qs.QSTile;
 import com.android.systemui.R;
 
+import org.bluros.internal.logging.CMMetricsLogger;
+
 /** Quick settings tile: Heads up **/
 public class HeadsUpTile extends QSTile<QSTile.BooleanState> {
 
-private static final Intent NOTIFICATION_SETTINGS = new Intent().setComponent(new ComponentName ("com.android.settings", "com.android.settings.Settings$HeadsupSettingsActivity"));
+    private static final Intent NOTIFICATION_SETTINGS =
+            new Intent("android.settings.NOTIFICATION_MANAGER");
 
     private final GlobalSetting mSetting;
 
@@ -52,25 +53,19 @@ private static final Intent NOTIFICATION_SETTINGS = new Intent().setComponent(ne
 
     @Override
     protected void handleClick() {
-        MetricsLogger.action(mContext, getMetricsCategory());
         setEnabled(!mState.value);
         refreshState();
     }
 
     @Override
     protected void handleLongClick() {
-        //mHost.startActivityDismissingKeyguard(NOTIFICATION_SETTINGS);
+        mHost.startActivityDismissingKeyguard(NOTIFICATION_SETTINGS);
     }
 
     private void setEnabled(boolean enabled) {
         Settings.Global.putInt(mContext.getContentResolver(),
                 Settings.Global.HEADS_UP_NOTIFICATIONS_ENABLED,
                 enabled ? 1 : 0);
-    }
-
-    @Override
-    public int getMetricsCategory() {
-        return MetricsLogger.QS_HEADSUP;
     }
 
     @Override
@@ -98,6 +93,11 @@ private static final Intent NOTIFICATION_SETTINGS = new Intent().setComponent(ne
         } else {
             return mContext.getString(R.string.accessibility_quick_settings_heads_up_changed_off);
         }
+    }
+
+    @Override
+    public int getMetricsCategory() {
+        return CMMetricsLogger.TILE_HEADS_UP;
     }
 
     @Override

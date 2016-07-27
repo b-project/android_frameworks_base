@@ -20,8 +20,6 @@ import com.android.internal.logging.MetricsLogger;
 import com.android.systemui.R;
 import com.android.systemui.qs.PseudoGridView;
 import com.android.systemui.statusbar.policy.UserSwitcherController;
-import android.graphics.PorterDuff.Mode;
-import android.provider.Settings;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -35,8 +33,6 @@ import android.view.ViewGroup;
 public class UserDetailView extends PseudoGridView {
 
     private Adapter mAdapter;
-
-    private boolean mQsColorSwitch = false;
 
     public UserDetailView(Context context, AttributeSet attrs) {
         super(context, attrs);

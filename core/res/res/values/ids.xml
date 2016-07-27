@@ -115,7 +115,7 @@
 
   <!-- Accessibility action identifier for {@link android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction#ACTION_SCROLL_RIGHT}. -->
   <item type="id" name="accessibilityActionScrollRight" />
-  
+
   <!-- Accessibility action identifier for {@link android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction#ACTION_CONTEXT_CLICK}. -->
   <item type="id" name="accessibilityActionContextClick" />
 </resources>

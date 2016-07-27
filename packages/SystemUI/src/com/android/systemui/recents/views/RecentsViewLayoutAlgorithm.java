@@ -43,12 +43,6 @@ public class RecentsViewLayoutAlgorithm {
      */
     List<Rect> computeStackRects(List<TaskStackView> stackViews, Rect availableBounds) {
         ArrayList<Rect> bounds = new ArrayList<Rect>(stackViews.size());
-/**		for (Rect bound : bounds) {
-                int top = bound.top;
-                int bottom = bound.bottom;
-                int height = bottom - top;
-                bound.bottom = top + (int) (height * 1.5f);
-        } */
         int stackViewsCount = stackViews.size();
         for (int i = 0; i < stackViewsCount; i++) {
             TaskStack stack = stackViews.get(i).getStack();

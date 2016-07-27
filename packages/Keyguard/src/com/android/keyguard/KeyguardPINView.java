@@ -118,12 +118,12 @@ public class KeyguardPINView extends KeyguardPinBasedInputView {
                         null, mEcaView, null
                 }};
 
+        boolean scramblePin = (CMSettings.System.getInt(getContext().getContentResolver(),
+                CMSettings.System.LOCKSCREEN_PIN_SCRAMBLE_LAYOUT, 0) == 1);
 
         boolean quickUnlock = (Settings.System.getInt(getContext().getContentResolver(),
                 Settings.System.LOCKSCREEN_QUICK_UNLOCK_CONTROL, 0) == 1);
 
-        boolean scramblePin = (CMSettings.System.getInt(getContext().getContentResolver(),
-                CMSettings.System.LOCKSCREEN_PIN_SCRAMBLE_LAYOUT, 0) == 1);
         if (scramblePin) {
             Collections.shuffle(sNumbers);
             // get all children who are NumPadKey's
@@ -221,7 +221,6 @@ public class KeyguardPINView extends KeyguardPinBasedInputView {
         if (password != null) {
             if (password.length() > MINIMUM_PASSWORD_LENGTH_BEFORE_REPORT
                     && kpvCheckPassword(password)) {
-                mPasswordEntry.setEnabled(false);
                 mCallback.reportUnlockAttempt(true, userId);
                 mCallback.dismiss(true);
                 resetPasswordText(true);

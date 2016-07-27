@@ -18,7 +18,6 @@ package com.android.systemui.statusbar;
 
 import android.content.Context;
 import android.view.View;
-import android.provider.Settings;
 
 /**
  * Wraps the actual notification content view; used to implement behaviors which are different for
@@ -29,12 +28,11 @@ public abstract class NotificationViewWrapper {
     private static final String TAG_BIG_MEDIA_NARROW = "bigMediaNarrow";
     private static final String TAG_MEDIA = "media";
     private static final String TAG_BIG_PICTURE = "bigPicture";
-    protected final View mView;
-    private boolean MColorSwitch = false; 
-	
 
-    public static NotificationViewWrapper wrap(Context ctx, View v) {	
-	if (v.getId() == com.android.internal.R.id.status_bar_latest_event_content) {
+    protected final View mView;
+
+    public static NotificationViewWrapper wrap(Context ctx, View v) {
+        if (v.getId() == com.android.internal.R.id.status_bar_latest_event_content) {
             if (TAG_BIG_MEDIA_NARROW.equals(v.getTag())) {
                 return new NotificationBigMediaNarrowViewWrapper(ctx, v);
             } else if (TAG_MEDIA.equals(v.getTag())) {
@@ -46,9 +44,9 @@ public abstract class NotificationViewWrapper {
             }
         } else {
             return new NotificationCustomViewWrapper(v);
-        		}
-		}
-	
+        }
+    }
+
     protected NotificationViewWrapper(View view) {
         mView = view;
     }

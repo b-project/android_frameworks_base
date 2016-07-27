@@ -20,7 +20,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.graphics.drawable.Drawable;
-import android.graphics.PorterDuff.Mode;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.UserHandle;
@@ -51,7 +50,6 @@ public class KeyguardShortcuts extends LinearLayout {
     private SettingsObserver mSettingsObserver;
     private PackageManager mPackageManager;
     private Context mContext;
-    private int mIconColor;
 
     public KeyguardShortcuts(Context context) {
         this(context, null);
@@ -94,8 +92,6 @@ public class KeyguardShortcuts extends LinearLayout {
                 Settings.System.LOCKSCREEN_SHORTCUTS_LONGPRESS, 1, UserHandle.USER_CURRENT);
 
         ActionConfig actionConfig;
-        mIconColor = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.LS_SHORTCUT_ICON_COLOR, 0xFFFFFFFF);
 
         for (int j = 0; j < actionConfigs.size(); j++) {
             actionConfig = actionConfigs.get(j);
@@ -115,10 +111,7 @@ public class KeyguardShortcuts extends LinearLayout {
             i.setContentDescription(AppHelper.getFriendlyNameForUri(
                     mContext, mPackageManager, actionConfig.getClickAction()));
             i.setClickable(true);
-            
-            if (i != null) {  
-	    i.setColorFilter(mIconColor, Mode.MULTIPLY);
-	    }
+
             if (clickType == 0) {
                 i.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -194,9 +187,6 @@ public class KeyguardShortcuts extends LinearLayout {
                     false, this, UserHandle.USER_ALL);
             mContext.getContentResolver().registerContentObserver(Settings.System.getUriFor(
                     Settings.System.LOCKSCREEN_SHORTCUTS_LONGPRESS),
-                    false, this, UserHandle.USER_ALL);
-            mContext.getContentResolver().registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.LS_SHORTCUT_ICON_COLOR),
                     false, this, UserHandle.USER_ALL);
             update();
         }

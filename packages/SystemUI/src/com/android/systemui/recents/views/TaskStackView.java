@@ -61,20 +61,17 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import com.android.systemui.doze.ShakeSensorManager;
-
 
 /* The visual representation of a task stack view */
 public class TaskStackView extends FrameLayout implements TaskStack.TaskStackCallbacks,
         TaskView.TaskViewCallbacks, TaskStackViewScroller.TaskStackViewScrollerCallbacks,
-        ViewPool.ViewPoolConsumer<TaskView, Task>, RecentsPackageMonitor.PackageCallbacks, ShakeSensorManager.ShakeListener {
+        ViewPool.ViewPoolConsumer<TaskView, Task>, RecentsPackageMonitor.PackageCallbacks {
 
     /** The TaskView callbacks */
     interface TaskStackViewCallbacks {
         public void onTaskViewClicked(TaskStackView stackView, TaskView tv, TaskStack stack, Task t,
                                       boolean lockToTask);
         public void onTaskViewAppInfoClicked(Task t);
-        public void onTaskFloatClicked(Task t);
         public void onTaskViewDismissed(Task t);
         public void onAllTaskViewsDismissed(ArrayList<Task> removedTasks);
         public void onTaskStackFilterTriggered();
@@ -97,7 +94,6 @@ public class TaskStackView extends FrameLayout implements TaskStack.TaskStackCal
     Rect mTaskStackBounds = new Rect();
     DismissView mDismissAllButton;
     boolean mDismissAllButtonAnimating;
-    static ShakeSensorManager mShakeSensorManager;
     int mFocusedTaskIndex = -1;
     int mPrevAccessibilityFocusedIndex = -1;
 
@@ -156,23 +152,6 @@ public class TaskStackView extends FrameLayout implements TaskStack.TaskStackCal
             }
         });
         setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
-        mShakeSensorManager = new ShakeSensorManager(mContext, this);
-    }
-
-    @Override
-    public synchronized void onShake() {
-        enableShake(false);
-        mStack.removeAllTasks();
-    }
-
-    public static void enableShake(boolean enableShakeClean) {
-        if( mShakeSensorManager == null)
-            return;
-        if (enableShakeClean) {
-            mShakeSensorManager.enable(10);
-        } else {
-            mShakeSensorManager.disable();
-        }
     }
 
     /** Sets the callbacks */
@@ -1244,7 +1223,6 @@ public class TaskStackView extends FrameLayout implements TaskStack.TaskStackCal
         // Announce for accessibility
         String msg = getContext().getString(R.string.accessibility_recents_all_items_dismissed);
         announceForAccessibility(msg);
-
     }
 
     @Override
@@ -1505,12 +1483,6 @@ public class TaskStackView extends FrameLayout implements TaskStack.TaskStackCal
         popup.show();
     }
 
-    @Override
-    public void onTaskFloatClicked(TaskView tv) {
-        if (mCb != null) {
-            mCb.onTaskFloatClicked(tv.getTask());
-        }
-    }
 
     @Override
     public void onTaskViewClicked(TaskView tv, Task task, boolean lockToTask) {

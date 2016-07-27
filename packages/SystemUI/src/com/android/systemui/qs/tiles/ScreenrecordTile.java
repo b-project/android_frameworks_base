@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
- * Copyright (C) 2012-2015 The BlurOS Project
+ * Copyright (C) 2012-2015 The CyanogenMod Project
  * Copyright (C) 2014-2015 The Euphoria-OS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,14 +32,10 @@ import android.view.View;
 import com.android.systemui.R;
 import com.android.systemui.omni.screenrecord.TakeScreenrecordService;
 import com.android.systemui.qs.QSTile;
-import com.android.systemui.qs.QSTileView;
-import com.android.internal.logging.MetricsLogger;
+import org.bluros.internal.logging.CMMetricsLogger;
 
 /** Quick settings tile: Screenrecord **/
 public class ScreenrecordTile extends QSTile<QSTile.BooleanState> {
-
-	private static final Intent APP_RECORD = new Intent().setComponent(new ComponentName(
-            "com.android.gallery3d", "com.android.gallery3d.app.GalleryActivity"));
 
     private boolean mListening;
     private boolean mRecording;
@@ -60,11 +56,6 @@ public class ScreenrecordTile extends QSTile<QSTile.BooleanState> {
         mListening = listening;
     }
 
-   @Override
-    public int getMetricsCategory() {
-        return MetricsLogger.DONT_TRACK_ME_BRO;
-    }
-
     @Override
     public void handleClick() {
         mHost.collapsePanels();
@@ -79,18 +70,24 @@ public class ScreenrecordTile extends QSTile<QSTile.BooleanState> {
 
     @Override
     protected void handleSecondaryClick() {
-       mHost.startActivityDismissingKeyguard(APP_RECORD);
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.setClassName("com.android.gallery3d",
+            "com.android.gallery3d.app.GalleryActivity");
+        mContext.sendBroadcast(intent);
     }
 
     @Override
     public void handleLongClick() {
-       mHost.startActivityDismissingKeyguard(APP_RECORD);
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.setClassName("com.android.gallery3d",
+            "com.android.gallery3d.app.GalleryActivity");
+        mContext.sendBroadcast(intent);
     }
 
     @Override
     protected void handleUpdateState(BooleanState state, Object arg) {
         state.visible = true;
-	state.value = mRecording;
+    state.value = mRecording;
         if (mRecording) {
             state.icon = ResourceIcon.get(R.drawable.ic_qs_screenrecord);
             state.label = mContext.getString(R.string.quick_settings_screenrecord_on);
@@ -167,5 +164,10 @@ public class ScreenrecordTile extends QSTile<QSTile.BooleanState> {
                 mHandler.postDelayed(mScreenrecordTimeout, 100000);
             }
         }
+    }
+
+    @Override
+    public int getMetricsCategory() {
+        return CMMetricsLogger.DONT_LOG;
     }
 }

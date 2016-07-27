@@ -300,6 +300,7 @@ public class NetworkTraffic extends TextView {
         }
 
             setTextColor(mNetworkTrafficColor);
+            updateTrafficDrawable();
 
         if (isSet(mState, MASK_UNIT)) {
             KB = KILOBYTE;
@@ -317,6 +318,7 @@ public class NetworkTraffic extends TextView {
                     mTrafficHandler.sendEmptyMessage(1);
                 }
                 setVisibility(View.VISIBLE);
+                updateTrafficDrawable();
                 return;
             }
         } else {
@@ -338,5 +340,28 @@ public class NetworkTraffic extends TextView {
         mTrafficHandler.removeCallbacks(mRunnable);
         mTrafficHandler.removeMessages(0);
         mTrafficHandler.removeMessages(1);
+    }
+
+    private void updateTrafficDrawable() {
+        int intTrafficDrawable;
+        Drawable drw = null;
+        if (!mHideArrow) {
+            if (isSet(mState, MASK_UP + MASK_DOWN)) {
+                intTrafficDrawable = R.drawable.stat_sys_network_traffic_updown;
+            } else if (isSet(mState, MASK_UP)) {
+                intTrafficDrawable = R.drawable.stat_sys_network_traffic_up;
+            } else if (isSet(mState, MASK_DOWN)) {
+                intTrafficDrawable = R.drawable.stat_sys_network_traffic_down;
+            } else {
+                intTrafficDrawable = 0;
+            }
+            if (intTrafficDrawable != 0) {
+                drw = getContext().getResources().getDrawable(intTrafficDrawable);
+                drw.setColorFilter(mNetworkTrafficColor, PorterDuff.Mode.SRC_ATOP);
+            }
+        } else {
+            drw = null;
+        }
+        setCompoundDrawablesWithIntrinsicBounds(null, null, drw, null);
     }
 }

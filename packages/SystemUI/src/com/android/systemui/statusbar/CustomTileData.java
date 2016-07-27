@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 The BlurOS Project
+ * Copyright (C) 2015 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ public class CustomTileData {
         public final StatusBarPanelCustomTile sbc;
 
         public Entry(StatusBarPanelCustomTile sbc) {
-            this.key = sbc.getKey();
+            this.key = sbc.persistableKey();
             this.sbc = sbc;
         }
     }

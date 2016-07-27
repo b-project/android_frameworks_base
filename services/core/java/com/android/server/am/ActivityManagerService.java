@@ -328,7 +328,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
     // Amount of time after a call to stopAppSwitches() during which we will
     // prevent further untrusted switches from happening.
-    static final long APP_SWITCH_DELAY_TIME = 5*1000;
+    static final long APP_SWITCH_DELAY_TIME = 1*1000;
 
     // How long we wait for a launched process to attach to the activity manager
     // before we decide it's never going to come up for real.
@@ -1484,16 +1484,10 @@ public final class ActivityManagerService extends ActivityManagerNative
                         return;
                     }
                     if (mShowDialogs && !mSleeping && !mShuttingDown) {
-                        if (Settings.System.getInt(mContext.getContentResolver(),
-                                Settings.System.DISABLE_FC_NOTIFICATIONS, 1) != 1) {
-                            Dialog d = new AppErrorDialog(getUiContext(),
+                        Dialog d = new AppErrorDialog(getUiContext(),
                                 ActivityManagerService.this, res, proc);
-                            d.show();
-                            proc.crashDialog = d;
-                        } else {
-                            Slog.w(TAG, "Skipping crash dialog of " + proc + ": disabled");
-                            res.set(0);
-                        }
+                        d.show();
+                        proc.crashDialog = d;
                     } else {
                         // The device is asleep, so just pretend that the user
                         // saw a crash dialog and hit "force quit".
@@ -6563,13 +6557,12 @@ public final class ActivityManagerService extends ActivityManagerNative
     }
 
     @Override
-    public void showBootMessage(final ApplicationInfo info, final int current,
-            final int total, final boolean always) {
+    public void showBootMessage(final CharSequence msg, final boolean always) {
         if (Binder.getCallingUid() != Process.myUid()) {
             // These days only the core system can call this, so apps can't get in
             // the way of what we show about running them.
         }
-        mWindowManager.showBootMessage(info, current, total, always);
+        mWindowManager.showBootMessage(msg, always);
     }
 
     @Override
@@ -8634,6 +8627,14 @@ public final class ActivityManagerService extends ActivityManagerNative
         return list;
     }
 
+    @Override
+    public boolean isPackageInForeground(String packageName) {
+        synchronized (this) {
+            ActivityRecord activity = mStackSupervisor.topRunningActivityLocked();
+            return activity != null && activity.packageName.equals(packageName);
+        }
+    }
+
     /**
      * Creates a new RecentTaskInfo from a TaskRecord.
      */
@@ -9068,6 +9069,27 @@ public final class ActivityManagerService extends ActivityManagerNative
         }
     }
 
+    private void cleanupProtectedComponentTasksLocked() {
+        for (int i = mRecentTasks.size() - 1; i >= 0; i--) {
+            TaskRecord tr = mRecentTasks.get(i);
+
+            for (int j = tr.mActivities.size() - 1; j >= 0; j--) {
+                ActivityRecord r = tr.mActivities.get(j);
+                ComponentName cn = r.realActivity;
+
+                try {
+                    boolean isProtected = AppGlobals.getPackageManager()
+                        .isComponentProtected(null, -1, cn, getCurrentUserIdLocked());
+                    if (isProtected) {
+                        removeTaskByIdLocked(tr.taskId, false);
+                    }
+                } catch (RemoteException re) {
+
+                }
+            }
+        }
+    }
+
     /**
      * Removes the task with the specified task id.
      *
@@ -9343,23 +9365,6 @@ public final class ActivityManagerService extends ActivityManagerNative
         synchronized (this) {
             mDeviceOwnerName = packageName;
         }
-    }
-
-    public IBinder getActivityForTask(int task, boolean onlyRoot) {
-        final ActivityStack mainStack = mStackSupervisor.getFocusedStack();
-        synchronized(this) {
-            ArrayList<ActivityStack> stacks = mStackSupervisor.getStacks();
-            for (ActivityStack stack : stacks) {
-                TaskRecord r = stack.taskForIdLocked(task);
-
-                if (r != null && r.getTopActivity() != null) {
-                    return r.getTopActivity().appToken;
-                } else {
-                    return null;
-                }
-            }
-        }
-        return null;
     }
 
     @Override
@@ -11975,8 +11980,8 @@ public final class ActivityManagerService extends ActivityManagerNative
                 intent.setComponent(comp);
                 doneReceivers.add(comp);
                 lastRi = curRi;
-                showBootMessage(ai.applicationInfo, Integer.MIN_VALUE + 2, Integer.MIN_VALUE + 2,
-                        false);
+                CharSequence label = ai.loadLabel(mContext.getPackageManager());
+                showBootMessage(mContext.getString(R.string.android_preparing_apk, label), false);
             }
             Slog.i(TAG, "Pre-boot of " + intent.getComponent().toShortString()
                     + " for user " + users[curUser]);
@@ -12084,6 +12089,7 @@ public final class ActivityManagerService extends ActivityManagerNative
 
             mRecentTasks.clear();
             mRecentTasks.addAll(mTaskPersister.restoreTasksLocked());
+            cleanupProtectedComponentTasksLocked();
             mRecentTasks.cleanupLocked(UserHandle.USER_ALL);
             mTaskPersister.startPersisting();
 
@@ -12098,7 +12104,9 @@ public final class ActivityManagerService extends ActivityManagerNative
                         synchronized (ActivityManagerService.this) {
                             mDidUpdate = true;
                         }
-                        showBootMessage(null, Integer.MIN_VALUE + 3, Integer.MIN_VALUE + 3, false);
+                        showBootMessage(mContext.getText(
+                                R.string.android_upgrading_complete),
+                                false);
                         writeLastDonePreBootReceivers(doneReceivers);
                         systemReady(goingCallback);
                     }
@@ -12588,6 +12596,7 @@ public final class ActivityManagerService extends ActivityManagerNative
         synchronized (sb) {
             bufferWasEmpty = sb.length() == 0;
             appendDropBoxProcessHeaders(process, processName, sb);
+            sb.append("CM Version: ").append(bluros.os.Build.CYANOGENMOD_VERSION).append("\n");
             sb.append("Build: ").append(Build.FINGERPRINT).append("\n");
             sb.append("System-App: ").append(isSystemApp).append("\n");
             sb.append("Uptime-Millis: ").append(info.violationUptimeMillis).append("\n");
@@ -12857,6 +12866,7 @@ public final class ActivityManagerService extends ActivityManagerNative
         if (subject != null) {
             sb.append("Subject: ").append(subject).append("\n");
         }
+        sb.append("CM Version: ").append(bluros.os.Build.CYANOGENMOD_VERSION).append("\n");
         sb.append("Build: ").append(Build.FINGERPRINT).append("\n");
         if (Debug.isDebuggerConnected()) {
             sb.append("Debugger: Connected\n");
@@ -16952,7 +16962,8 @@ public final class ActivityManagerService extends ActivityManagerNative
         } else if (callerApp == null || !callerApp.persistent) {
             try {
                 if (AppGlobals.getPackageManager().isProtectedBroadcast(
-                        intent.getAction())) {
+                        intent.getAction()) && !AppGlobals.getPackageManager()
+                        .isProtectedBroadcastAllowed(intent.getAction(), callingUid)) {
                     String msg = "Permission Denial: not allowed to send broadcast "
                             + intent.getAction() + " from pid="
                             + callingPid + ", uid=" + callingUid;
@@ -17122,6 +17133,14 @@ public final class ActivityManagerService extends ActivityManagerNative
                 case Proxy.PROXY_CHANGE_ACTION:
                     ProxyInfo proxy = intent.getParcelableExtra(Proxy.EXTRA_PROXY_INFO);
                     mHandler.sendMessage(mHandler.obtainMessage(UPDATE_HTTP_PROXY_MSG, proxy));
+                    break;
+                case bluros.content.Intent.ACTION_PROTECTED_CHANGED:
+                    final boolean state =
+                            intent.getBooleanExtra(
+                                    bluros.content.Intent.EXTRA_PROTECTED_STATE, false);
+                    if (state == PackageManager.COMPONENT_PROTECTED_STATUS) {
+                        cleanupProtectedComponentTasksLocked();
+                    }
                     break;
             }
         }

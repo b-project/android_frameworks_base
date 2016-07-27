@@ -23,7 +23,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.graphics.PorterDuff.Mode;
 
 import com.android.systemui.FontSizeUtils;
 import com.android.systemui.R;
@@ -31,8 +30,6 @@ import com.android.systemui.qs.DataUsageGraph;
 import com.android.systemui.statusbar.policy.NetworkController;
 
 import java.text.DecimalFormat;
-
-import android.provider.Settings;
 
 /**
  * Layout for the data usage detail in quick settings.
@@ -42,9 +39,6 @@ public class DataUsageDetailView extends LinearLayout {
     private static final double KB = 1024;
     private static final double MB = 1024 * KB;
     private static final double GB = 1024 * MB;
-
-
-    private boolean mQsColorSwitch = false;	
 
     private final DecimalFormat FORMAT = new DecimalFormat("#.##");
 
@@ -98,15 +92,10 @@ public class DataUsageDetailView extends LinearLayout {
             usageColor = R.color.system_warning_color;
         }
 
-	mQsColorSwitch = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.QS_COLOR_SWITCH, 0) == 1;
-	int QsTextColor = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.QS_TEXT_COLOR, 0xFFFFFFFF);
-
         final TextView title = (TextView) findViewById(android.R.id.title);
         title.setText(titleId);
         final TextView usage = (TextView) findViewById(R.id.usage_text);
-	usage.setText(formatBytes(bytes));
+        usage.setText(formatBytes(bytes));
         usage.setTextColor(mContext.getColor(usageColor));
         final DataUsageGraph graph = (DataUsageGraph) findViewById(R.id.usage_graph);
         graph.setLevels(info.limitLevel, info.warningLevel, info.usageLevel);
@@ -120,14 +109,7 @@ public class DataUsageDetailView extends LinearLayout {
         final TextView infoBottom = (TextView) findViewById(R.id.usage_info_bottom_text);
         infoBottom.setVisibility(bottom != null ? View.VISIBLE : View.GONE);
         infoBottom.setText(bottom);
-	if (mQsColorSwitch) {
-	    title.setTextColor(QsTextColor);
-            carrier.setTextColor(QsTextColor);
-	    period.setTextColor(QsTextColor);
-            infoTop.setTextColor(QsTextColor);
-	    infoBottom.setTextColor(QsTextColor);
-    	 }
-	}
+    }
 
     private String formatBytes(long bytes) {
         final long b = Math.abs(bytes);

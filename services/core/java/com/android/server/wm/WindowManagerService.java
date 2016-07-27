@@ -29,7 +29,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.CompatibilityInfo;
 import android.content.res.Configuration;
@@ -150,7 +149,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.List;
 
 import static android.view.WindowManager.LayoutParams.FIRST_APPLICATION_WINDOW;
@@ -5671,120 +5669,6 @@ public class WindowManagerService extends IWindowManager.Stub
         mLastStatusBarVisibility |= flags;
     }
 
-    private void moveTaskAndActivityToFront(int taskId) {
-        try {
-            moveTaskToTop(taskId);
-            mActivityManager.moveTaskToFront(taskId, 0, null);
-        } catch (RemoteException e) {
-            Log.e(TAG, "Cannot move the activity to front", e);
-        }
-    }
-
-    @Override
-    public void notifyFloatActivityTouched(IBinder token, boolean force) {
-        synchronized(mWindowMap) {
-              boolean changed = false;
-              if (token != null) {
-                  AppWindowToken newFocus = findAppWindowToken(token);
-                  if (newFocus == null) {
-                      Slog.w(TAG, "Attempted to set focus to non-existing app token: " + token);
-                      return;
-                  }
-                  changed = mFocusedApp != newFocus;
-                  mFocusedApp = newFocus;
-                  if (changed || force) {
-                      if (DEBUG_FOCUS) Slog.v(TAG, "Changed app focus to " + token);
-                      mInputMonitor.setFocusedAppLw(newFocus);
-                  }
-              }
-
-              if (changed || force) {
-                  final long origId = Binder.clearCallingIdentity();
-                  updateFocusedWindowLocked(UPDATE_FOCUS_NORMAL, true);
-                  mH.removeMessages(H.REPORT_FOCUS_CHANGE);
-                  mH.sendEmptyMessage(H.REPORT_FOCUS_CHANGE);
-                  Binder.restoreCallingIdentity(origId);
-              }
-       }
-
-       if (!force) {
-           final long origId = Binder.clearCallingIdentity();
-           try {
-                int taskId = mActivityManager.getTaskForActivity(token, false);
-                moveTaskAndActivityToFront(taskId);
-           } catch (RemoteException e) {
-                Log.e(TAG, "Cannot move the activity to front", e);
-           }
-           Binder.restoreCallingIdentity(origId);
-       }
-    }
-
-    @Override
-    public Rect getAppFullscreenViewRect() {
-        final DisplayContent displayContent = getDefaultDisplayContentLocked();
-        final boolean rotated = (mRotation == Surface.ROTATION_90
-                || mRotation == Surface.ROTATION_270);
-        final int realdw = rotated ?
-                displayContent.mBaseDisplayHeight : displayContent.mBaseDisplayWidth;
-        final int realdh = rotated ?
-                displayContent.mBaseDisplayWidth : displayContent.mBaseDisplayHeight;
-
-        int dw = realdw;
-        int dh = realdh;
-
-        // Get application display metrics.
-        int appWidth = mPolicy.getNonDecorDisplayWidth(dw, dh, mRotation);
-        int appHeight = mPolicy.getNonDecorDisplayHeight(dw, dh, mRotation);
-
-        return new Rect(0, 0, appWidth, appHeight);
-    }
-
-    @Override
-    public Rect getAppMinimumViewRect() {
-        final DisplayContent displayContent = getDefaultDisplayContentLocked();
-        final boolean rotated = (mRotation == Surface.ROTATION_90
-                || mRotation == Surface.ROTATION_270);
-        final int realdw = rotated ?
-                displayContent.mBaseDisplayHeight : displayContent.mBaseDisplayWidth;
-        final int realdh = rotated ?
-                displayContent.mBaseDisplayWidth : displayContent.mBaseDisplayHeight;
-
-        int dw = realdw;
-        int dh = realdh;
-
-        // Get application display metrics.
-        int appWidth = mPolicy.getNonDecorDisplayWidth(dw, dh, mRotation);
-        int appHeight = mPolicy.getNonDecorDisplayHeight(dw, dh, mRotation);
-
-        return new Rect(0, 0, (int)(appWidth * 0.5f) , (int)(appHeight * 0.5f));
-    }
-
-    @Override
-    public Rect getFloatViewRect() {
-        final DisplayContent displayContent = getDefaultDisplayContentLocked();
-        final boolean rotated = (mRotation == Surface.ROTATION_90
-                || mRotation == Surface.ROTATION_270);
-        final int realdw = rotated ?
-                displayContent.mBaseDisplayHeight : displayContent.mBaseDisplayWidth;
-        final int realdh = rotated ?
-                displayContent.mBaseDisplayWidth : displayContent.mBaseDisplayHeight;
-        final boolean nativeLandscape =
-                (displayContent.mBaseDisplayHeight < displayContent.mBaseDisplayWidth);
-
-        int dw = realdw;
-        int dh = realdh;
-
-        // Get application display metrics.
-        int appWidth = mPolicy.getNonDecorDisplayWidth(dw, dh, mRotation);
-        int appHeight = mPolicy.getNonDecorDisplayHeight(dw, dh, mRotation);
-
-        if (nativeLandscape ^ rotated) {
-            return new Rect(0, 0, (int)(appWidth * 0.7f), (int)(appHeight * 0.9f));
-        } else {
-            return new Rect(0, 0, (int)(appWidth * 0.9f) , (int)(appHeight * 0.7f));
-        }
-    }
-
     // Called by window manager policy. Not exposed externally.
     @Override
     public int getLidState() {
@@ -5829,6 +5713,12 @@ public class WindowManagerService extends IWindowManager.Stub
     @Override
     public void shutdown(boolean confirm) {
         ShutdownThread.shutdown(mContext, confirm);
+    }
+
+    // Called by window manager policy.  Not exposed externally.
+    @Override
+    public void rebootTile() {
+        ShutdownThread.reboot(mContext, null, true);
     }
 
     // Called by window manager policy.  Not exposed externally.
@@ -6060,15 +5950,13 @@ public class WindowManagerService extends IWindowManager.Stub
         return true;
     }
 
-    public void showBootMessage(final ApplicationInfo info, final int current, final int total,
-            final boolean always) {
+    public void showBootMessage(final CharSequence msg, final boolean always) {
         boolean first = false;
         synchronized(mWindowMap) {
             if (DEBUG_BOOT) {
                 RuntimeException here = new RuntimeException("here");
                 here.fillInStackTrace();
-                Slog.i(TAG, "showBootMessage: info=" + (info != null ? info.toString() : null)
-                        + " current=" + current + " total=" + total + " always=" + always
+                Slog.i(TAG, "showBootMessage: msg=" + msg + " always=" + always
                         + " mAllowBootMessages=" + mAllowBootMessages
                         + " mShowingBootMessages=" + mShowingBootMessages
                         + " mSystemBooted=" + mSystemBooted, here);
@@ -6086,7 +5974,7 @@ public class WindowManagerService extends IWindowManager.Stub
                 return;
             }
             mShowingBootMessages = true;
-            mPolicy.showBootMessage(info, current, total, always);
+            mPolicy.showBootMessage(msg, always);
         }
         if (first) {
             performEnableScreen();
@@ -10979,16 +10867,8 @@ public class WindowManagerService extends IWindowManager.Stub
 
             if (DEBUG_FOCUS_LIGHT) Slog.v(TAG, "findFocusedWindow: Found new focus @ " + i +
                         " = " + win);
-
-            // Dispatch to this window if it is wants key events.
-            if (win.canReceiveKeys()) {
-                if (mFocusedApp != null) {
-                    return win;
-                } else {
-                    return win;
-                }
-            }
-		}
+            return win;
+        }
 
         if (DEBUG_FOCUS_LIGHT) Slog.v(TAG, "findFocusedWindow: No focusable windows.");
         return null;
@@ -11317,14 +11197,9 @@ public class WindowManagerService extends IWindowManager.Stub
         return mPolicy.hasPermanentMenuKey();
     }
 
-    @Override 
+    @Override
     public boolean needsNavigationBar() {
         return mPolicy.needsNavigationBar();
-    }
-
-    @Override
-    public boolean navigationBarCanMove() {
-        return mPolicy.navigationBarCanMove();
     }
 
     @Override

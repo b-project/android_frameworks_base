@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 The BlurOS Project
+ * Copyright (C) 2015 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,7 @@ public class QSPanelTopView extends FrameLayout {
     protected View mBrightnessView;
     protected TextView mToastView;
     protected View mAddTarget;
+    protected TextView mEditInstructionText;
 
     private boolean mEditing = false;
     private boolean mDisplayingInstructions = false;
@@ -112,6 +113,14 @@ public class QSPanelTopView extends FrameLayout {
         mBrightnessView = findViewById(R.id.brightness_container);
         mToastView = (TextView) findViewById(R.id.qs_toast);
         mAddTarget = findViewById(R.id.add_target);
+        mEditInstructionText = (TextView) findViewById(R.id.edit_text_instruction);
+        updateResources();
+    }
+
+    public void updateResources() {
+        if (mEditInstructionText != null) {
+            mEditInstructionText.setText(R.string.qs_tile_edit_header_instruction);
+        }
     }
 
     @Override

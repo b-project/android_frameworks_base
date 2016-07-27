@@ -45,10 +45,7 @@ import com.android.systemui.cm.UserContentObserver;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.TimeZone;
 
 import libcore.icu.LocaleData;
@@ -77,40 +74,25 @@ public class Clock extends TextView implements DemoMode {
     public static final int CLOCK_DATE_STYLE_LOWERCASE = 1;
     public static final int CLOCK_DATE_STYLE_UPPERCASE = 2;
 
-    public static final int STYLE_DATE_LEFT  = 0;
-    public static final int STYLE_DATE_RIGHT = 1;
-    
-     public static final int FONT_NORMAL = 0;
-     public static final int FONT_ITALIC = 1;
-     public static final int FONT_BOLD = 2;
-     public static final int FONT_BOLD_ITALIC = 3;
-     public static final int FONT_LIGHT = 4;
-     public static final int FONT_LIGHT_ITALIC = 5;
-     public static final int FONT_THIN = 6;
-     public static final int FONT_THIN_ITALIC = 7;
-     public static final int FONT_CONDENSED = 8;
-     public static final int FONT_CONDENSED_ITALIC = 9;
-     public static final int FONT_CONDENSED_LIGHT = 10;
-     public static final int FONT_CONDENSED_LIGHT_ITALIC = 11;
-     public static final int FONT_CONDENSED_BOLD = 12;
-     public static final int FONT_CONDENSED_BOLD_ITALIC = 13;
-     public static final int FONT_MEDIUM = 14;
-     public static final int FONT_MEDIUM_ITALIC = 15;
-     public static final int FONT_BLACK = 16;
-     public static final int FONT_BLACK_ITALIC = 17;
-     public static final int FONT_DANCINGSCRIPT = 18;
-     public static final int FONT_DANCINGSCRIPT_BOLD = 19;
-     public static final int FONT_COMINGSOON = 20;
-     public static final int FONT_NOTOSERIF = 21;
-     public static final int FONT_NOTOSERIF_ITALIC = 22;
-     public static final int FONT_NOTOSERIF_BOLD = 23;
-     public static final int FONT_NOTOSERIF_BOLD_ITALIC = 24;
-     private int mClockFontStyle = FONT_NORMAL;
-     private int mClockFontSize = 14;
-     protected int mclockColor;
+    public static final int FONT_NORMAL = 0;
+    public static final int FONT_ITALIC = 1;
+    public static final int FONT_BOLD = 2;
+    public static final int FONT_BOLD_ITALIC = 3;
+    public static final int FONT_LIGHT = 4;
+    public static final int FONT_LIGHT_ITALIC = 5;
+    public static final int FONT_THIN = 6;
+    public static final int FONT_THIN_ITALIC = 7;
+    public static final int FONT_CONDENSED = 8;
+    public static final int FONT_CONDENSED_ITALIC = 9;
+    public static final int FONT_CONDENSED_BOLD = 10;
+    public static final int FONT_CONDENSED_BOLD_ITALIC = 11;
+    public static final int FONT_MEDIUM = 12;
+    public static final int FONT_MEDIUM_ITALIC = 13;
 
     protected int mClockDateDisplay = CLOCK_DATE_DISPLAY_GONE;
     protected int mClockDateStyle = CLOCK_DATE_STYLE_REGULAR;
+    private int mClockFontStyle = FONT_NORMAL;
+    private int mClockFontSize = 14;
 
     private SettingsObserver mSettingsObserver;
 
@@ -132,9 +114,6 @@ public class Clock extends TextView implements DemoMode {
                     this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System
                     .getUriFor(Settings.System.STATUSBAR_CLOCK_COLOR), false,
-                    this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System
-                    .getUriFor(Settings.System.STATUSBAR_CLOCK_DATE_POSITION), false,
                     this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System
                     .getUriFor(Settings.System.STATUSBAR_CLOCK_FONT_STYLE), false,
@@ -228,11 +207,20 @@ public class Clock extends TextView implements DemoMode {
 
     final void updateClock() {
         if (mDemoMode || mCalendar == null) return;
+
+        ContentResolver resolver = mContext.getContentResolver();
+        int defaultColor = mContext.getResources().getColor(R.color.status_bar_clock_color);
+        int clockColor = Settings.System.getIntForUser(resolver,
+                Settings.System.STATUSBAR_CLOCK_COLOR, defaultColor,
+                UserHandle.USER_CURRENT);
+        if (clockColor == Integer.MIN_VALUE) {
+            // flag to reset the color
+            clockColor = defaultColor;
+        }
+        setTextColor(clockColor);
+
         mCalendar.setTimeInMillis(System.currentTimeMillis());
         setText(getSmallTime());
-        setTextColor(mclockColor);
-        getFontStyle(mClockFontStyle);
-        setTextSize(mClockFontSize);
     }
 
     private final CharSequence getSmallTime() {
@@ -285,37 +273,28 @@ public class Clock extends TextView implements DemoMode {
 
         CharSequence dateString = null;
 
-        String result = "";
-        String timeResult = sdf.format(mCalendar.getTime());
-        String dateResult = "";
-
-        int clockDatePosition = Settings.System.getInt(getContext().getContentResolver(),
-            Settings.System.STATUSBAR_CLOCK_DATE_POSITION, 0);
+        String result = sdf.format(mCalendar.getTime());
 
         if (mClockDateDisplay != CLOCK_DATE_DISPLAY_GONE) {
             Date now = new Date();
 
             String clockDateFormat = Settings.System.getString(getContext().getContentResolver(),
                     Settings.System.STATUS_BAR_DATE_FORMAT);
+
             if (clockDateFormat == null || clockDateFormat.isEmpty()) {
-                // Set dateString to short uppercase Weekday (Default for AOKP) if empty
-                dateString = DateFormat.format("EEE", now);
+                // Set dateString to short uppercase Weekday (Default for BLUROS) if empty
+                dateString = DateFormat.format("EEE", now) + " ";
             } else {
-                dateString = DateFormat.format(clockDateFormat, now) ;
+                dateString = DateFormat.format(clockDateFormat, now) + " ";
             }
             if (mClockDateStyle == CLOCK_DATE_STYLE_LOWERCASE) {
                 // When Date style is small, convert date to lowercase
-                dateResult = dateString.toString().toLowerCase();
+                result = dateString.toString().toLowerCase() + result;
             } else if (mClockDateStyle == CLOCK_DATE_STYLE_UPPERCASE) {
-                dateResult = dateString.toString().toUpperCase();
+                result = dateString.toString().toUpperCase() + result;
             } else {
-                dateResult = dateString.toString();
+                result = dateString.toString() + result;
             }
-            result = (clockDatePosition == STYLE_DATE_LEFT) ?
-                    dateResult + " " + timeResult : timeResult + " " + dateResult;
-        } else {
-            // No date, just show time
-            result = timeResult;
         }
 
         SpannableStringBuilder formatted = new SpannableStringBuilder(result);
@@ -323,16 +302,12 @@ public class Clock extends TextView implements DemoMode {
         if (mClockDateDisplay != CLOCK_DATE_DISPLAY_NORMAL) {
             if (dateString != null) {
                 int dateStringLen = dateString.length();
-                int timeStringOffset =
-                        (clockDatePosition == STYLE_DATE_RIGHT) ?
-                        timeResult.length() + 1 : 0;
                 if (mClockDateDisplay == CLOCK_DATE_DISPLAY_GONE) {
                     formatted.delete(0, dateStringLen);
                 } else {
                     if (mClockDateDisplay == CLOCK_DATE_DISPLAY_SMALL) {
                         CharacterStyle style = new RelativeSizeSpan(0.7f);
-                        formatted.setSpan(style, timeStringOffset,
-                                          timeStringOffset + dateStringLen,
+                        formatted.setSpan(style, 0, dateStringLen,
                                           Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
                     }
                 }
@@ -360,7 +335,9 @@ public class Clock extends TextView implements DemoMode {
 
     protected void updateSettings() {
         ContentResolver resolver = mContext.getContentResolver();
+
         mClockFormatString = "";
+
         mClockDateDisplay = Settings.System.getIntForUser(resolver,
                 Settings.System.STATUS_BAR_DATE, CLOCK_DATE_DISPLAY_GONE,
                 UserHandle.USER_CURRENT);
@@ -373,24 +350,17 @@ public class Clock extends TextView implements DemoMode {
         mClockFontSize = Settings.System.getIntForUser(resolver,
                 Settings.System.STATUSBAR_CLOCK_FONT_SIZE, 14,
                 UserHandle.USER_CURRENT);
-        int defaultColor = getResources().getColor(R.color.status_bar_clock_color);
-        mclockColor = Settings.System.getIntForUser(resolver,
-                Settings.System.STATUSBAR_CLOCK_COLOR, defaultColor,
-                UserHandle.USER_CURRENT);
-        if (mclockColor == Integer.MIN_VALUE) {
-            // flag to reset the color
-            mclockColor = defaultColor;
-        }
-        if (mAttached) {
-            updateClock();
-        }
+
+        getFontStyle(mClockFontStyle);
+        setTextSize(mClockFontSize);
+        updateClock();
     }
-    
+
     public void getFontStyle(int font) {
-         switch (font) {
-             case FONT_NORMAL:
-             default:
-                 setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
+        switch (font) {
+            case FONT_NORMAL:
+            default:
+                setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
                 break;
             case FONT_ITALIC:
                 setTypeface(Typeface.create("sans-serif", Typeface.ITALIC));
@@ -419,12 +389,6 @@ public class Clock extends TextView implements DemoMode {
             case FONT_CONDENSED_ITALIC:
                 setTypeface(Typeface.create("sans-serif-condensed", Typeface.ITALIC));
                 break;
-            case FONT_CONDENSED_LIGHT:
-                setTypeface(Typeface.create("sans-serif-condensed-light", Typeface.NORMAL));
-                break;
-            case FONT_CONDENSED_LIGHT_ITALIC:
-                setTypeface(Typeface.create("sans-serif-condensed-light", Typeface.ITALIC));
-                break;
             case FONT_CONDENSED_BOLD:
                 setTypeface(Typeface.create("sans-serif-condensed", Typeface.BOLD));
                 break;
@@ -436,33 +400,6 @@ public class Clock extends TextView implements DemoMode {
                 break;
             case FONT_MEDIUM_ITALIC:
                 setTypeface(Typeface.create("sans-serif-medium", Typeface.ITALIC));
-                break;
-            case FONT_BLACK:
-                setTypeface(Typeface.create("sans-serif-black", Typeface.NORMAL));
-                break;
-            case FONT_BLACK_ITALIC:
-                setTypeface(Typeface.create("sans-serif-black", Typeface.ITALIC));
-                break;
-            case FONT_DANCINGSCRIPT:
-                setTypeface(Typeface.create("cursive", Typeface.NORMAL));
-                break;
-            case FONT_DANCINGSCRIPT_BOLD:
-                setTypeface(Typeface.create("cursive", Typeface.BOLD));
-                break;
-            case FONT_COMINGSOON:
-                setTypeface(Typeface.create("casual", Typeface.NORMAL));
-                break;
-            case FONT_NOTOSERIF:
-                setTypeface(Typeface.create("serif", Typeface.NORMAL));
-               break;
-            case FONT_NOTOSERIF_ITALIC:
-                setTypeface(Typeface.create("serif", Typeface.ITALIC));
-                break;
-            case FONT_NOTOSERIF_BOLD:
-                setTypeface(Typeface.create("serif", Typeface.BOLD));
-                break;
-            case FONT_NOTOSERIF_BOLD_ITALIC:
-                setTypeface(Typeface.create("serif", Typeface.BOLD_ITALIC));
                 break;
         }
     }

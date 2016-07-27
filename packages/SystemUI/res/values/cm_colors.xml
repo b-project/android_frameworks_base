@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2015 The BlurOS Project
+     Copyright (C) 2015 The CyanogenMod Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -112,6 +112,12 @@
     <color name="qs_detailed_title_text_color">@color/qs_title_text_color</color>
     <color name="qs_detailed_icon_tint_color">@color/qs_title_text_color</color>
 
+    <!-- Quick tile text color when the tile is disabled -->
+    <color name="qs_tile_text_disabled">#ff747474</color>
+
+    <!-- Active color for volume slider -->
+    <color name="volume_slider_active">@color/system_accent_color</color>
+
     <!-- Play Queue -->
     <color name="notification_guts_media_bg_color">#ff606060</color>
     <color name="queue_background">#ff303030</color>
@@ -119,10 +125,4 @@
 
     <color name="live_lockscreen_gradient_start">#00000000</color>
     <color name="live_lockscreen_gradient_end">#66000000</color>
-
-    <!-- Quick tile text color when the tile is disabled -->
-    <color name="qs_tile_text_disabled">#ff747474</color>
-
-    <!-- Active color for volume slider -->
-    <color name="volume_slider_active">@color/system_accent_color</color>
 </resources>

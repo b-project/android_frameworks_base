@@ -896,7 +896,7 @@
     <string name="task_manager_title">Task Manager</string>
     <string name="message_switch_fail">Cannot switch to this task, because it has no interface.</string>
     <string name="tasklist_killall">Kill All</string>
-    <string name="tasklist_memory_usage"><b>"Free / Total Memory : </b><xliff:g id="number">%s</xliff:g> / <xliff:g id="name">%s</xliff:g>"</string>
+    <string name="tasklist_memory_usage">"Free/Total Memory: <xliff:g id="number">%s</xliff:g> / <xliff:g id="name">%s</xliff:g>"</string>
     <string name="message_keep_one_launcher">Should keep at least one home activity!</string>
 
     <!-- Footer device owned text [CHAR LIMIT=50] -->
@@ -1142,21 +1142,5 @@
 
     <!-- Bluetooth enablement ok text [CHAR LIMIT=40] -->
     <string name="enable_bluetooth_confirmation_ok">Turn on</string>
-
-    <!-- Screenshot Crop & Share -->
-    <string name="action_delete_success">Deleted</string>
-    <string name="action_delete_fault">Deleting was unsuccessful</string>
-    <string name="action_save_success">Saved</string>
-    <string name="action_save_fault">Saving was unsuccessful</string>
-    <string name="pref_action_color_title">Action buttons color</string>
-    <string name="pref_action_color_summary">Choose your favorite color for the action buttons</string>
-    <string name="pref_category_main">Main Settings</string>
-    <string name="pref_category_user">User Settings</string>
-    <string name="pref_crop_behavior_title">Crop behavior</string>
-    <string name="pref_crop_behavior_summary">Use the cropped image even if the original one hasn\'t actually been cropped with the crop action</string>
-    <string name="action_ok">OK</string>
-    <string name="action_edit">Edit</string>
-
-	<string name="quick_settings_dolby_title">Dolby</string>
 
 </resources>

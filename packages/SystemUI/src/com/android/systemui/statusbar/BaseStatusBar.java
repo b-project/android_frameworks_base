@@ -110,9 +110,6 @@ import com.android.internal.util.cm.SpamFilter;
 import com.android.internal.util.cm.SpamFilter.SpamContract.NotificationTable;
 import com.android.internal.util.cm.SpamFilter.SpamContract.PackageTable;
 import com.android.internal.util.NotificationColorUtil;
-import com.android.internal.util.rr.OmniSwitchConstants;
-import com.android.internal.util.rr.ColorHelper;
-import com.android.internal.util.rr.NotificationColorHelper;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.keyguard.KeyguardUpdateMonitor;
 import com.android.systemui.DejankUtils;
@@ -122,7 +119,6 @@ import com.android.systemui.SwipeHelper;
 import com.android.systemui.SystemUI;
 import com.android.systemui.assist.AssistManager;
 import com.android.systemui.chaos.lab.gestureanywhere.GestureAnywhereView;
-import com.android.systemui.navigation.Navigator;
 import com.android.systemui.recents.Recents;
 import com.android.systemui.recents.RecentsActivity;
 import com.android.systemui.cm.SpamMessageProvider;
@@ -137,6 +133,7 @@ import com.android.systemui.statusbar.pie.PieController;
 import com.android.systemui.statusbar.policy.HeadsUpManager;
 import com.android.systemui.statusbar.policy.PreviewInflater;
 import com.android.systemui.statusbar.stack.NotificationStackScrollLayout;
+
 import bluros.providers.CMSettings;
 
 import java.lang.reflect.Field;
@@ -144,6 +141,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+
+import bluros.providers.CMSettings;
 
 import static com.android.keyguard.KeyguardHostView.OnDismissAction;
 
@@ -221,7 +220,7 @@ public abstract class BaseStatusBar extends SystemUI implements
     protected AccessibilityManager mAccessibilityManager;
 
     // on-screen navigation buttons
-    protected Navigator mNavigationBarView = null;
+    protected NavigationBarView mNavigationBarView = null;
 
     protected boolean mDeviceInteractive;
 
@@ -323,7 +322,7 @@ public abstract class BaseStatusBar extends SystemUI implements
         private void update() {
             ContentResolver resolver = mContext.getContentResolver();
             boolean pieEnabled = Settings.System.getIntForUser(resolver,
-                    Settings.System.PA_PIE_STATE, 1, UserHandle.USER_CURRENT) == 1;
+                    Settings.System.PA_PIE_STATE, 0, UserHandle.USER_CURRENT) == 1;
 
             updatePieControls(!pieEnabled);
         }
@@ -337,8 +336,8 @@ public abstract class BaseStatusBar extends SystemUI implements
     protected final ContentObserver mSettingsObserver = new ContentObserver(mHandler) {
         @Override
         public void onChange(boolean selfChange) {
-            final boolean provisioned = 0 != Settings.Global.getInt(
-                    mContext.getContentResolver(), Settings.Global.DEVICE_PROVISIONED, 0);
+            final boolean provisioned = 0 != CMSettings.Secure.getInt(
+                    mContext.getContentResolver(), CMSettings.Secure.CM_SETUP_WIZARD_COMPLETED, 0);
             if (provisioned != mDeviceProvisioned) {
                 mDeviceProvisioned = provisioned;
                 updateNotifications();
@@ -689,8 +688,8 @@ public abstract class BaseStatusBar extends SystemUI implements
         mPowerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
 
         mContext.getContentResolver().registerContentObserver(
-                Settings.Global.getUriFor(Settings.Global.DEVICE_PROVISIONED), true,
-                mSettingsObserver);
+                CMSettings.Secure.getUriFor(CMSettings.Secure.CM_SETUP_WIZARD_COMPLETED), false,
+                mSettingsObserver, UserHandle.USER_ALL);
         mContext.getContentResolver().registerContentObserver(
                 Settings.Global.getUriFor(Settings.Global.ZEN_MODE), false,
                 mSettingsObserver);
@@ -792,11 +791,8 @@ public abstract class BaseStatusBar extends SystemUI implements
         mContext.registerReceiverAsUser(mAllUsersReceiver, UserHandle.ALL, allUsersFilter,
                 null, null);
         updateCurrentProfilesCache();
-
-
         SettingsObserver observer = new SettingsObserver(mHandler);
         observer.observe();
- 
 
         mPieSettingsObserver.onChange(false);
         mContext.getContentResolver().registerContentObserver(Settings.System.getUriFor(
@@ -833,7 +829,7 @@ public abstract class BaseStatusBar extends SystemUI implements
                 return;
             } else {
                 boolean shouldEnable = Settings.System.getIntForUser(mContext.getContentResolver(),
-                        Settings.System.PA_PIE_STATE, 1, UserHandle.USER_CURRENT) == 1;
+                        Settings.System.PA_PIE_STATE, 0, UserHandle.USER_CURRENT) == 1;
                 if (shouldEnable) {
                     // Re-init Orientation listener for later action
                     getOrientationListener();
@@ -1076,41 +1072,6 @@ public abstract class BaseStatusBar extends SystemUI implements
         startNotificationGutsIntent(intent, appUid);
     }
 
-    private void launchFloating(PendingIntent pIntent) {
-        Intent overlay = new Intent();
-        overlay.addFlags(Intent.FLAG_FLOATING_WINDOW | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        try {
-            ActivityManagerNative.getDefault().resumeAppSwitches();
-        } catch (RemoteException e) {
-        }
-        try {
-            pIntent.send(mContext, 0, overlay);
-        } catch (PendingIntent.CanceledException e) {
-            // the stack trace isn't very helpful here.  Just log the exception message.
-            Slog.w(TAG, "Sending contentIntent failed: " + e);
-        }
-        final boolean keyguardShowing = mStatusBarKeyguardViewManager.isShowing();
-        dismissKeyguardThenExecute(new OnDismissAction() {
-            @Override
-            public boolean onDismiss() {
-                AsyncTask.execute(new Runnable() {
-                    public void run() {
-                        try {
-                            if (keyguardShowing) {
-                                ActivityManagerNative.getDefault()
-                                        .keyguardWaitingForActivityDrawn();
-                            }
-                            overrideActivityPendingAppTransition(keyguardShowing);
-                        } catch (RemoteException e) {
-                        }
-                    }
-                });
-                animateCollapsePanels(CommandQueue.FLAG_EXCLUDE_RECENTS_PANEL, true /* force */);
-                return true;
-            }
-        }, false /* afterKeyguardGone */);
-    }
-
     private void startNotificationGutsIntent(final Intent intent, final int appUid) {
         final boolean keyguardShowing = mStatusBarKeyguardViewManager.isShowing();
         dismissKeyguardThenExecute(new OnDismissAction() {
@@ -1146,7 +1107,6 @@ public abstract class BaseStatusBar extends SystemUI implements
         row.setTag(sbn.getPackageName());
         final View guts = row.getGuts();
         final String pkg = sbn.getPackageName();
-        final PendingIntent contentIntent = sbn.getNotification().contentIntent;
         String appname = pkg;
         Drawable pkgicon = null;
         int appUid = -1;
@@ -1166,7 +1126,6 @@ public abstract class BaseStatusBar extends SystemUI implements
         ((ImageView) row.findViewById(android.R.id.icon)).setImageDrawable(pkgicon);
         ((DateTimeView) row.findViewById(R.id.timestamp)).setTime(sbn.getPostTime());
         ((TextView) row.findViewById(R.id.pkgname)).setText(appname);
-        final View floatButton = guts.findViewById(R.id.notification_float_item);
         final View settingsButton = guts.findViewById(R.id.notification_inspect_item);
         final View appSettingsButton
                 = guts.findViewById(R.id.notification_inspect_app_provided_settings);
@@ -1199,21 +1158,8 @@ public abstract class BaseStatusBar extends SystemUI implements
                     removeNotification(sbn.getKey(), null);
                 }
             });
-	    if (floatButton!=null) {
-		  if (Settings.System.getInt(mContext.getContentResolver(),
-			Settings.System.FLOATING_WINDOW_MODE, 0) == 1) {
-			floatButton.setVisibility(View.VISIBLE);
-		  } else {
-			floatButton.setVisibility(View.GONE);
-		  }
-		  floatButton.setOnClickListener(new View.OnClickListener() {
-		  public void onClick(View v) {
-                    launchFloating(contentIntent);
-		    }
-		});
-            }
-			
-			final Intent appSettingsQueryIntent
+
+            final Intent appSettingsQueryIntent
                     = new Intent(Intent.ACTION_MAIN)
                     .addCategory(Notification.INTENT_CATEGORY_NOTIFICATION_PREFERENCES)
                     .setPackage(pkg);
@@ -1239,8 +1185,7 @@ public abstract class BaseStatusBar extends SystemUI implements
             } else {
                 appSettingsButton.setVisibility(View.GONE);
             }
-        }
-        if (appUid < 0) {
+        } else {
             settingsButton.setVisibility(View.GONE);
             appSettingsButton.setVisibility(View.GONE);
             filterButton.setVisibility(View.GONE);
@@ -1379,14 +1324,6 @@ public abstract class BaseStatusBar extends SystemUI implements
         mHandler.removeMessages(msg);
         mHandler.sendEmptyMessage(msg);
     }
-    
-    
-	public void screenPinningStateChanged(boolean enabled) {
-        if (mNavigationBarView != null) {
-            mNavigationBarView.screenPinningStateChanged(enabled);
-        }
-    }
-    
 
     @Override
     public void toggleLastApp() {
@@ -1412,7 +1349,7 @@ public abstract class BaseStatusBar extends SystemUI implements
     protected H createHandler() {
          return new H();
     }
-    
+
     static void sendCloseSystemWindows(Context context, String reason) {
         if (ActivityManagerNative.isSystemReady()) {
             try {
@@ -1426,30 +1363,15 @@ public abstract class BaseStatusBar extends SystemUI implements
 
     /** Proxy for RecentsComponent */
 
-    private boolean isOmniSwitchEnabled() {
-        int settingsValue = Settings.System.getIntForUser(
-                mContext.getContentResolver(), Settings.System.RECENTS_USE_OMNISWITCH, 0
-                , UserHandle.USER_CURRENT);
-        return (settingsValue == 1);
-    }
-
     protected void showRecents(boolean triggeredFromAltTab) {
-        if (isOmniSwitchEnabled()) {
-            Intent showIntent = new Intent(OmniSwitchConstants.ACTION_SHOW_OVERLAY);
-            mContext.sendBroadcastAsUser(showIntent, UserHandle.CURRENT);
-        } else {
-            if (mRecents != null) {
-                sendCloseSystemWindows(mContext, SYSTEM_DIALOG_REASON_RECENT_APPS);
-                mRecents.showRecents(triggeredFromAltTab, getStatusBarView());
-            }
+        if (mRecents != null) {
+            sendCloseSystemWindows(mContext, SYSTEM_DIALOG_REASON_RECENT_APPS);
+            mRecents.showRecents(triggeredFromAltTab, getStatusBarView());
         }
     }
 
     protected void hideRecents(boolean triggeredFromAltTab, boolean triggeredFromHomeKey) {
-        if (isOmniSwitchEnabled()) {
-            Intent showIntent = new Intent(OmniSwitchConstants.ACTION_HIDE_OVERLAY);
-            mContext.sendBroadcastAsUser(showIntent, UserHandle.CURRENT);
-        } else if (mRecents != null) {
+        if (mRecents != null) {
             mRecents.hideRecents(triggeredFromAltTab, triggeredFromHomeKey);
         } else if (mSlimRecents != null) {
             mSlimRecents.hideRecents(triggeredFromHomeKey);
@@ -1465,10 +1387,7 @@ public abstract class BaseStatusBar extends SystemUI implements
     }
 
     protected void toggleRecents() {
-        if (isOmniSwitchEnabled()) {
-            Intent showIntent = new Intent(OmniSwitchConstants.ACTION_TOGGLE_OVERLAY);
-            mContext.sendBroadcastAsUser(showIntent, UserHandle.CURRENT);
-        } else if (mRecents != null) {
+        if (mRecents != null) {
             sendCloseSystemWindows(mContext, SYSTEM_DIALOG_REASON_RECENT_APPS);
             mRecents.toggleRecents(mDisplay, mLayoutDirection, getStatusBarView());
         } else if (mSlimRecents != null) {
@@ -1484,11 +1403,7 @@ public abstract class BaseStatusBar extends SystemUI implements
     }
 
     protected void preloadRecents() {
-        if (!isOmniSwitchEnabled()) {
-            if (mRecents != null) {
-                mRecents.showNextAffiliatedTask();
-            }
-        } else if (mRecents != null) {
+        if (mRecents != null) {
             mRecents.preloadRecents();
         } else if (mSlimRecents != null) {
             mSlimRecents.preloadRecentTasksList();
@@ -1496,32 +1411,24 @@ public abstract class BaseStatusBar extends SystemUI implements
     }
 
     protected void cancelPreloadingRecents() {
-        if (!isOmniSwitchEnabled()) {
-            if (mRecents != null) {
-                mRecents.showNextAffiliatedTask();
-            }
-        } else if (mRecents != null) {
+        if (mRecents != null) {
             mRecents.cancelPreloadingRecents();
         }
     }
 
     protected void showRecentsNextAffiliatedTask() {
-        if (!isOmniSwitchEnabled()) {
-            if (mRecents != null) {
-                mRecents.showNextAffiliatedTask();
-            }
+        if (mRecents != null) {
+            mRecents.showNextAffiliatedTask();
         }
     }
 
     protected void showRecentsPreviousAffiliatedTask() {
-        if (!isOmniSwitchEnabled()) {
-            if (mRecents != null) {
-                mRecents.showPrevAffiliatedTask();
-        	} else if (mRecents != null) {
-             mRecents.showNextAffiliatedTask();
-        	} else if (mSlimRecents != null) {
+        if (mRecents != null) {
+            mRecents.showPrevAffiliatedTask();
+     	} else if (mRecents != null) {
+            mRecents.showNextAffiliatedTask();
+     	} else if (mSlimRecents != null) {
             mSlimRecents.cancelPreloadingRecentTasksList();
-            }
         }
     }
 
@@ -1747,6 +1654,20 @@ public abstract class BaseStatusBar extends SystemUI implements
     }
 
     protected boolean inflateViews(Entry entry, ViewGroup parent) {
+        final StatusBarNotification sbn = entry.notification;
+        String themePackageName = mCurrentTheme != null
+                ? mCurrentTheme.getOverlayPkgNameForApp(sbn.getPackageName()) : null;
+        boolean inflated = inflateViews(entry, parent, true);
+        if (!inflated && themePackageName != null
+                && !ThemeConfig.SYSTEM_DEFAULT.equals(themePackageName)) {
+            Log.w(TAG, "Couldn't expand themed RemoteViews, trying unthemed for: " + sbn);
+            inflated = inflateViews(entry, mStackScroller, false);
+        }
+
+        return inflated;
+    }
+
+    protected boolean inflateViews(Entry entry, ViewGroup parent, boolean isThemeable) {
         PackageManager pmUser = getPackageManagerForUser(
                 entry.notification.getUser().getIdentifier());
 
@@ -1791,7 +1712,6 @@ public abstract class BaseStatusBar extends SystemUI implements
             // cannot use isMediaNotification()
             if (sbn.getNotification().category != null
                     && sbn.getNotification().category.equals(Notification.CATEGORY_TRANSPORT)) {
-                Log.d("ro", "inflating media notification");
                 row = (MediaExpandableNotificationRow) inflater.inflate(
                         R.layout.status_bar_notification_row_media, parent, false);
                 ((MediaExpandableNotificationRow)row).setMediaController(
@@ -1824,10 +1744,12 @@ public abstract class BaseStatusBar extends SystemUI implements
         View contentViewLocal = null;
         View bigContentViewLocal = null;
         View headsUpContentViewLocal = null;
-        String themePackageName = mCurrentTheme != null
-                ? mCurrentTheme.getOverlayPkgNameForApp(sbn.getPackageName()) : null;
-        String statusBarThemePackageName = mCurrentTheme != null
-                ? mCurrentTheme.getOverlayForStatusBar() : null;
+        String themePackageName = (isThemeable && mCurrentTheme != null)
+                ? mCurrentTheme.getOverlayPkgNameForApp(sbn.getPackageName())
+                : ThemeConfig.SYSTEM_DEFAULT;
+        String statusBarThemePackageName = (isThemeable && mCurrentTheme != null)
+                ? mCurrentTheme.getOverlayForStatusBar()
+                : ThemeConfig.SYSTEM_DEFAULT;
 
         try {
             contentViewLocal = contentView.apply(
@@ -1918,8 +1840,10 @@ public abstract class BaseStatusBar extends SystemUI implements
         }
 
         if (publicViewLocal == null) {
+            final Context layoutContext = isThemeable ? mContext
+                    : maybeGetThemedContext(mContext, ThemeConfig.SYSTEM_DEFAULT);
             // Add a basic notification template
-            publicViewLocal = LayoutInflater.from(mContext).inflate(
+            publicViewLocal = LayoutInflater.from(layoutContext).inflate(
                     R.layout.notification_public_default,
                     contentContainerPublic, false);
             publicViewLocal.setIsRootNamespace(true);
@@ -2351,10 +2275,6 @@ public abstract class BaseStatusBar extends SystemUI implements
         mStackScroller.changeViewPosition(mEmptyShadeView, mStackScroller.getChildCount() - 2);
         mStackScroller.changeViewPosition(mKeyguardIconOverflowContainer,
                 mStackScroller.getChildCount() - 3);
-
-        if (onKeyguard) {
-            hideWeatherPanelIfNecessary(visibleNotifications, getMaxKeyguardNotifications());
-        }
     }
 
     private boolean shouldShowOnKeyguard(StatusBarNotification sbn) {
@@ -2370,17 +2290,6 @@ public abstract class BaseStatusBar extends SystemUI implements
                     (showOnKeyguard & Notification.SHOW_NO_ONGOING_NOTI_ON_KEYGUARD) == 0;
         }
         return isKeyguardAllowedForApp;
-    }
-
-    private void hideWeatherPanelIfNecessary(int visibleNotifications, int maxKeyguardNotifications) {
-        final ContentResolver resolver = mContext.getContentResolver();
-        int notifications = visibleNotifications;
-        if (mKeyguardIconOverflowContainer.getIconsView().getChildCount() > 0) {
-            notifications += 1;
-        }
-        Settings.System.putInt(resolver,
-                Settings.System.LOCK_SCREEN_VISIBLE_NOTIFICATIONS, notifications);
-        maxKeyguardNotifications = getMaxKeyguardNotifications();
     }
 
     protected void setZenMode(int mode) {
@@ -2673,9 +2582,7 @@ public abstract class BaseStatusBar extends SystemUI implements
             return false;
         }
 
-        // Give incoming call free passage here,
-        // we'll decide later if intrusive notification will be allowed
-        if (isSnoozedPackage(sbn) && !isIncomingCall(sbn)) {
+        if (isSnoozedPackage(sbn)) {
             return false;
         }
 
@@ -2684,11 +2591,6 @@ public abstract class BaseStatusBar extends SystemUI implements
             return false;
         }
 
-        // check if package is blacklisted first
-        if (isPackageBlacklisted(sbn.getPackageName()) || isPackageInDnd(getTopLevelPackage())) {
-            return false;
-        }
- 
         Notification notification = sbn.getNotification();
         // some predicates to make the boolean logic legible
         boolean whiteListed = mForceAllHeads || isPackageWhitelisted(sbn.getPackageName());
@@ -2698,15 +2600,9 @@ public abstract class BaseStatusBar extends SystemUI implements
                 || notification.vibrate != null;
         boolean isHighPriority = sbn.getScore() >= INTERRUPTION_THRESHOLD;
         boolean isFullscreen = notification.fullScreenIntent != null;
-
-        // incoming call should be allowed to process
-        // to handle non-intrusive ui correctly
-        int defHeadsUp = (isIncomingCall(sbn) && isIntrusiveEnabled())
-                ? Notification.HEADS_UP_NEVER
-                : Notification.HEADS_UP_ALLOWED;
         boolean hasTicker = mHeadsUpTicker && !TextUtils.isEmpty(notification.tickerText);
         boolean isAllowed = notification.extras.getInt(Notification.EXTRA_AS_HEADS_UP,
-                defHeadsUp) != Notification.HEADS_UP_NEVER;
+                Notification.HEADS_UP_ALLOWED) != Notification.HEADS_UP_NEVER;
         boolean accessibilityForcesLaunch = isFullscreen
                 && mAccessibilityManager.isTouchExplorationEnabled();
         boolean justLaunchedFullScreenIntent = entry.hasJustLaunchedFullScreenIntent();
@@ -2733,15 +2629,6 @@ public abstract class BaseStatusBar extends SystemUI implements
         }
         if (DEBUG) Log.d(TAG, "interrupt: " + interrupt);
         return interrupt;
-    }
-
-    private boolean isIncomingCall(StatusBarNotification sbn) {
-        return sbn.getPackageName().equals("com.android.dialer");
-    }
-
-    private boolean isIntrusiveEnabled() {
-        return Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.USE_INTRUSIVE_CALL, 0) != 0;
     }
 
     protected abstract boolean isSnoozedPackage(StatusBarNotification sbn);
@@ -2861,11 +2748,9 @@ public abstract class BaseStatusBar extends SystemUI implements
 
     @ChaosLab(name="GestureAnywhere", classification=Classification.NEW_METHOD)
     protected void addGestureAnywhereView() {
-      if (mGestureAnywhereView == null) {
         mGestureAnywhereView = (GestureAnywhereView)View.inflate(
                 mContext, R.layout.gesture_anywhere_overlay, null);
         mWindowManager.addView(mGestureAnywhereView, getGestureAnywhereViewLayoutParams(Gravity.LEFT));
-        }
         mGestureAnywhereView.setStatusBar(this);
     }
 
@@ -2896,10 +2781,10 @@ public abstract class BaseStatusBar extends SystemUI implements
     }
 
     protected void addAppCircleSidebar() {
-	    if (mAppCircleSidebar == null) {
+        if (mAppCircleSidebar == null) {
             mAppCircleSidebar = (AppCircleSidebar) View.inflate(mContext, R.layout.app_circle_sidebar, null);
             mWindowManager.addView(mAppCircleSidebar, getAppCircleSidebarLayoutParams());
-            }
+        }
     }
 
     protected void removeAppCircleSidebar() {
@@ -2908,7 +2793,7 @@ public abstract class BaseStatusBar extends SystemUI implements
         }
     }
 
- protected WindowManager.LayoutParams getAppCircleSidebarLayoutParams() {
+    protected WindowManager.LayoutParams getAppCircleSidebarLayoutParams() {
         int maxWidth =
                 mContext.getResources().getDimensionPixelSize(R.dimen.app_sidebar_trigger_width);
 
@@ -2928,6 +2813,26 @@ public abstract class BaseStatusBar extends SystemUI implements
         lp.setTitle("AppCircleSidebar");
 
         return lp;
+    }
+
+    /**
+     * Returns a context with the given theme applied or the original context if we fail to get a
+     * themed context.
+     */
+    private Context maybeGetThemedContext(Context context, String themePkg) {
+        Context themedContext;
+        try {
+            ApplicationInfo ai = context.getPackageManager().getApplicationInfo(
+                    context.getPackageName(), 0);
+            themedContext = context.createApplicationContext(ai, themePkg,
+                    0);
+        } catch (PackageManager.NameNotFoundException e) {
+            themedContext = null;
+        }
+        if (themedContext == null) {
+            themedContext = context;
+        }
+        return themedContext;
     }
 
     Runnable mKillTask = new Runnable() {

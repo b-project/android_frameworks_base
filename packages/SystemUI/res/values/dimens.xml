@@ -218,7 +218,7 @@
     <dimen name="recents_task_view_application_icon_size">48dp</dimen>
 
     <!-- The radius of the rounded corners on a task view. -->
-    <dimen name="recents_task_view_rounded_corners_radius">0dp</dimen>
+    <dimen name="recents_task_view_rounded_corners_radius">2dp</dimen>
 
     <!-- The min translation in the Z index for the last task. -->
     <dimen name="recents_task_view_z_min">20dp</dimen>
@@ -445,22 +445,10 @@
     <dimen name="keyguard_carrier_text_margin">16dp</dimen>
 
     <!-- Margin on the left side of the battery % in the header. -->
-    <dimen name="header_battery_margin_expanded">5.5dp</dimen> 
-
-    <!-- Margin on the left side of the battery somc in the header. -->
-    <dimen name="header_battery_somc_expanded">5.5dp</dimen>
-
-    <!-- Margin on the left side of the battery somc in the header. -->
-    <dimen name="header_battery_somc_expanded">4dp</dimen>
+    <dimen name="header_battery_margin_expanded">6dp</dimen>
 
     <!-- Margin on the left side of the battery % when on Keyguard. -->
-    <dimen name="header_battery_margin_keyguard">5.5dp</dimen>
-
-    <!-- Margin on the left side of the battery somc when on Keyguard. -->
-    <dimen name="header_battery_somc_keyguard">5.5dp</dimen>
-
-    <!-- Margin on the left side of the battery somc when on Keyguard. -->
-    <dimen name="header_battery_somc_keyguard">4dp</dimen>
+    <dimen name="header_battery_margin_keyguard">6dp</dimen>
 
     <!-- Margin on the right side of the system icon group on Keyguard. -->
     <dimen name="system_icons_keyguard_padding_end">4dp</dimen>
@@ -602,12 +590,4 @@
 
     <!-- Thickness of the shadows of the assist disclosure beams -->
     <dimen name="assist_disclosure_shadow_thickness">1.5dp</dimen>
-
-    <!-- Screenshot Crop & Share -->
-    <dimen name="fab_margin">16dp</dimen>
-    <dimen name="text_size_m">24sp</dimen>
-    <dimen name="text_size_s">17sp</dimen>
-    <dimen name="button_height">40dp</dimen>
-    <dimen name="crop_buttons">48dp</dimen>
-    <dimen name="crop_buttons_inlet">32dp</dimen>
 </resources>

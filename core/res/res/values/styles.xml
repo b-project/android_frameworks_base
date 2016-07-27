@@ -1455,17 +1455,5 @@ please see styles_device_defaults.xml.
         <item name="minHeight">72dp</item>
         <item name="padding">16dp</item>
     </style>
-    <style name="SwipeBackLayout">
-        <item name="EdgeSize">15dip</item>
-        <item name="ShadowLeft">@drawable/shadow_left</item>
-        <item name="ShadowRight">@drawable/shadow_right</item>
-        <item name="ShadowBottom">@drawable/shadow_bottom</item>
-    </style>
-    
-    <!-- dialog animation style -->
-    <style name="DialogSlideAnimation">
-        <item name="windowEnterAnimation">@anim/slide_up_dialog</item>
-        <item name="windowExitAnimation">@anim/slide_down_dialog</item>
-    </style>
 
 </resources>

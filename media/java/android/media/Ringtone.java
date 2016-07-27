@@ -44,7 +44,7 @@ import java.util.ArrayList;
  */
 public class Ringtone {
     private static final String TAG = "Ringtone";
-    private static final boolean LOGD = true;
+    private static final boolean LOGD = false;
 
     private static final String[] MEDIA_COLUMNS = new String[] {
         MediaStore.Audio.Media._ID,
@@ -221,6 +221,11 @@ public class Ringtone {
                     } else {
                         actualUri = RingtoneManager.getActualDefaultRingtoneUri(context,
                              RingtoneManager.getDefaultType(uri));
+                    }
+                    if (actualUri == null) {
+                        title = context
+                                .getString(com.android.internal.R.string.ringtone_default);
+                        return title;
                     }
                     String actualTitle = getTitle(
                             context, actualUri, false /*followSettingsUri*/, allowRemote);

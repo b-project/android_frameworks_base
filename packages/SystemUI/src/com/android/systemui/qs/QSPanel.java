@@ -19,8 +19,6 @@ package com.android.systemui.qs;
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -30,15 +28,6 @@ import android.os.Message;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.AttributeSet;
-import android.util.TypedValue;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.AnticipateInterpolator;
-import android.view.animation.AnticipateOvershootInterpolator;
-import android.view.animation.BounceInterpolator;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.OvershootInterpolator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,15 +35,10 @@ import android.view.accessibility.AccessibilityEvent;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import android.graphics.PorterDuff.Mode;
-import android.graphics.PorterDuffColorFilter;
-
 import com.android.internal.logging.MetricsLogger;
 import com.android.systemui.FontSizeUtils;
 import com.android.systemui.R;
-import com.android.systemui.qs.QSTile.CustomTitleDetailAdapter;
 import com.android.systemui.qs.QSTile.DetailAdapter;
-import com.android.systemui.qs.QSTileView;
 import com.android.systemui.settings.BrightnessController;
 import com.android.systemui.settings.ToggleSlider;
 import com.android.systemui.statusbar.phone.QSTileHost;
@@ -88,12 +72,9 @@ public class QSPanel extends ViewGroup {
     protected int mDualTileUnderlap;
     protected int mBrightnessPaddingTop;
     protected int mGridHeight;
-    private boolean mExpanded;
+    protected boolean mExpanded;
     protected boolean mListening;
     private boolean mClosingDetail;
-
-    private boolean mQsColorSwitch = false;
-    public QSTileView mTileView;
 
     protected Record mDetailRecord;
     private Callback mCallback;
@@ -122,25 +103,16 @@ public class QSPanel extends ViewGroup {
         mDetailSettingsButton = (TextView) mDetail.findViewById(android.R.id.button2);
         mDetailDoneButton = (TextView) mDetail.findViewById(android.R.id.button1);
         updateDetailText();
-	mBrightnessView = LayoutInflater.from(mContext).inflate(
-                R.layout.quick_settings_brightness_dialog, this, false);
         mDetail.setVisibility(GONE);
         mDetail.setClickable(true);
+        mBrightnessView = LayoutInflater.from(mContext).inflate(
+                R.layout.quick_settings_brightness_dialog, this, false);
         mFooter = new QSFooter(this, mContext);
         addView(mDetail);
         addView(mBrightnessView);
         addView(mFooter.getView());
         mClipper = new QSDetailClipper(mDetail);
         updateResources();
-
-
-	mTileView = new QSTileView(mContext);
-	boolean brightnessIconEnabled = Settings.System.getIntForUser(
-            mContext.getContentResolver(), Settings.System.BRIGHTNESS_ICON,
-                1, UserHandle.USER_CURRENT) == 1;
-	boolean addtileenabled = Settings.System.getIntForUser(
-            mContext.getContentResolver(), Settings.System.PERSIST_ADD,
-                1, UserHandle.USER_CURRENT) == 1;
 
         mBrightnessController = new BrightnessController(getContext(),
                 (ImageView) findViewById(R.id.brightness_icon),
@@ -156,7 +128,6 @@ public class QSPanel extends ViewGroup {
         });
     }
 
-
     /**
      * Enable/disable brightness slider.
      */
@@ -164,59 +135,17 @@ public class QSPanel extends ViewGroup {
         boolean brightnessSliderEnabled = CMSettings.System.getIntForUser(
             mContext.getContentResolver(), CMSettings.System.QS_SHOW_BRIGHTNESS_SLIDER,
                 1, UserHandle.USER_CURRENT) == 1;
-        boolean brightnessIconEnabled = Settings.System.getIntForUser(
-            mContext.getContentResolver(), Settings.System.BRIGHTNESS_ICON,
-                0, UserHandle.USER_CURRENT) == 1;
         ToggleSlider brightnessSlider = (ToggleSlider) findViewById(R.id.brightness_slider);
-        ImageView brightnessIcon = (ImageView) findViewById(R.id.brightness_icon);
         if (brightnessSliderEnabled) {
-  	if (brightnessIconEnabled) {
-            brightnessIcon.setVisibility(View.VISIBLE);
-            } else {
-            brightnessIcon.setVisibility(View.GONE);
-            }
-            mBrightnessView.setVisibility(View.VISIBLE);
-            brightnessSlider.setVisibility(View.VISIBLE);
-            
+            mBrightnessView.setVisibility(VISIBLE);
+            brightnessSlider.setVisibility(VISIBLE);
         } else {
-            mBrightnessView.setVisibility(View.GONE);
-            brightnessSlider.setVisibility(View.GONE);
-	        brightnessIcon.setVisibility(View.GONE);	       
+            mBrightnessView.setVisibility(GONE);
+            brightnessSlider.setVisibility(GONE);
         }
- 	updatecolors();
         updateResources();
-        return brightnessSliderEnabled;	
+        return brightnessSliderEnabled;
     }
-	
-   public void updatecolors() {
-	ImageView brightnessIcon = (ImageView) findViewById(R.id.brightness_icon);
-	mQsColorSwitch = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.QS_COLOR_SWITCH, 0) == 1;
-	int mIconColor = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.QS_BRIGHTNESS_ICON_COLOR, 0xFFFFFFFF);
-        if(brightnessIcon!=null) {        
-		if (mQsColorSwitch) {	
-		brightnessIcon.setColorFilter(mIconColor, Mode.SRC_ATOP);
-		}
-	}	
-     }
-  public void setDetailBackgroundColor(int color) {
-	final Resources res = getContext().getResources();
-	int mStockBg = res.getColor(R.color.quick_settings_panel_background);
-        mQsColorSwitch = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.QS_COLOR_SWITCH, 0) == 1;
-        if (mQsColorSwitch) {
-            if (mDetail != null) {
-                    mDetail.getBackground().setColorFilter(
-                            color, Mode.SRC_ATOP);
-                } 		
-            } else {
-	if (mDetail != null) {
-                    mDetail.getBackground().setColorFilter(
-                           mStockBg, Mode.SRC_ATOP);
-                }
-	 }    
-	}
 
     protected void updateDetailText() {
         mDetailDoneButton.setText(R.string.quick_settings_done);
@@ -265,7 +194,6 @@ public class QSPanel extends ViewGroup {
             refreshAllTiles();
         }
         updateDetailText();
-	updatecolors();
     }
 
     @Override
@@ -381,57 +309,6 @@ public class QSPanel extends ViewGroup {
         r.tileView.onStateChanged(state);
     }
 
-    private void setAnimationTile(TileRecord r) {
-        ObjectAnimator animTile = null;
-        int animStyle = Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.ANIM_TILE_STYLE, 0, UserHandle.USER_CURRENT);
-        int animDuration = Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.ANIM_TILE_DURATION, 1500, UserHandle.USER_CURRENT);
-        int interpolatorType = Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.ANIM_TILE_INTERPOLATOR, 0, UserHandle.USER_CURRENT);
-        if (animStyle == 0) {
-            //No animation
-        }
-        if (animStyle == 1) {
-            animTile = ObjectAnimator.ofFloat(r.tileView, "rotationY", 0f, 360f);
-        }
-        if (animStyle == 2) {
-            animTile = ObjectAnimator.ofFloat(r.tileView, "rotation", 0f, 360f);
-        }
-        if (animTile != null) {
-            switch (interpolatorType) {
-                    case 0:
-                        animTile.setInterpolator(new LinearInterpolator());
-                        break;
-                    case 1:
-                        animTile.setInterpolator(new AccelerateInterpolator());
-                        break;
-                    case 2:
-                        animTile.setInterpolator(new DecelerateInterpolator());
-                        break;
-                    case 3:
-                        animTile.setInterpolator(new AccelerateDecelerateInterpolator());
-                        break;
-                    case 4:
-                        animTile.setInterpolator(new BounceInterpolator());
-                        break;
-                    case 5:
-                        animTile.setInterpolator(new OvershootInterpolator());
-                        break;
-                    case 6:
-                        animTile.setInterpolator(new AnticipateInterpolator());
-                        break;
-                    case 7:
-                        animTile.setInterpolator(new AnticipateOvershootInterpolator());
-                        break;
-                    default:
-                        break;
-            }
-            animTile.setDuration(animDuration);
-            animTile.start();
-        }
-    }
-
     private void addTile(final QSTile<?> tile) {
         final TileRecord r = new TileRecord();
         r.tile = tile;
@@ -472,21 +349,18 @@ public class QSPanel extends ViewGroup {
             @Override
             public void onClick(View v) {
                 r.tile.click();
-                setAnimationTile(r);
             }
         };
         final View.OnClickListener clickSecondary = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 r.tile.secondaryClick();
-                setAnimationTile(r);
             }
         };
         final View.OnLongClickListener longClick = new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 r.tile.longClick();
-                setAnimationTile(r);
                 return true;
             }
         };
@@ -567,7 +441,7 @@ public class QSPanel extends ViewGroup {
             MetricsLogger.visible(mContext, detailAdapter.getMetricsCategory());
             announceForAccessibility(mContext.getString(
                     R.string.accessibility_quick_settings_detail,
-                    QSTile.getDetailAdapterTitle(mContext, detailAdapter)));
+                    mContext.getString(detailAdapter.getTitle())));
             setDetailRecord(r);
             listener = mHideGridContentWhenDone;
             if (r instanceof TileRecord && visibleDiff) {
@@ -585,10 +459,7 @@ public class QSPanel extends ViewGroup {
         sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
         fireShowingDetail(show ? detailAdapter : null);
         if (visibleDiff) {
-	    try {
             mClipper.animateCircularClip(x, y, show, listener);
-            } catch(IllegalStateException e) {
-            }
         }
     }
 
@@ -799,7 +670,7 @@ public class QSPanel extends ViewGroup {
         public void onAnimationEnd(Animator animation) {
             // Only hide content if still in detail state.
             if (mDetailRecord != null) {
-                setGridContentVisibility(true);
+                setGridContentVisibility(false);
                 redrawTile();
             }
         }

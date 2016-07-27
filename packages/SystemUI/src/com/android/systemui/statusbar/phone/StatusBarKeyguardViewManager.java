@@ -444,7 +444,7 @@ public class StatusBarKeyguardViewManager {
     private Runnable mMakeNavigationBarVisibleRunnable = new Runnable() {
         @Override
         public void run() {
-            mPhoneStatusBar.getNavigationBarView().getBaseView().setVisibility(View.VISIBLE);
+            mPhoneStatusBar.getNavigationBarView().setVisibility(View.VISIBLE);
         }
     };
 
@@ -479,7 +479,7 @@ public class StatusBarKeyguardViewManager {
                     }
                 } else {
                     mContainer.removeCallbacks(mMakeNavigationBarVisibleRunnable);
-                    mPhoneStatusBar.getNavigationBarView().getBaseView().setVisibility(View.GONE);
+                    mPhoneStatusBar.getNavigationBarView().setVisibility(View.GONE);
                 }
             }
         }
@@ -578,11 +578,11 @@ public class StatusBarKeyguardViewManager {
         return mPhoneStatusBar.isKeyguardShowingMedia();
     }
 
-    public void setBackgroundBitmap(Bitmap bmp) {
-        mPhoneStatusBar.setBackgroundBitmap(bmp);
-    }
-
     public void setKeyguardExternalViewFocus(boolean hasFocus) {
         mStatusBarWindowManager.setKeyguardExternalViewFocus(hasFocus);
+    }
+
+    public void setBackgroundBitmap(Bitmap bmp) {
+        mPhoneStatusBar.setBackgroundBitmap(bmp);
     }
 }

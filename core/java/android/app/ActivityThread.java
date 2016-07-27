@@ -2278,18 +2278,6 @@ public final class ActivityThread {
         return mActivities.get(token).activity;
     }
 
-    protected void performFinishFloating() {
-        synchronized (mPackages) {
-            Activity a = null;
-            for (ActivityClientRecord ar : mActivities.values()) {
-                a = ar.activity;
-                if (a != null && !a.mFinished && a.getWindow() != null && a.getWindow().mIsFloatingWindow) {
-                    a.finish();
-                }
-            }
-        }
-    }
-
     public final void sendActivityResult(
             IBinder token, String id, int requestCode,
             int resultCode, Intent data) {
@@ -3145,12 +3133,12 @@ public final class ActivityThread {
                 r.state = null;
                 r.persistentState = null;
             } catch (Exception e) {
-                /*if (!mInstrumentation.onException(r.activity, e)) {
+                if (!mInstrumentation.onException(r.activity, e)) {
                     throw new RuntimeException(
                         "Unable to resume activity "
                         + r.intent.getComponent().toShortString()
                         + ": " + e.toString(), e);
-                }*/
+                }
             }
         }
         return r;
@@ -4459,7 +4447,9 @@ public final class ActivityThread {
             int uid = Process.myUid();
             String[] packages = getPackageManager().getPackagesForUid(uid);
 
-            if (packages != null) {
+            // If there are several packages in this application we won't
+            // initialize the graphics disk caches
+            if (packages != null && packages.length == 1) {
                 HardwareRenderer.setupDiskCache(cacheDir);
                 RenderScriptCacheDir.setupDiskCache(cacheDir);
             }
@@ -4472,7 +4462,7 @@ public final class ActivityThread {
         if (mCurDefaultDisplayDpi != Configuration.DENSITY_DPI_UNDEFINED
                 && mCurDefaultDisplayDpi != DisplayMetrics.DENSITY_DEVICE
                 && !mDensityCompatMode) {
-            Slog.i(TAG, "Switching default density from "
+            if (DEBUG_MESSAGES) Slog.i(TAG, "Switching default density from "
                     + DisplayMetrics.DENSITY_DEVICE + " to "
                     + mCurDefaultDisplayDpi);
             DisplayMetrics.DENSITY_DEVICE = mCurDefaultDisplayDpi;

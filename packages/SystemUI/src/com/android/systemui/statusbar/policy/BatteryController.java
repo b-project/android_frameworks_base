@@ -40,7 +40,6 @@ public class BatteryController extends BroadcastReceiver implements BatteryState
 
     public static final int STYLE_ICON_PORTRAIT = 0;
     public static final int STYLE_CIRCLE = 2;
-    public static final int STYLE_DOTTED_CIRCLE = 3;
     public static final int STYLE_GONE = 4;
     public static final int STYLE_ICON_LANDSCAPE = 5;
     public static final int STYLE_TEXT = 6;
@@ -198,7 +197,7 @@ public class BatteryController extends BroadcastReceiver implements BatteryState
             mStyle = CMSettings.System.getIntForUser(mResolver,
                     CMSettings.System.STATUS_BAR_BATTERY_STYLE, 0, mUserId);
             mPercentMode = CMSettings.System.getIntForUser(mResolver,
-                    CMSettings.System.STATUS_BAR_SHOW_BATTERY_PERCENT, 2, mUserId);
+                    CMSettings.System.STATUS_BAR_SHOW_BATTERY_PERCENT, 0, mUserId);
 
             fireSettingsChanged();
         }

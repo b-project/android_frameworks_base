@@ -251,6 +251,7 @@ import com.android.server.LocalServices;
 import com.android.server.policy.PhoneWindowManager;
 import com.android.server.ServiceThread;
 import com.android.server.SystemConfig;
+import com.android.server.SystemConfig.AppLink;
 import com.android.server.Watchdog;
 import com.android.server.pm.PermissionsState.PermissionState;
 import com.android.server.pm.Settings.DatabaseVersion;
@@ -619,7 +620,7 @@ public class PackageManagerService extends IPackageManager.Stub {
     final ArraySet<String> mTransferedPackages = new ArraySet<String>();
 
     // Broadcast actions that are only available to the system.
-    final ArraySet<String> mProtectedBroadcasts = new ArraySet<String>();
+    final ArrayMap<String, String> mProtectedBroadcasts = new ArrayMap<>();
 
     /** List of packages waiting for verification. */
     final SparseArray<PackageVerificationState> mPendingVerification
@@ -2662,10 +2663,11 @@ public class PackageManagerService extends IPackageManager.Stub {
         }
 
         SystemConfig systemConfig = SystemConfig.getInstance();
-        ArraySet<String> packages = systemConfig.getLinkedApps();
+        ArraySet<AppLink> links = systemConfig.getLinkedApps();
         ArraySet<String> domains = new ArraySet<String>();
 
-        for (String packageName : packages) {
+        for (AppLink link : links) {
+            String packageName = link.pkgname;
             PackageParser.Package pkg = mPackages.get(packageName);
             if (pkg != null) {
                 if (!pkg.isSystemApp()) {
@@ -2690,11 +2692,11 @@ public class PackageManagerService extends IPackageManager.Stub {
                     // state w.r.t. the formal app-linkage "no verification attempted" state;
                     // and then 'always' in the per-user state actually used for intent resolution.
                     final IntentFilterVerificationInfo ivi;
-                    ivi = mSettings.createIntentFilterVerificationIfNeededLPw(packageName,
-                            new ArrayList<String>(domains));
+                    ivi = mSettings.createIntentFilterVerificationIfNeededLPw(
+                            packageName, new ArrayList<String>(domains));
                     ivi.setStatus(INTENT_FILTER_DOMAIN_VERIFICATION_STATUS_UNDEFINED);
-                    mSettings.updateIntentFilterVerificationStatusLPw(packageName,
-                            INTENT_FILTER_DOMAIN_VERIFICATION_STATUS_ALWAYS, userId);
+                    mSettings.updateIntentFilterVerificationStatusLPw(
+                            packageName, link.state, userId);
                 } else {
                     Slog.w(TAG, "Sysconfig <app-link> package '" + packageName
                             + "' does not handle web links");
@@ -4064,7 +4066,19 @@ public class PackageManagerService extends IPackageManager.Stub {
     @Override
     public boolean isProtectedBroadcast(String actionName) {
         synchronized (mPackages) {
-            return mProtectedBroadcasts.contains(actionName);
+            return mProtectedBroadcasts.containsKey(actionName);
+        }
+    }
+
+    @Override
+    public boolean isProtectedBroadcastAllowed(String actionName, int callingUid) {
+        synchronized (mPackages) {
+            if (mProtectedBroadcasts.containsKey(actionName)) {
+               final int result = checkUidPermission(mProtectedBroadcasts.get(actionName),
+                        callingUid);
+                return result == PackageManager.PERMISSION_GRANTED;
+            }
+            return false;
         }
     }
 
@@ -6019,16 +6033,17 @@ public class PackageManagerService extends IPackageManager.Stub {
         if ((parseFlags & PackageParser.PARSE_IS_PREBUNDLED_DIR) != 0) {
             synchronized (mPackages) {
                 PackageSetting existingSettings = mSettings.peekPackageLPr(pkg.packageName);
-                boolean isInstalledForUser = (existingSettings != null
-                        && existingSettings.getInstalled(user.getIdentifier()));
-                if (mSettings.wasPrebundledPackageInstalledLPr(user.getIdentifier(),
-                        pkg.packageName) && !isInstalledForUser) {
-                    // The prebundled app was installed at some point for the user and isn't
-                    // currently installed for the user, skip reinstalling it
+
+                if (!mSettings.shouldPrebundledPackageBeInstalledForUserLPr(existingSettings,
+                        user.getIdentifier(), pkg.packageName)) {
+                    // The prebundled app was installed at some point for the owner and isn't
+                    // currently installed for the owner, dont install it for a new user
+                    // OR the prebundled app was installed for the user at some point and isn't
+                    // current installed for the user, so skip reinstalling it
                     throw new PackageManagerException(INSTALL_FAILED_UNINSTALLED_PREBUNDLE,
                             "skip reinstall for " + pkg.packageName);
-                } else if (!mSettings.shouldPrebundledPackageBeInstalled(mContext.getResources(),
-                                pkg.packageName, mCustomResources)) {
+                } else if (!mSettings.shouldPrebundledPackageBeInstalledForRegion(
+                        mContext.getResources(), pkg.packageName, mCustomResources)) {
                     // The prebundled app is not needed for the default mobile country code,
                     // skip installing it
                     throw new PackageManagerException(INSTALL_FAILED_REGION_LOCKED_PREBUNDLE,
@@ -6345,7 +6360,8 @@ public class PackageManagerService extends IPackageManager.Stub {
                     if (!isFirstBoot()) {
                         try {
                             ActivityManagerNative.getDefault().showBootMessage(
-                                    null, Integer.MIN_VALUE + 1, Integer.MIN_VALUE + 1, true);
+                                    mContext.getResources().getString(
+                                            R.string.android_upgrading_fstrim), true);
                         } catch (RemoteException e) {
                         }
                     }
@@ -6471,20 +6487,20 @@ public class PackageManagerService extends IPackageManager.Stub {
         if (DEBUG_DEXOPT) {
             Log.i(TAG, "Optimizing app " + curr + " of " + total + ": " + pkg.packageName);
         }
+        // give the packagename to the PhoneWindowManager
+        ApplicationInfo ai;
         try {
-            // give the packagename to the PhoneWindowManager
-            ApplicationInfo ai;
-            try {
-                ai = mContext.getPackageManager().getApplicationInfo(pkg.packageName, 0);
-            } catch (Exception e) {
-                ai = null;
-            }
-            mPolicy.setPackageName((String) (ai != null ? mContext.getPackageManager().getApplicationLabel(ai) : pkg.packageName));
-
-            ActivityManagerNative.getDefault().showBootMessage(pkg.applicationInfo, curr, total, true);
+            ai = mContext.getPackageManager().getApplicationInfo(pkg.packageName, 0);
+        } catch (Exception e) {
+            ai = null;
+        }
+        mPolicy.setPackageName((String) (ai != null ? mContext.getPackageManager().getApplicationLabel(ai) : pkg.packageName));
+        try {
+            ActivityManagerNative.getDefault().showBootMessage(
+                    mContext.getResources().getString(R.string.android_upgrading_apk,
+                            curr, total), true);
         } catch (RemoteException e) {
         }
-
         PackageParser.Package p = pkg;
         synchronized (mInstallLock) {
             mPackageDexOptimizer.performDexOpt(p, null /* instruction sets */,
@@ -7510,6 +7526,25 @@ public class PackageManagerService extends IPackageManager.Stub {
         KeySetManagerService ksms = mSettings.mKeySetManagerService;
         ksms.assertScannedPackageValid(pkg);
 
+        // Get the current theme config. We do this outside the lock
+        // since ActivityManager might be waiting on us already
+        // and a deadlock would result.
+        final boolean isBootScan = (scanFlags & SCAN_BOOTING) != 0;
+        ThemeConfig config = mBootThemeConfig;
+        if (!isBootScan) {
+            final IActivityManager am = ActivityManagerNative.getDefault();
+            try {
+                if (am != null) {
+                    config = am.getConfiguration().themeConfig;
+                } else {
+                    Log.w(TAG, "ActivityManager getDefault() " +
+                            "returned null, cannot compile app's theme");
+                }
+            } catch(RemoteException e) {
+                Log.w(TAG, "Failed to get the theme config from ActivityManager");
+            }
+        }
+
         // writer
         synchronized (mPackages) {
             // We don't expect installation to fail beyond this point
@@ -7851,13 +7886,13 @@ public class PackageManagerService extends IPackageManager.Stub {
             if (pkg.protectedBroadcasts != null) {
                 N = pkg.protectedBroadcasts.size();
                 for (i=0; i<N; i++) {
-                    mProtectedBroadcasts.add(pkg.protectedBroadcasts.get(i));
+                    mProtectedBroadcasts.put(pkg.protectedBroadcasts.keyAt(i),
+                            pkg.protectedBroadcasts.valueAt(i));
                 }
             }
 
             pkgSetting.setTimeStamp(scanFileTime);
 
-            final boolean isBootScan = (scanFlags & SCAN_BOOTING) != 0;
             // Generate resources & idmaps if pkg is NOT a theme
             // We must compile resources here because during the initial boot process we may get
             // here before a default theme has had a chance to compile its resources
@@ -7865,21 +7900,6 @@ public class PackageManagerService extends IPackageManager.Stub {
             // in background)
             if (pkg.mOverlayTargets.isEmpty() && mOverlays.containsKey(pkg.packageName)) {
                 ArrayMap<String, PackageParser.Package> themes = mOverlays.get(pkg.packageName);
-
-                final IActivityManager am = ActivityManagerNative.getDefault();
-                ThemeConfig themeConfig = null;
-                try {
-                    if (am != null) {
-                        themeConfig = am.getConfiguration().themeConfig;
-                    } else {
-                        Log.e(TAG, "ActivityManager getDefault() " +
-                                "returned null, cannot compile app's theme");
-                    }
-                } catch(RemoteException e) {
-                    Log.e(TAG, "Failed to get the theme config ", e);
-                }
-
-                ThemeConfig config = isBootScan ? mBootThemeConfig : themeConfig;
 
                 if (config != null) {
                     for(PackageParser.Package themePkg : themes.values()) {
@@ -7929,10 +7949,22 @@ public class PackageManagerService extends IPackageManager.Stub {
                     }
 
                     if (failedException != null) {
-                        Slog.w(TAG, "Unable to process theme " + pkgName + " for " + target,
-                                failedException);
-                        // remove target from mOverlayTargets
-                        iterator.remove();
+                        if (failedException instanceof AaptException &&
+                                ((AaptException) failedException).isCommon) {
+                            Slog.e(TAG, "Unable to process common resources for " + pkgName +
+                                    ", uninstalling theme.", failedException);
+                            uninstallThemeForAllApps(pkg);
+                            deletePackageLI(pkg.packageName, null, true, null, null, 0, null,
+                                    false);
+                            throw new PackageManagerException(
+                                    PackageManager.INSTALL_FAILED_THEME_AAPT_ERROR,
+                                    "Unable to process theme " + pkgName, failedException);
+                        } else {
+                            Slog.w(TAG, "Unable to process theme " + pkgName + " for " + target,
+                                    failedException);
+                            // remove target from mOverlayTargets
+                            iterator.remove();
+                        }
                     }
                 }
             }
@@ -8305,8 +8337,15 @@ public class PackageManagerService extends IPackageManager.Stub {
     }
 
     public class AaptException extends Exception {
+        boolean isCommon;
+
         public AaptException(String message) {
+            this(message, false);
+        }
+
+        public AaptException(String message, boolean isCommon) {
             super(message);
+            this.isCommon = isCommon;
         }
     }
 
@@ -8344,7 +8383,7 @@ public class PackageManagerService extends IPackageManager.Stub {
             pkgId = Resources.THEME_APP_PKG_ID;
         }
 
-        boolean hasCommonResources = (hasCommonResources(pkg) && !COMMON_OVERLAY.equals(target));
+        boolean hasCommonResources = (hasCommonResources(pkg) && !isCommonResources);
         PackageParser.Package targetPkg = mPackages.get(target);
         String appPath = targetPkg != null ? targetPkg.baseCodePath :
                 Environment.getRootDirectory() + "/framework/framework-res.apk";
@@ -8354,7 +8393,7 @@ public class PackageManagerService extends IPackageManager.Stub {
                 appPath,
                 hasCommonResources ? ThemeUtils.getTargetCacheDir(COMMON_OVERLAY, pkg)
                         + File.separator + "resources.apk" : "") != 0) {
-            throw new AaptException("Failed to run aapt");
+            throw new AaptException("Failed to run aapt", isCommonResources);
         }
     }
 
@@ -9457,12 +9496,15 @@ public class PackageManagerService extends IPackageManager.Stub {
             mFlags = flags;
             List<ResolveInfo> list = super.queryIntent(intent, resolvedType,
                     (flags & PackageManager.MATCH_DEFAULT_ONLY) != 0, userId);
-            // Remove protected Application components
+            // Remove protected Application components if they're explicitly queried for.
+            // Implicit intent queries will be gated when the returned component is acted upon.
             int callingUid = Binder.getCallingUid();
             String[] pkgs = getPackagesForUid(callingUid);
             List<String> packages = (pkgs != null) ? Arrays.asList(pkgs) : Collections.EMPTY_LIST;
-            if (callingUid != Process.SYSTEM_UID &&
-                    (getFlagsForUid(callingUid) & ApplicationInfo.FLAG_SYSTEM) == 0) {
+            final boolean isNotSystem = callingUid != Process.SYSTEM_UID &&
+                    (getFlagsForUid(callingUid) & ApplicationInfo.FLAG_SYSTEM) == 0;
+
+            if (isNotSystem && intent.getComponent() != null) {
                Iterator<ResolveInfo> itr = list.iterator();
                 while (itr.hasNext()) {
                     ActivityInfo activityInfo = itr.next().activityInfo;
@@ -17313,7 +17355,8 @@ public class PackageManagerService extends IPackageManager.Stub {
         //If this component is launched from the system or a uid of a protected component, allow it.
         boolean fromProtectedComponentUid = false;
         for (String protectedComponentManager : protectedComponentManagers) {
-            if (callingUid == getPackageUid(protectedComponentManager, userId)) {
+            int packageUid = getPackageUid(protectedComponentManager, userId);
+            if (packageUid != -1 && callingUid == packageUid) {
                 fromProtectedComponentUid = true;
             }
         }
@@ -17836,10 +17879,20 @@ public class PackageManagerService extends IPackageManager.Stub {
             }
 
             if (failedException != null) {
-                Slog.w(TAG, "Unable to process theme " + pkg.packageName + " for " + target,
-                        failedException);
-                // remove target from mOverlayTargets
-                iterator.remove();
+                if (failedException instanceof AaptException &&
+                        ((AaptException) failedException).isCommon) {
+                    Slog.e(TAG, "Unable to process common resources for " + pkg.packageName +
+                            ", uninstalling theme.", failedException);
+                    uninstallThemeForAllApps(pkg);
+                    deletePackageX(pkg.packageName, getCallingUid(),
+                            PackageManager.DELETE_ALL_USERS);
+                    return PackageManager.INSTALL_FAILED_THEME_AAPT_ERROR;
+                } else {
+                    Slog.w(TAG, "Unable to process theme " + pkg.packageName + " for " + target,
+                            failedException);
+                    // remove target from mOverlayTargets
+                    iterator.remove();
+                }
             }
         }
 

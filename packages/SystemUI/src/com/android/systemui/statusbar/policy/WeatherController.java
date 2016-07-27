@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 The BlurOS Project
+ * Copyright (C) 2014 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,9 @@ public interface WeatherController {
         void onWeatherChanged(WeatherInfo temp);
     }
     public static class WeatherInfo {
-        public String temp = null;
+        public double temp = Double.NaN;
         public String city = null;
         public String condition = null;
+        public int tempUnit;
     }
 }

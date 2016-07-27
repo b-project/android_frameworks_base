@@ -61,6 +61,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import bluros.providers.CMSettings;
+
 /**
  * Keeps the lock pattern/password data and related settings for each user.
  * Used by LockPatternUtils. Needs to be a service because Settings app also needs
@@ -468,6 +470,7 @@ public class LockSettingsService extends ILockSettings.Stub {
     @Override
     public void setLockPattern(String pattern, String savedCredential, int userId)
             throws RemoteException {
+        checkWritePermission(userId);
         byte[] currentHandle = getCurrentHandle(userId);
 
         if (pattern == null) {
@@ -496,6 +499,7 @@ public class LockSettingsService extends ILockSettings.Stub {
     @Override
     public void setLockPassword(String password, String savedCredential, int userId)
             throws RemoteException {
+        checkWritePermission(userId);
         byte[] currentHandle = getCurrentHandle(userId);
 
         if (password == null) {
@@ -824,8 +828,8 @@ public class LockSettingsService extends ILockSettings.Stub {
         Secure.LOCK_PATTERN_ENABLED,
         Secure.LOCK_BIOMETRIC_WEAK_FLAGS,
         Secure.LOCK_PATTERN_VISIBLE,
-        Secure.LOCK_PASS_TO_SECURITY_VIEW,
         Secure.LOCK_PATTERN_TACTILE_FEEDBACK_ENABLED,
+        CMSettings.Secure.LOCK_PASS_TO_SECURITY_VIEW,
         Secure.LOCK_PATTERN_SIZE,
         Secure.LOCK_DOTS_VISIBLE,
         Secure.LOCK_SHOW_ERROR_PATH,

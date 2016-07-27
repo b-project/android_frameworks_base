@@ -244,8 +244,6 @@ LOCAL_SHARED_LIBRARIES := \
     libicuuc \
     libicui18n \
     libmedia \
-    libblurosutils \
-    libbluros-phoneloc-jni \
     libjpeg \
     libusbhost \
     libharfbuzz_ng \

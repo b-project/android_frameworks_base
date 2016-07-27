@@ -84,23 +84,17 @@
     <bool name="config_sendAudioBecomingNoisy">true</bool>
 
     <!-- The duration (in milliseconds) of a short animation. -->
-    <integer name="config_shortAnimTime">200</integer>
+    <integer name="config_shortAnimTime">100</integer>
 
     <!-- The duration (in milliseconds) of a medium-length animation. -->
-    <integer name="config_mediumAnimTime">400</integer>
+    <integer name="config_mediumAnimTime">200</integer>
 
     <!-- The duration (in milliseconds) of a long animation. -->
-    <integer name="config_longAnimTime">500</integer>
+    <integer name="config_longAnimTime">250</integer>
 
     <!-- The duration (in milliseconds) of the activity open/close and fragment open/close animations. -->
-    <integer name="config_activityShortDur">150</integer>
-    <integer name="config_activityDefaultDur">220</integer>
-
-    <!-- The duration (in milliseconds) of recent app screen animation. -->
-    <integer name="config_recentDefaultDur">300</integer>
-
-    <!-- The duration (in milliseconds) of recent app screen exit animation. -->
-    <integer name="config_recentExitDur">450</integer>
+    <integer name="config_activityShortDur">75</integer>
+    <integer name="config_activityDefaultDur">110</integer>
 
     <!-- Duration for the dim animation behind a dialog.  This may be either
          a percentage, which is relative to the duration of the enter/open
@@ -511,6 +505,12 @@
     <!-- Integer indicating RSSI boost given to current network -->
     <integer translatable="false" name="config_wifi_framework_current_network_boost">25</integer>
 
+    <!-- Integer indicating the number of selective channel scan when Wifi turn on -->
+    <integer translatable="false" name="config_max_initial_scans_on_selective_channels">2</integer>
+
+    <!-- Integer indicating the interval for selective channel scan when Wifi turn on -->
+    <integer translatable="false" name="config_initial_saved_channel_scan_interval">2000</integer>
+
     <!-- Integer indicating how to handle beacons with uninitialized RSSI value of 0 -->
     <integer translatable="false" name="config_wifi_framework_scan_result_rssi_level_patchup_value">-85</integer>
 
@@ -906,7 +906,7 @@
     <integer name="config_shutdownBatteryTemperature">680</integer>
 
     <!-- Display low battery warning when battery level dips to this value -->
-    <integer name="config_lowBatteryWarningLevel">0</integer>
+    <integer name="config_lowBatteryWarningLevel">15</integer>
 
     <!-- Close low battery warning when battery level reaches the lowBatteryWarningLevel
          plus this -->
@@ -1709,6 +1709,9 @@
          turned off and the screen off animation has been performed. -->
     <bool name="config_dozeAfterScreenOff">false</bool>
 
+    <!-- Wether doze feature is enabled by default in settings. -->
+    <bool name="config_doze_enabled_by_default">true</bool>
+
     <!-- Power Management: Specifies whether to decouple the auto-suspend state of the
          device from the display on/off state.
 
@@ -2169,7 +2172,15 @@
     <string-array translatable="false" name="config_globalActionsList">
         <item>power</item>
         <item>reboot</item>
+        <item>screenshot</item>
+        <item>screenrecord</item>
+        <item>profile</item>
+        <item>airplane</item>
         <item>users</item>
+        <item>settings</item>
+        <item>lockdown</item>
+        <item>bugreport</item>
+        <item>silent</item>
     </string-array>
 
     <!-- Number of milliseconds to hold a wake lock to ensure that drawing is fully
@@ -2505,7 +2516,7 @@
 
     <!-- Timeout in MS for how long you have to long-press the back key to
          kill the foreground app. -->
-    <integer name="config_backKillTimeout">750</integer>
+    <integer name="config_backKillTimeout">2000</integer>
 
     <!-- Setting to false will disable CM's IME switcher implementation for tablets -->
     <bool name="config_show_cmIMESwitcher">true</bool>
@@ -2550,13 +2561,9 @@
          is non-interactive. -->
     <bool name="config_cameraDoubleTapPowerGestureEnabled">true</bool>
 
-
     <!-- Support in Surfaceflinger for blur layers.
          NOTE: This requires additional hardware-specific code. -->
     <bool name="config_ui_blur_enabled">false</bool>
-
-    <!-- Sets whether IME switcher on statusbar should be shown or not. -->
-	<bool name="config_show_IMESwitcher">true</bool>
 
     <!-- When config_LTE_RSRP_threshold_type is set to "custom" -->
     <integer-array name="config_LTE_RSRP_custom_levels">
@@ -2568,7 +2575,6 @@
         <item>-44</item>
     </integer-array>
 
-
     <!-- Name of the component to handle network policy notifications. If present,
          disables NetworkPolicyManagerService's presentation of data-usage notifications. -->
     <string translatable="false" name="config_networkPolicyNotificationComponent"></string>
@@ -2577,16 +2583,12 @@
          automatically try to pair with it when the device exits tablet mode. -->
     <string translatable="false" name="config_packagedKeyboardName"></string>
 
-    <!-- Use alternative way to blur lockscreen -->
-    <bool name="config_use_stackblur">true</bool>
+    <!-- Show battery fully charged notification -->
+    <bool name="config_showBatteryFullyChargedNotification">false</bool>
 
     <!-- Older rotation sensors are not setting event.timestamp correctly. Setting to
          true will use SystemClock.elapsedRealtimeNanos() to set timestamp. -->
     <bool name="config_useSystemClockforRotationSensor">false</bool>
-
-     <!-- Older sensors are not setting event.timestamp correctly. Setting to
-         true will use SystemClock.elapsedRealtimeNanos() to set timestamp. -->
-    <bool name="config_useSystemClockforSensors">false</bool>
 
     <!-- Whether to persist the notification for when a usb drive device is plugged in -->
     <bool name="config_persistUsbDriveNotification">false</bool>

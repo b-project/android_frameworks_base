@@ -31,10 +31,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Resources;
+import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.database.ContentObserver;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -61,6 +61,7 @@ import android.view.SurfaceControl;
 import android.view.WindowManager;
 import android.view.WindowManagerPolicy;
 
+import bluros.providers.CMSettings;
 import java.io.PrintWriter;
 
 /**
@@ -419,7 +420,7 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
                         TYPICAL_PROXIMITY_THRESHOLD);
             }
         }
-		
+
         Intent intent = new Intent();
         intent.setClassName(KEYGUARD_PACKAGE,
                 KEYGUARD_CLASS);
@@ -518,10 +519,10 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
             if (changed && !mPendingRequestChangedLocked) {
                 if ((mKeyguardService != null && !mKeyguardService.isShowing())
                         && request.policy == DisplayPowerRequest.POLICY_OFF) {
-                    boolean seeThrough = Settings.System.getBoolean(mContext.getContentResolver(),
-                            Settings.System.LOCKSCREEN_SEE_THROUGH, true);
+                    boolean keyguardBlurEnabled = CMSettings.Secure.getInt(mContext.getContentResolver(),
+                            CMSettings.Secure.LOCK_SCREEN_BLUR_ENABLED, 0) == 1;
                     Bitmap bmp = null;
-                    if (seeThrough) {
+                    if (keyguardBlurEnabled) {
                         WindowManager wm = (WindowManager)
                                 mContext.getSystemService(Context.WINDOW_SERVICE);
                         Display display = wm.getDefaultDisplay();

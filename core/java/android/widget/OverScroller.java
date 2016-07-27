@@ -18,7 +18,6 @@ package android.widget;
 
 import android.content.Context;
 import android.hardware.SensorManager;
-import android.os.PowerManager;
 import android.util.Log;
 import android.view.ViewConfiguration;
 import android.view.animation.AnimationUtils;
@@ -42,8 +41,6 @@ public class OverScroller {
     private static final int DEFAULT_DURATION = 250;
     private static final int SCROLL_MODE = 0;
     private static final int FLING_MODE = 1;
-
-    private final PowerManager mPm;
 
     /**
      * Creates an OverScroller with a viscous fluid scroll interpolator and flywheel.
@@ -80,8 +77,6 @@ public class OverScroller {
         mFlywheel = flywheel;
         mScrollerX = new SplineOverScroller(context);
         mScrollerY = new SplineOverScroller(context);
-        
-        mPm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
     }
 
     /**
@@ -376,7 +371,6 @@ public class OverScroller {
      */
     public void startScroll(int startX, int startY, int dx, int dy, int duration) {
         mMode = SCROLL_MODE;
-        mPm.cpuBoost(1500000);
         mScrollerX.startScroll(startX, dx, duration);
         mScrollerY.startScroll(startY, dy, duration);
     }
@@ -447,7 +441,6 @@ public class OverScroller {
             }
         }
 
-        mPm.cpuBoost(1500000);
         mMode = FLING_MODE;
         mScrollerX.fling(startX, velocityX, minX, maxX, overX);
         mScrollerY.fling(startY, velocityY, minY, maxY, overY);

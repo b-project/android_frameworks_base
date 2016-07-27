@@ -30,6 +30,10 @@ import android.provider.Settings;
 import android.os.UserHandle;
 import android.util.Log;
 
+import com.android.internal.util.slim.ActionConfig;
+import com.android.internal.util.slim.ConfigSplitHelper;
+import com.android.internal.util.slim.ImageHelper;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;

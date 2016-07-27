@@ -18,7 +18,6 @@ package android.app;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.app.BlurDialogFragmentHelper;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -173,13 +172,6 @@ public class DialogFragment extends Fragment
     private static final String SAVED_CANCELABLE = "android:cancelable";
     private static final String SAVED_SHOWS_DIALOG = "android:showsDialog";
     private static final String SAVED_BACK_STACK_ID = "android:backStackId";
-
-    private BlurDialogFragmentHelper mHelper;
-
-    public static DialogFragment newInstance() {
-        DialogFragment fragment = new DialogFragment();
-        return fragment;
-    }
 
     int mStyle = STYLE_NORMAL;
     int mTheme = 0;
@@ -392,8 +384,7 @@ public class DialogFragment extends Fragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mHelper = new BlurDialogFragmentHelper(this);
-        mHelper.onCreate();
+
         mShowsDialog = mContainerId == 0;
 
         if (savedInstanceState != null) {
@@ -462,7 +453,6 @@ public class DialogFragment extends Fragment
     }
 
     public void onDismiss(DialogInterface dialog) {
-		mHelper.onDismiss();
         if (!mViewDestroyed) {
             // Note: we need to use allowStateLoss, because the dialog
             // dispatches this asynchronously so we can receive the call
@@ -475,7 +465,7 @@ public class DialogFragment extends Fragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-		mHelper.onActivityCreated();
+
         if (!mShowsDialog) {
             return;
         }
@@ -504,7 +494,6 @@ public class DialogFragment extends Fragment
     @Override
     public void onStart() {
         super.onStart();
-         mHelper.onStart();
         if (mDialog != null) {
             mViewDestroyed = false;
             mDialog.show();

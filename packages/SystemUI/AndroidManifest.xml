@@ -22,7 +22,6 @@
         android:sharedUserId="android.uid.systemui"
         coreApp="true">
 
-    <uses-permission android:name="android.permission.CLEAR_APP_USER_DATA" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -56,7 +55,6 @@
     <uses-permission android:name="android.permission.ACCESS_BLUETOOTH_AVRCP_CT_DATA" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
@@ -140,15 +138,6 @@
             android:protectionLevel="signature" />
     <uses-permission android:name="com.android.systemui.permission.SELF" />
 
-    <!-- LiveDisplay -->
-    <uses-permission android:name="android.permission.HARDWARE_ABSTRACTION_ACCESS" />
-
-    <!-- Weather -->
-    <uses-permission android:name="com.bluros.lockclock.permission.READ_WEATHER" />
-
-    <!-- Action target -->
-    <uses-permission android:name="android.permission.FORCE_STOP_PACKAGES" />
-
     <!-- Kill app permission -->
     <uses-permission android:name="android.permission.FORCE_STOP_PACKAGES" />
 
@@ -158,24 +147,8 @@
     <!-- headset icon -->
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
-    <!-- Reboot -->
-    <uses-permission android:name="android.permission.REBOOT" />
-    <uses-permission android:name="android.permission.RECOVERY" />
-
-    <!-- Themes tile -->
-    <uses-permission android:name="bluros.permission.ACCESS_THEME_MANAGER" />
-    <uses-permission android:name="bluros.permission.READ_THEMES" />
-    <uses-permission android:name="bluros.permission.WRITE_THEMES" />
-
-    <!-- Visualizer -->
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-
-    <!-- Action target -->
-    <uses-permission android:name="android.permission.FORCE_STOP_PACKAGES" />
-
-    <!-- Images in navbar -->
-    <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
+    <!-- Weather -->
+    <uses-permission android:name="com.bluros.lockclock.permission.READ_WEATHER" />
 
     <application
         android:name=".SystemUIApplication"
@@ -209,13 +182,6 @@
         <receiver android:name=".screenshot.TrashScreenshot"
                 android:exported="true" />
 
- 	<!-- started from PhoneWindowManager
-             TODO: Should have an android:permission attribute -->
-        <service android:name=".rr.onthego.OnTheGoService"
-            android:process=":onthego"
-            android:exported="false" />
-
-
         <!-- started from PhoneWindowManager
              TODO: Should have an android:permission attribute -->
         <service android:name=".omni.screenrecord.TakeScreenrecordService"
@@ -247,13 +213,15 @@
                   android:enabled="false"
                   android:icon="@drawable/tuner"
                   android:theme="@android:style/Theme.Material.Settings"
-                  android:label="@string/status_bar_tuner"
+                  android:label="@string/system_ui_tuner"
                   android:process=":tuner"
                   android:exported="true">
             <intent-filter>
                 <action android:name="com.android.settings.action.EXTRA_SETTINGS" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+            <meta-data android:name="com.android.settings.category"
+                    android:value="com.android.settings.category.system" />
         </activity>
 
         <!-- Alternate Recents -->
@@ -463,19 +431,6 @@
             </intent-filter>
         </activity>
 
-        <!-- App picker activity -->
-        <activity
-            android:name=".rr.apppicker.AppPickerActivity"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar"
-            android:label="@string/accessibility_app_picker"
-            android:enabled="true"
-            android:excludeFromRecents="true" >
-            <intent-filter>
-                <action android:name=".rr.apppicker.AppPickerActivity" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
         <!-- Doze with notifications, run in main sysui process for every user  -->
         <service
             android:name=".doze.DozeService"
@@ -491,88 +446,5 @@
             </intent-filter>
         </receiver>
 
-        <service
-            android:name=".screenshot.ScreenshotEditor"
-			android:theme="@style/ScreenshotEditorStyle" />
-            
-        <!-- Callback for editing screenshot notification -->
-        <activity android:name=".screenshot.GlobalScreenshot$EditScreenshotActivity"
-                  android:process=":screenshot"
-                  android:exported="false"
-                  android:taskAffinity=""
-                  android:excludeFromRecents="true" />
-
-       <activity android:name=".DaylightHeaderDefault"
-                android:label="Default" >
-            <intent-filter>
-                <action android:name="org.omnirom.DaylightHeaderPack" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
-		<activity
-			android:name=".nature"
-			android:label="Nature" >
-			<intent-filter>
-				<action android:name="org.omnirom.DaylightHeaderPack1" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-		</activity>
-
-		<activity
-			android:name=".poly"
-			android:label="Poly" >
-			<intent-filter>
-				<action android:name="org.omnirom.DaylightHeaderPack1" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-		</activity>
-		<activity
-			android:name=".naturerandom"
-			android:label="Nature (random)" >
-			<intent-filter>
-				<action android:name="org.omnirom.DaylightHeaderPack1" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-		</activity>
-		 <activity
-			android:name=".n"
-			android:label="Splash" >
-			<intent-filter>
-				<action android:name="org.omnirom.DaylightHeaderPack1" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-		</activity>
-		 <activity
-			android:name=".n1"
-			android:label="Google pixels" >
-			<intent-filter>
-				<action android:name="org.omnirom.DaylightHeaderPack1" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-		</activity>
-		 <activity
-			android:name=".n3"
-			android:label="Google colors" >
-			<intent-filter>
-				<action android:name="org.omnirom.DaylightHeaderPack1" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-		</activity>
-		 <activity
-			android:name=".n2"
-			android:label="Dots" >
-			<intent-filter>
-				<action android:name="org.omnirom.DaylightHeaderPack1" />
-
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-		</activity>
     </application>
 </manifest>

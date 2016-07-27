@@ -104,6 +104,7 @@ public class ClockController {
 
         setClockAndDateStatus();
         setTextColor(mIconTint);
+        updateFontSize();
     }
 
     private void updateSettings() {
@@ -133,6 +134,12 @@ public class ClockController {
         mIconTint = iconTint;
         if (mActiveClock != null) {
             mActiveClock.setTextColor(iconTint);
+        }
+    }
+
+    public void updateFontSize() {
+        if (mActiveClock != null) {
+            FontSizeUtils.updateFontSize(mActiveClock, R.dimen.status_bar_clock_size);
         }
     }
 

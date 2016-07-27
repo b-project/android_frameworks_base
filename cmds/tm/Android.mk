@@ -1,4 +1,4 @@
-# Copyright 2015 The BlurOS Project
+# Copyright 2015 The CyanogenMod Project
 #
 LOCAL_PATH:= $(call my-dir)
 

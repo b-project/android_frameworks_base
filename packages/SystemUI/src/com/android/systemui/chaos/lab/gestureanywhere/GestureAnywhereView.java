@@ -124,7 +124,7 @@ public class GestureAnywhereView extends TriggerOverlayView implements GestureOv
             }
 
             int width = Settings.System.getInt(
-                    resolver, Settings.System.GESTURE_ANYWHERE_TRIGGER_WIDTH, 10);
+                    resolver, Settings.System.GESTURE_ANYWHERE_TRIGGER_WIDTH, 40);
             if (mTriggerWidth != width)
                 setTriggerWidth(width);
             setTopPercentage(Settings.System.getInt(
@@ -277,15 +277,6 @@ public class GestureAnywhereView extends TriggerOverlayView implements GestureOv
     private boolean launchShortcut(String uri) {
         try {
             Intent intent = Intent.parseUri(uri, 0);
-            if (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.GESTURE_ANYWHERE_FLOATING, 0) == 1) {
-                intent.setFlags(Intent.FLAG_FLOATING_WINDOW
-                        | Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(intent);
-            } else {
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(intent);
-            }
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             mContext.startActivity(intent);
             return true;

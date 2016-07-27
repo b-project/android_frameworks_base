@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 RR
+ * Copyright (C) 2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,36 +16,28 @@
 
 package com.android.systemui.qs.tiles;
 
-
-import android.content.Intent;
-import android.content.Context;
 import android.content.ComponentName;
-import android.provider.Settings;
-import android.provider.Settings.Global;
-import android.hardware.input.InputManager;
-import android.os.Handler;
-import android.os.PowerManager;
-import android.os.SystemClock;
-import android.view.KeyEvent;
+import android.content.Context;
+import android.content.Intent;
+import android.os.RemoteException;
+import android.os.ServiceManager;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.IWindowManager;
+import android.view.WindowManagerGlobal;
 
-import com.android.internal.logging.MetricsConstants;
 import com.android.systemui.R;
 import com.android.systemui.qs.QSTile;
 
-/** Quick settings: Power Menu*/
+import org.bluros.internal.logging.CMMetricsLogger;
+
+/** Quick settings tile: PowerMenu **/
 public class PowerMenuTile extends QSTile<QSTile.BooleanState> {
 
-private static final Intent POWER_SETTINGS = new Intent().setComponent(new ComponentName(
-            "com.android.settings", "com.android.settings.Settings$ButtonSettingsActivity"));
-
-    private PowerManager mPm;
     private boolean mListening;
 
     public PowerMenuTile(Host host) {
         super(host);
-        mPm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
     }
 
     @Override
@@ -60,47 +52,27 @@ private static final Intent POWER_SETTINGS = new Intent().setComponent(new Compo
 
     @Override
     public void handleClick() {
-     	mHost.collapsePanels();
-        triggerVirtualKeypress(KeyEvent.KEYCODE_POWER, true);
-    }
-
-    @Override
-    protected void handleSecondaryClick() {
         mHost.collapsePanels();
-        triggerVirtualKeypress(KeyEvent.KEYCODE_POWER, true);
+        Intent intent = new Intent(Intent.ACTION_POWERMENU);
+        mContext.sendBroadcast(intent);
     }
 
     @Override
     public void handleLongClick() {
-       	mHost.startActivityDismissingKeyguard(POWER_SETTINGS);
-    }
-
-    @Override
-    public int getMetricsCategory() {
-        return MetricsConstants.DONT_TRACK_ME_BRO;
+        mHost.collapsePanels();
+        Intent intent = new Intent(Intent.ACTION_POWERMENU_REBOOT);
+        mContext.sendBroadcast(intent);
     }
 
     @Override
     protected void handleUpdateState(BooleanState state, Object arg) {
         state.visible = true;
-        state.label = mContext.getString(R.string.quick_settings_power_menu_label);
-        state.icon = ResourceIcon.get(R.drawable.ic_qs_power_menu);
+        state.label = mContext.getString(R.string.quick_settings_powermenu_label);
+        state.icon = ResourceIcon.get(R.drawable.ic_qs_powermenu);
     }
 
-    private void triggerVirtualKeypress(final int keyCode, final boolean longPress) {
-        new Thread(new Runnable() {
-            public void run() {
-                InputManager im = InputManager.getInstance();
-                KeyEvent keyEvent;
-                if (longPress) {
-                    keyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, keyCode);
-                    keyEvent.changeFlags(keyEvent, KeyEvent.FLAG_FROM_SYSTEM | KeyEvent.FLAG_LONG_PRESS);
-                } else {
-                    keyEvent = new KeyEvent(KeyEvent.ACTION_UP, keyCode);
-                    keyEvent.changeFlags(keyEvent, KeyEvent.FLAG_FROM_SYSTEM);
-                }
-                im.injectInputEvent(keyEvent, InputManager.INJECT_INPUT_EVENT_MODE_WAIT_FOR_RESULT);
-            }
-        }).start();
+    @Override
+    public int getMetricsCategory() {
+        return CMMetricsLogger.DONT_LOG;
     }
 }

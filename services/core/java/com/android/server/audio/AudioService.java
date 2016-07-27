@@ -53,7 +53,6 @@ import android.hardware.hdmi.HdmiControlManager;
 import android.hardware.hdmi.HdmiPlaybackClient;
 import android.hardware.hdmi.HdmiTvClient;
 import android.hardware.usb.UsbManager;
-import android.net.Uri;
 import android.media.AudioAttributes;
 import android.media.AudioDevicePort;
 import android.media.AudioSystem;
@@ -78,6 +77,7 @@ import android.media.audiopolicy.AudioMix;
 import android.media.audiopolicy.AudioPolicy;
 import android.media.audiopolicy.AudioPolicyConfig;
 import android.media.audiopolicy.IAudioPolicyCallback;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Environment;
@@ -610,16 +610,6 @@ public class AudioService extends IAudioService.Stub {
         return "card=" + card + ";device=" + device + ";";
     }
 
-    // only these packages are allowed to override Pulse visualizer lock
-    private static final String[] VISUALIZER_WHITELIST = new String[] {
-            "android",
-            "com.android.systemui",
-            "com.android.keyguard",
-            "com.google.android.googlequicksearchbox"
-    };
-
-    private boolean mVisualizerLocked;
-
     ///////////////////////////////////////////////////////////////////////////
     // Construction
     ///////////////////////////////////////////////////////////////////////////
@@ -700,8 +690,7 @@ public class AudioService extends IAudioService.Stub {
         updateStreamVolumeAlias(false /*updateVolumes*/, TAG);
         readPersistedSettings();
         mSettingsObserver = new SettingsObserver();
-
-        // Update volumes steps before creatingStreamStates!
+        //Update volumes steps before creatingStreamStates!
         initVolumeSteps();
         createStreamStates();
 
@@ -901,58 +890,58 @@ public class AudioService extends IAudioService.Stub {
         AudioSystem.setParameters("restarting=false");
     }
 
-    private void initVolumeSteps() {
-        // Defaults for reference
-        // 5, // STREAM_VOICE_CALL
-        // 7, // STREAM_SYSTEM
-        // 7, // STREAM_RING
-        // 15, // STREAM_MUSIC
-        // 7, // STREAM_ALARM
-        // 7, // STREAM_NOTIFICATION
-        // 15, // STREAM_BLUETOOTH_SCO
-        // 7, // STREAM_SYSTEM_ENFORCED
-        // 15, // STREAM_DTMF
-        // 15 // STREAM_TTS
+    private void initVolumeSteps(){
+        //Defaults for reference
+        //5,  // STREAM_VOICE_CALL
+        //7,  // STREAM_SYSTEM
+        //7,  // STREAM_RING
+        //15, // STREAM_MUSIC
+        //7,  // STREAM_ALARM
+        //7,  // STREAM_NOTIFICATION
+        //15, // STREAM_BLUETOOTH_SCO
+        //7,  // STREAM_SYSTEM_ENFORCED
+        //15, // STREAM_DTMF
+        //15  // STREAM_TTS
 
         MAX_STREAM_VOLUME[AudioSystem.STREAM_VOICE_CALL] =
-                Settings.System.getInt(mContentResolver, "volume_steps_voice_call",
-                        MAX_STREAM_VOLUME[AudioSystem.STREAM_VOICE_CALL]);
+            Settings.System.getInt(mContentResolver, "volume_steps_voice_call",
+                MAX_STREAM_VOLUME[AudioSystem.STREAM_VOICE_CALL]);
 
         MAX_STREAM_VOLUME[AudioSystem.STREAM_SYSTEM] =
-                Settings.System.getInt(mContentResolver, "volume_steps_system",
-                        MAX_STREAM_VOLUME[AudioSystem.STREAM_SYSTEM]);
+            Settings.System.getInt(mContentResolver, "volume_steps_system",
+                MAX_STREAM_VOLUME[AudioSystem.STREAM_SYSTEM]);
 
         MAX_STREAM_VOLUME[AudioSystem.STREAM_RING] =
-                Settings.System.getInt(mContentResolver, "volume_steps_ring",
-                        MAX_STREAM_VOLUME[AudioSystem.STREAM_RING]);
+            Settings.System.getInt(mContentResolver, "volume_steps_ring",
+                MAX_STREAM_VOLUME[AudioSystem.STREAM_RING]);
 
         MAX_STREAM_VOLUME[AudioSystem.STREAM_MUSIC] =
-                Settings.System.getInt(mContentResolver, "volume_steps_music",
-                        MAX_STREAM_VOLUME[AudioSystem.STREAM_MUSIC]);
+            Settings.System.getInt(mContentResolver, "volume_steps_music",
+                MAX_STREAM_VOLUME[AudioSystem.STREAM_MUSIC]);
 
         MAX_STREAM_VOLUME[AudioSystem.STREAM_ALARM] =
-                Settings.System.getInt(mContentResolver, "volume_steps_alarm",
-                        MAX_STREAM_VOLUME[AudioSystem.STREAM_ALARM]);
+            Settings.System.getInt(mContentResolver, "volume_steps_alarm",
+                MAX_STREAM_VOLUME[AudioSystem.STREAM_ALARM]);
 
         MAX_STREAM_VOLUME[AudioSystem.STREAM_NOTIFICATION] =
-                Settings.System.getInt(mContentResolver, "volume_steps_notification",
-                        MAX_STREAM_VOLUME[AudioSystem.STREAM_NOTIFICATION]);
+            Settings.System.getInt(mContentResolver, "volume_steps_notification",
+                MAX_STREAM_VOLUME[AudioSystem.STREAM_NOTIFICATION]);
 
         MAX_STREAM_VOLUME[AudioSystem.STREAM_BLUETOOTH_SCO] =
-                Settings.System.getInt(mContentResolver, "volume_steps_bluetooth_sco",
-                        MAX_STREAM_VOLUME[AudioSystem.STREAM_BLUETOOTH_SCO]);
+            Settings.System.getInt(mContentResolver, "volume_steps_bluetooth_sco",
+                MAX_STREAM_VOLUME[AudioSystem.STREAM_BLUETOOTH_SCO]);
 
         MAX_STREAM_VOLUME[AudioSystem.STREAM_SYSTEM_ENFORCED] =
-                Settings.System.getInt(mContentResolver, "volume_steps_system_enforced",
-                        MAX_STREAM_VOLUME[AudioSystem.STREAM_SYSTEM_ENFORCED]);
+            Settings.System.getInt(mContentResolver, "volume_steps_system_enforced",
+                MAX_STREAM_VOLUME[AudioSystem.STREAM_SYSTEM_ENFORCED]);
 
         MAX_STREAM_VOLUME[AudioSystem.STREAM_DTMF] =
-                Settings.System.getInt(mContentResolver, "volume_steps_dtmf",
-                        MAX_STREAM_VOLUME[AudioSystem.STREAM_DTMF]);
+            Settings.System.getInt(mContentResolver, "volume_steps_dtmf",
+                MAX_STREAM_VOLUME[AudioSystem.STREAM_DTMF]);
 
         MAX_STREAM_VOLUME[AudioSystem.STREAM_TTS] =
-                Settings.System.getInt(mContentResolver, "volume_steps_tts",
-                        MAX_STREAM_VOLUME[AudioSystem.STREAM_TTS]);
+            Settings.System.getInt(mContentResolver, "volume_steps_tts",
+                MAX_STREAM_VOLUME[AudioSystem.STREAM_TTS]);
     }
 
     private void createAudioSystemThread() {
@@ -979,59 +968,63 @@ public class AudioService extends IAudioService.Stub {
      * @hide
      */
     public void addMediaPlayerAndUpdateRemoteController (String packageName) {
-        Log.v(TAG, "addMediaPlayerAndUpdateRemoteController: size of existing list: " +
-                mMediaPlayers.size());
-        boolean playerToAdd = true;
-        if (mMediaPlayers.size() > 0) {
-            final Iterator<MediaPlayerInfo> rccIterator = mMediaPlayers.iterator();
-            while (rccIterator.hasNext()) {
-                final MediaPlayerInfo player = rccIterator.next();
-                if (packageName.equals(player.getPackageName())) {
-                    Log.e(TAG, "Player entry present, no need to add");
-                    playerToAdd = false;
-                    player.setFocus(true);
-                } else {
-                    Log.e(TAG, "Player: " + player.getPackageName()+ "Lost Focus");
-                    player.setFocus(false);
+        synchronized(mMediaPlayers) {
+            Log.v(TAG, "addMediaPlayerAndUpdateRemoteController: size of existing list: " +
+                    mMediaPlayers.size());
+            boolean playerToAdd = true;
+            if (mMediaPlayers.size() > 0) {
+                final Iterator<MediaPlayerInfo> rccIterator = mMediaPlayers.iterator();
+                while (rccIterator.hasNext()) {
+                    final MediaPlayerInfo player = rccIterator.next();
+                    if (packageName.equals(player.getPackageName())) {
+                        Log.e(TAG, "Player entry present, no need to add");
+                        playerToAdd = false;
+                        player.setFocus(true);
+                    } else {
+                        Log.e(TAG, "Player: " + player.getPackageName()+ "Lost Focus");
+                        player.setFocus(false);
+                    }
                 }
             }
+            if (playerToAdd) {
+                Log.e(TAG, "Adding Player: " + packageName + " to available player list");
+                mMediaPlayers.add(new MediaPlayerInfo(packageName, true));
+            }
+            Intent intent = new Intent(AudioManager.RCC_CHANGED_ACTION);
+            intent.putExtra(AudioManager.EXTRA_CALLING_PACKAGE_NAME, packageName);
+            intent.putExtra(AudioManager.EXTRA_FOCUS_CHANGED_VALUE, true);
+            intent.putExtra(AudioManager.EXTRA_AVAILABLITY_CHANGED_VALUE, true);
+            sendBroadcastToAll(intent);
+            Log.v(TAG, "updating focussed RCC change to RCD: CallingPackageName:"
+                    + packageName);
         }
-        if (playerToAdd) {
-            Log.e(TAG, "Adding Player: " + packageName + " to available player list");
-            mMediaPlayers.add(new MediaPlayerInfo(packageName, true));
-        }
-        Intent intent = new Intent(AudioManager.RCC_CHANGED_ACTION);
-        intent.putExtra(AudioManager.EXTRA_CALLING_PACKAGE_NAME, packageName);
-        intent.putExtra(AudioManager.EXTRA_FOCUS_CHANGED_VALUE, true);
-        intent.putExtra(AudioManager.EXTRA_AVAILABLITY_CHANGED_VALUE, true);
-        sendBroadcastToAll(intent);
-        Log.v(TAG, "updating focussed RCC change to RCD: CallingPackageName:"
-                + packageName);
     }
 
     /**
      * @hide
      */
     public void updateRemoteControllerOnExistingMediaPlayers() {
-        Log.v(TAG, "updateRemoteControllerOnExistingMediaPlayers: size of Player list: " +
+        synchronized(mMediaPlayers) {
+            Log.v(TAG, "updateRemoteControllerOnExistingMediaPlayers: size of Player list: " +
                                                                 mMediaPlayers.size());
-        if (mMediaPlayers.size() > 0) {
-            Log.v(TAG, "Inform RemoteController regarding existing RCC entry");
-            final Iterator<MediaPlayerInfo> rccIterator = mMediaPlayers.iterator();
-            while (rccIterator.hasNext()) {
-                final MediaPlayerInfo player = rccIterator.next();
-                Intent intent = new Intent(AudioManager.RCC_CHANGED_ACTION);
-                intent.putExtra(AudioManager.EXTRA_CALLING_PACKAGE_NAME,
-                                                    player.getPackageName());
-                intent.putExtra(AudioManager.EXTRA_FOCUS_CHANGED_VALUE,
-                                                    player.isFocussed());
-                intent.putExtra(AudioManager.EXTRA_AVAILABLITY_CHANGED_VALUE, true);
-                sendBroadcastToAll(intent);
-                Log.v(TAG, "updating RCC change: CallingPackageName:" +
-                                                    player.getPackageName());
+            if (mMediaPlayers.size() > 0) {
+                Log.v(TAG, "Inform RemoteController regarding existing RCC entry");
+                final Iterator<MediaPlayerInfo> rccIterator = mMediaPlayers.iterator();
+                while (rccIterator.hasNext()) {
+                    final MediaPlayerInfo player = rccIterator.next();
+                    Intent intent = new Intent(AudioManager.RCC_CHANGED_ACTION);
+                    intent.putExtra(AudioManager.EXTRA_CALLING_PACKAGE_NAME,
+                                                        player.getPackageName());
+                    intent.putExtra(AudioManager.EXTRA_FOCUS_CHANGED_VALUE,
+                                                        player.isFocussed());
+                    intent.putExtra(AudioManager.EXTRA_AVAILABLITY_CHANGED_VALUE, true);
+                    sendBroadcastToAll(intent);
+                    Log.v(TAG, "updating RCC change: CallingPackageName:" +
+                                                        player.getPackageName());
+                }
+            } else {
+                Log.e(TAG, "No RCC entry present to update");
             }
-        } else {
-            Log.e(TAG, "No RCC entry present to update");
         }
     }
 
@@ -1039,34 +1032,36 @@ public class AudioService extends IAudioService.Stub {
      * @hide
      */
     public void removeMediaPlayerAndUpdateRemoteController (String packageName) {
-        Log.v(TAG, "removeMediaPlayerAndUpdateRemoteController: size of existing list: " +
-                                                                mMediaPlayers.size());
-        boolean playerToRemove = false;
-        int index = -1;
-        if (mMediaPlayers.size() > 0) {
-            final Iterator<MediaPlayerInfo> rccIterator = mMediaPlayers.iterator();
-            while (rccIterator.hasNext()) {
-                index++;
-                final MediaPlayerInfo player = rccIterator.next();
-                if (packageName.equals(player.getPackageName())) {
-                    Log.v(TAG, "Player entry present remove and update RemoteController");
-                    playerToRemove = true;
-                    break;
-                } else {
-                    Log.v(TAG, "Player entry for " + player.getPackageName()+ " is not present");
+        synchronized(mMediaPlayers) {
+            Log.v(TAG, "removeMediaPlayerAndUpdateRemoteController: size of existing list: " +
+                                                                    mMediaPlayers.size());
+            boolean playerToRemove = false;
+            int index = -1;
+            if (mMediaPlayers.size() > 0) {
+                final Iterator<MediaPlayerInfo> rccIterator = mMediaPlayers.iterator();
+                while (rccIterator.hasNext()) {
+                    index++;
+                    final MediaPlayerInfo player = rccIterator.next();
+                    if (packageName.equals(player.getPackageName())) {
+                        Log.v(TAG, "Player entry present remove and update RemoteController");
+                        playerToRemove = true;
+                        break;
+                    } else {
+                        Log.v(TAG, "Player entry for " + player.getPackageName()+ " is not present");
+                    }
                 }
             }
+            if (playerToRemove) {
+                Log.e(TAG, "Removing Player: " + packageName + " from index" + index);
+                mMediaPlayers.remove(index);
+            }
+            Intent intent = new Intent(AudioManager.RCC_CHANGED_ACTION);
+            intent.putExtra(AudioManager.EXTRA_CALLING_PACKAGE_NAME, packageName);
+            intent.putExtra(AudioManager.EXTRA_FOCUS_CHANGED_VALUE, false);
+            intent.putExtra(AudioManager.EXTRA_AVAILABLITY_CHANGED_VALUE, false);
+            sendBroadcastToAll(intent);
+            Log.v(TAG, "Updated List size: " + mMediaPlayers.size());
         }
-        if (playerToRemove) {
-            Log.e(TAG, "Removing Player: " + packageName + " from index" + index);
-            mMediaPlayers.remove(index);
-        }
-        Intent intent = new Intent(AudioManager.RCC_CHANGED_ACTION);
-        intent.putExtra(AudioManager.EXTRA_CALLING_PACKAGE_NAME, packageName);
-        intent.putExtra(AudioManager.EXTRA_FOCUS_CHANGED_VALUE, false);
-        intent.putExtra(AudioManager.EXTRA_AVAILABLITY_CHANGED_VALUE, false);
-        sendBroadcastToAll(intent);
-        Log.v(TAG, "Updated List size: " + mMediaPlayers.size());
     }
 
     private void checkAllAliasStreamVolumes() {
@@ -2097,7 +2092,7 @@ public class AudioService extends IAudioService.Stub {
     public void setStreamMaxVolume(int streamType, int maxVol) {
         ensureValidStreamType(streamType);
         mStreamStates[streamType].setMaxIndex(maxVol);
-        setMaxStreamVolume(streamType, maxVol);
+        setMaxStreamVolume(streamType,maxVol);
     }
 
     /** @see AudioManager#getStreamMinVolume(int) */
@@ -3641,25 +3636,6 @@ public class AudioService extends IAudioService.Stub {
         return (mMuteAffectedStreams & (1 << streamType)) != 0;
     }
 
-    /** @hide */
-    public boolean isVisualizerLocked(String callingPackage) {
-        boolean isSystem = false;
-        for (int i = 0; i < VISUALIZER_WHITELIST.length; i++) {
-            if (TextUtils.equals(callingPackage, VISUALIZER_WHITELIST[i])) {
-                isSystem = true;
-                break;
-            }
-        }
-        return !isSystem && mVisualizerLocked;
-    }
-
-    /** @hide */
-    public void setVisualizerLocked(boolean doLock) {
-        if (mVisualizerLocked != doLock) {
-            mVisualizerLocked = doLock;
-        }
-    }
-
     private void ensureValidDirection(int direction) {
         switch (direction) {
             case AudioManager.ADJUST_LOWER:
@@ -4247,18 +4223,15 @@ public class AudioService extends IAudioService.Stub {
             return mIndexMax;
         }
 
-        public void setMaxIndex(int maxVol) {
-            mIndexMax = maxVol;
-            AudioSystem.initStreamVolume(mStreamType, 0, mIndexMax);
-            mIndexMax = maxVol;
-            mIndexMax *= 10;
-            // Volume steps changed, fire the intent.
-            Intent intent = new Intent(AudioManager.VOLUME_STEPS_CHANGED_ACTION);
-            sendBroadcastToAll(intent);
-        }
-
         public int getMinIndex() {
             return mIndexMin;
+        }
+
+        public void setMaxIndex(int maxVol) {
+             mIndexMax = maxVol;
+             AudioSystem.initStreamVolume(mStreamType, 0, mIndexMax);
+             mIndexMax = maxVol;
+             mIndexMax *= 10;
         }
 
         public void setAllIndexes(VolumeStreamState srcStream, String caller) {
@@ -4913,17 +4886,18 @@ public class AudioService extends IAudioService.Stub {
                     mSafeVolumeEnabled = safeVolumeEnabled(mContentResolver);
                 } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.MODE_RINGER_STREAMS_AFFECTED))) {
-                if (updateRingerModeAffectedStreams()) {
-                    /*
-                     * Ensure all stream types that should be affected by ringer mode
-                     * are in the proper state.
-                     */
-                    setRingerModeInt(getRingerModeInternal(), false);
+                    if (updateRingerModeAffectedStreams()) {
+                        /*
+                         * Ensure all stream types that should be affected by ringer mode
+                         * are in the proper state.
+                         */
+                        setRingerModeInt(getRingerModeInternal(), false);
                     }
                 } else if (uri.equals(Settings.Global.getUriFor(
                     Settings.Global.DOCK_AUDIO_MEDIA_ENABLED))) {
                     readDockAudioSettings(mContentResolver);
                 }
+                readDockAudioSettings(mContentResolver);
 
                 boolean linkNotificationWithVolume = Settings.Secure.getInt(mContentResolver,
                         Settings.Secure.VOLUME_LINK_NOTIFICATION, 1) == 1;
@@ -5203,7 +5177,7 @@ public class AudioService extends IAudioService.Stub {
                         0,
                         null,
                         0);
-                delay = 700;
+                delay = 1000;
             }
         }
 
@@ -5285,20 +5259,19 @@ public class AudioService extends IAudioService.Stub {
         }
     }
 
-    private void startMusicPlayer()
-    {
-        boolean launchPlayer = Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.HEADSET_CONNECT_PLAYER, 0, UserHandle.USER_CURRENT) != 0;
-
+    private void startMusicPlayer() {
+        boolean launchPlayer = CMSettings.System.getIntForUser(mContext.getContentResolver(),
+                CMSettings.System.HEADSET_CONNECT_PLAYER, 0, UserHandle.USER_CURRENT) != 0;
         TelecomManager tm = (TelecomManager) mContext.getSystemService(Context.TELECOM_SERVICE);
+
         if (launchPlayer && !tm.isInCall()) {
-            Intent playerIntent = new Intent(Intent.ACTION_MAIN);
-            playerIntent.addCategory(Intent.CATEGORY_APP_MUSIC);
-            playerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             try {
+                Intent playerIntent = new Intent(Intent.ACTION_MAIN);
+                playerIntent.addCategory(Intent.CATEGORY_APP_MUSIC);
+                playerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 mContext.startActivity(playerIntent);
-            } catch(ActivityNotFoundException e) {
-                Log.e(TAG, "error launching music player", e);
+            } catch (ActivityNotFoundException | IllegalArgumentException e) {
+                Log.w(TAG, "No music player Activity could be found");
             }
         }
     }

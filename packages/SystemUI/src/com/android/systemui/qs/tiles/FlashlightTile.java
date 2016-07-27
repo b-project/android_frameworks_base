@@ -17,14 +17,11 @@
 package com.android.systemui.qs.tiles;
 
 import android.app.ActivityManager;
-import android.content.Intent;
 
 import com.android.internal.logging.MetricsLogger;
 import com.android.systemui.R;
 import com.android.systemui.qs.QSTile;
 import com.android.systemui.statusbar.policy.FlashlightController;
-
-import android.provider.Settings;
 
 /** Quick settings tile: Control flashlight **/
 public class FlashlightTile extends QSTile<QSTile.BooleanState> implements
@@ -73,14 +70,7 @@ public class FlashlightTile extends QSTile<QSTile.BooleanState> implements
     }
 
     @Override
-    protected void handleLongClick() {
-      mHost.startActivityDismissingKeyguard(new Intent("android.media.action.IMAGE_CAPTURE"));
-    }
-
-    @Override
     protected void handleUpdateState(BooleanState state, Object arg) {
-	boolean mQSCSwitch = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.QS_COLOR_SWITCH, 0) == 1;
         state.visible = mFlashlightController.isAvailable();
         state.label = mHost.getContext().getString(R.string.quick_settings_flashlight_label);
         if (arg instanceof UserBoolean) {
@@ -92,15 +82,9 @@ public class FlashlightTile extends QSTile<QSTile.BooleanState> implements
         } else {
             state.value = mFlashlightController.isEnabled();
         }
-
-	if (mQSCSwitch) {
-            state.icon = ResourceIcon.get(state.value ? R.drawable.ic_qs_flashlight_on
-                    : R.drawable.ic_qs_flashlight_off);
-	} else {
-	final AnimationIcon icon = state.value ? mEnable : mDisable;
+        final AnimationIcon icon = state.value ? mEnable : mDisable;
         icon.setAllowAnimation(arg instanceof UserBoolean && ((UserBoolean) arg).userInitiated);
         state.icon = icon;
-	}
         int onOrOffId = state.value
                 ? R.string.accessibility_quick_settings_flashlight_on
                 : R.string.accessibility_quick_settings_flashlight_off;

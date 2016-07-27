@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2013-14 The Android Open Source Project
- * Copyright (C) 2016 The BlurOS Project
+ * Copyright (C) 2016 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,12 +28,9 @@ import android.content.res.ThemeConfig;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.DashPathEffect;
 import android.graphics.Color;
-import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -47,9 +44,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-
-
-import android.provider.Settings;
 
 import com.android.systemui.statusbar.policy.BatteryController;
 import com.android.systemui.statusbar.policy.BatteryStateRegistar;
@@ -70,7 +64,6 @@ public class BatteryMeterView extends View implements DemoMode,
         BATTERY_METER_ICON_PORTRAIT,
         BATTERY_METER_ICON_LANDSCAPE,
         BATTERY_METER_CIRCLE,
-        BATTERY_METER_DOTTED_CIRCLE,
         BATTERY_METER_TEXT
     }
 
@@ -100,8 +93,6 @@ public class BatteryMeterView extends View implements DemoMode,
     protected BatteryTracker mTracker = new BatteryTracker();
     private BatteryMeterDrawable mBatteryMeterDrawable;
     private int mIconTint = Color.WHITE;
-    private int mBatteryIconColor;
-    public boolean mColorSwitch = false;
 
     private int mCurrentBackgroundColor = 0;
     private int mCurrentFillColor = 0;
@@ -278,6 +269,7 @@ public class BatteryMeterView extends View implements DemoMode,
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
+
         if (mMeterMode == BatteryMeterMode.BATTERY_METER_TEXT) {
             onSizeChanged(width, height, 0, 0); // Force a size changed event
         }
@@ -325,9 +317,6 @@ public class BatteryMeterView extends View implements DemoMode,
         switch (style) {
             case BatteryController.STYLE_CIRCLE:
                 meterMode = BatteryMeterMode.BATTERY_METER_CIRCLE;
-                break;
-            case BatteryController.STYLE_DOTTED_CIRCLE:
-                meterMode = BatteryMeterMode.BATTERY_METER_DOTTED_CIRCLE;
                 break;
             case BatteryController.STYLE_GONE:
                 meterMode = BatteryMeterMode.BATTERY_METER_GONE;
@@ -408,7 +397,7 @@ public class BatteryMeterView extends View implements DemoMode,
     }
 
     public void setDarkIntensity(float darkIntensity) {
-	 if (mBatteryMeterDrawable != null) {
+        if (mBatteryMeterDrawable != null) {
             mCurrentBackgroundColor = getBackgroundColor(darkIntensity);
             mCurrentFillColor = getFillColor(darkIntensity);
             mBatteryMeterDrawable.setDarkIntensity(mCurrentBackgroundColor, mCurrentFillColor);
@@ -422,7 +411,7 @@ public class BatteryMeterView extends View implements DemoMode,
 
     private int getFillColor(float darkIntensity) {
         return getColorForDarkIntensity(
-                darkIntensity, mLightModeFillColor, mDarkModeFillColor);               
+                darkIntensity, mLightModeFillColor, mDarkModeFillColor);
     }
 
     private int getColorForDarkIntensity(float darkIntensity, int lightColor, int darkColor) {
@@ -542,7 +531,7 @@ public class BatteryMeterView extends View implements DemoMode,
         @Override
         public void onDraw(Canvas c, BatteryTracker tracker) {
             if (mDisposed) return;
-            
+
             if (!mInitialized) {
                 init();
             }
@@ -627,8 +616,6 @@ public class BatteryMeterView extends View implements DemoMode,
             }
         }
 
-        private DashPathEffect mPathEffect;
-
         private void loadBatteryDrawables(Resources res, BatteryMeterMode mode) {
             if (isThemeApplied()) {
                 try {
@@ -646,8 +633,6 @@ public class BatteryMeterView extends View implements DemoMode,
                 }
             }
 
-            mBatteryIconColor = Settings.System.getInt(mContext.getContentResolver(),Settings.System.BATTERY_ICON_COLOR, 0xFFFFFFFF);
-	     mColorSwitch =  Settings.System.getInt(mContext.getContentResolver(),Settings.System.STATUSBAR_COLOR_SWITCH, 0) == 1;
             int drawableResId = getBatteryDrawableResourceForMode(mode);
             mBatteryDrawable = (LayerDrawable) res.getDrawable(drawableResId);
             mFrameDrawable = mBatteryDrawable.findDrawableByLayerId(R.id.battery_frame);
@@ -657,11 +642,6 @@ public class BatteryMeterView extends View implements DemoMode,
             // set the animated vector drawable we will be stop animating
             Drawable levelDrawable = mBatteryDrawable.findDrawableByLayerId(R.id.battery_fill);
             mLevelDrawable = new StopMotionVectorDrawable(levelDrawable);
-            if(mColorSwitch) {
-		  if(levelDrawable != null) {
-		  levelDrawable.setColorFilter(mBatteryIconColor,Mode.SRC_ATOP);
-		  }
-            }        
             mBoltDrawable = mBatteryDrawable.findDrawableByLayerId(R.id.battery_charge_indicator);
         }
 
@@ -725,7 +705,6 @@ public class BatteryMeterView extends View implements DemoMode,
             // not much we can do with zero width or height, we'll get another pass later
             if (mWidth <= 0 || mHeight <=0) return;
 
-            mPathEffect = new DashPathEffect(new float[]{3,2},0);
             final float widthDiv2 = mWidth / 2f;
             // text size is width / 2 - 2dp for wiggle room
             final float textSize = widthDiv2 - getResources().getDisplayMetrics().density * 2;
@@ -772,7 +751,6 @@ public class BatteryMeterView extends View implements DemoMode,
             switch (mode) {
                 case BATTERY_METER_ICON_LANDSCAPE:
                     return R.drawable.ic_battery_landscape;
-                case BATTERY_METER_DOTTED_CIRCLE:
                 case BATTERY_METER_CIRCLE:
                     return R.drawable.ic_battery_circle;
                 case BATTERY_METER_ICON_PORTRAIT:
@@ -814,7 +792,6 @@ public class BatteryMeterView extends View implements DemoMode,
         // based drawables
         private void updateBoltDrawableLayer(LayerDrawable batteryDrawable, Drawable boltDrawable) {
             BitmapDrawable newBoltDrawable;
-            Paint paint;
             if (boltDrawable instanceof BitmapDrawable) {
                 newBoltDrawable = (BitmapDrawable) boltDrawable.mutate();
             } else {
@@ -826,12 +803,6 @@ public class BatteryMeterView extends View implements DemoMode,
                 Rect bounds = boltDrawable.getBounds();
                 newBoltDrawable = new BitmapDrawable(getResources(), boltBitmap);
                 newBoltDrawable.setBounds(bounds);
-            }
-	    paint = new Paint();
-            if (mMeterMode == BatteryMeterMode.BATTERY_METER_DOTTED_CIRCLE) {
-                paint.setPathEffect(mPathEffect);
-            } else {
-                paint.setPathEffect(null);
             }
             newBoltDrawable.getPaint().set(mTextAndBoltPaint);
             batteryDrawable.setDrawableByLayerId(R.id.battery_charge_indicator, newBoltDrawable);

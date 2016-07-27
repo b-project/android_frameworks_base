@@ -38,7 +38,6 @@ import android.widget.ImageView.ScaleType;
 
 import com.android.internal.util.gesture.EdgeGesturePosition;
 import com.android.internal.util.gesture.EdgeServiceConstants;
-import com.android.systemui.statusbar.pie.PieControlPanel;
 import com.android.internal.util.pa.PieConstants;
 import com.android.systemui.R;
 import com.android.systemui.statusbar.BaseStatusBar;
@@ -103,7 +102,6 @@ public class PieController extends EdgeGestureManager.EdgeGestureActivationListe
         mPieManager = EdgeGestureManager.getInstance();
         mPieManager.setEdgeGestureActivationListener(this);
         mForcePieCentered = mContext.getResources().getBoolean(R.bool.config_forcePieCentered);
-        PieControlPanel.startBlurTask();
     }
 
     public static PieController getInstance() {
@@ -127,7 +125,7 @@ public class PieController extends EdgeGestureManager.EdgeGestureActivationListe
 
     private boolean showPie() {
         final boolean pieEnabled = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.PA_PIE_STATE, 1) == 1;
+                Settings.System.PA_PIE_STATE, 0) == 1;
         return pieEnabled;
     }
 
@@ -151,11 +149,11 @@ public class PieController extends EdgeGestureManager.EdgeGestureActivationListe
 
     private void addPieInLocation(int gravity) {
         if(mPieAttached) return;
-		
+
         // pie panel
         mPieControlPanel = (PieControlPanel) View.inflate(mContext,
                 R.layout.pie_control_panel, null);
-		// PieControlPanel.startBlurTask();
+
         // init panel
         mPieControlPanel.init(mHandler, mBar, gravity);
         mPieControlPanel.setOnTouchListener(this);
@@ -185,7 +183,6 @@ public class PieController extends EdgeGestureManager.EdgeGestureActivationListe
 
         mWindowManager.addView(mPieControlPanel, lp);
         mPieAttached = true;
-
     }
 
     private boolean activateFromListener(int touchX, int touchY, EdgeGesturePosition position) {
@@ -250,7 +247,6 @@ public class PieController extends EdgeGestureManager.EdgeGestureActivationListe
         mPie.addItem(mNotificatons);
         mPie.addItem(mSettingsPanel);
         mPie.addItem(mScreenshot);
-       // PieControlPanel.startBlurTask();
     }
 
     public void setNavigationIconHints(int hints) {
@@ -281,7 +277,6 @@ public class PieController extends EdgeGestureManager.EdgeGestureActivationListe
 
     public void show(boolean show) {
         mPie.show(show);
-      //  PieControlPanel.startBlurTask();
     }
 
     public void setCenter(int x, int y) {
@@ -307,7 +302,6 @@ public class PieController extends EdgeGestureManager.EdgeGestureActivationListe
         mPie.setLayoutParams(lp);
         populateMenu();
         mPanel.addView(mPie);
-		// PieControlPanel.startBlurTask();
     }
 
     public interface OnNavButtonPressedListener {

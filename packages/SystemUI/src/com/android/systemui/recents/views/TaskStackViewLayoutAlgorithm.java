@@ -91,16 +91,11 @@ public class TaskStackViewLayoutAlgorithm {
         mStackRect.inset(widthPadding, heightPadding);
 
         // Compute the task rect
- /*       int size = mStackRect.width();
-        int sizeY = mStackRect.height();
-        int left = mStackRect.left + (mStackRect.width() - size) / 2;
-            mTaskRect.set(left, mStackRect.top,
-                    left + size, mStackRect.top + sizeY); */
-        // Compute the task rect
         int size = mStackRect.width();
         int left = mStackRect.left + (mStackRect.width() - size) / 2;
         mTaskRect.set(left, mStackRect.top,
                 left + size, mStackRect.top + size);
+
         // Update the affiliation offsets
         float visibleTaskPct = 0.8f;
         mWithinAffiliationOffset = mConfig.taskBarHeight;

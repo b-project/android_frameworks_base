@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-/* Copyright 2015, Resurrection Remix project
+/*
+** Copyright 2009, The Android Open Source Project
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -15,6 +16,7 @@
 ** limitations under the License.
 */
 -->
+
 <!-- These resources are around just to allow their values to be customized
      for different hardware and product builds.  Do not translate. -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
@@ -22,10 +24,13 @@
     <!-- If this is true, key chords can be used to take a screen record on the device. -->
     <bool name="config_enableScreenrecordChord">true</bool>
 
+    <!-- The list of components which should be automatically disabled. -->
+    <string-array name="config_disabledComponents" translatable="false">
+    </string-array>
+
     <!-- Hardware keys on/off option -->
     <bool name="config_hwKeysPref">false</bool>
 
-    <!-- Default value for led color when battery is really fully charged -->
-    <integer name="config_notificationsBatteryReallyFullARGB">0xFF0000FF</integer>
-      
+    <!-- Use alternative way to blur lockscreen -->
+    <bool name="config_use_stackblur">false</bool>
 </resources>

@@ -76,7 +76,6 @@ import android.provider.Settings;
 import android.service.dreams.DreamManagerInternal;
 import android.telephony.TelephonyManager;
 import android.util.EventLog;
-import android.util.Log;
 import android.util.Slog;
 import android.util.TimeUtils;
 import android.view.Display;
@@ -86,7 +85,6 @@ import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.io.IOException;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -542,7 +540,6 @@ public final class PowerManagerService extends SystemService
     private static native void nativeSendPowerHint(int hintId, int data);
     private static native void nativeSetFeature(int featureId, int data);
     private static native int nativeGetFeature(int featureId);
-    private static native void nativeCpuBoost(int duration);
 
     private boolean mKeyboardVisible = false;
 
@@ -553,6 +550,7 @@ public final class PowerManagerService extends SystemService
     private boolean mProximityWakeSupported;
     android.os.PowerManager.WakeLock mProximityWakeLock;
     SensorEventListener mProximityListener;
+    private boolean mForceNavbar;
 
     private PerformanceManagerInternal mPerf;
 
@@ -729,10 +727,13 @@ public final class PowerManagerService extends SystemService
                     CMSettings.Global.WAKE_WHEN_PLUGGED_OR_UNPLUGGED),
                     false, mSettingsObserver, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
-		    Settings.System.WAKELOCK_BLOCKING_ENABLED),
-		    false, mSettingsObserver, UserHandle.USER_ALL);
+                    Settings.System.WAKELOCK_BLOCKING_ENABLED),
+                    false, mSettingsObserver, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.WAKELOCK_BLOCKING_LIST),
+                    false, mSettingsObserver, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVIGATION_BAR_SHOW),
                     false, mSettingsObserver, UserHandle.USER_ALL);
 
             // Go.
@@ -833,7 +834,6 @@ public final class PowerManagerService extends SystemService
         setBlockedWakeLocks(blockedWakelockList);
         Slog.d(TAG, "mWakeLockBlockingEnabled=" + mWakeLockBlockingEnabled + " blockedWakelockList=" + blockedWakelockList);
 
-
         if (mSupportsDoubleTapWakeConfig) {
             boolean doubleTapWakeEnabled = Settings.Secure.getIntForUser(resolver,
                     Settings.Secure.DOUBLE_TAP_TO_WAKE, DEFAULT_DOUBLE_TAP_TO_WAKE,
@@ -886,7 +886,8 @@ public final class PowerManagerService extends SystemService
         mKeyboardBrightness = CMSettings.Secure.getIntForUser(resolver,
                 CMSettings.Secure.KEYBOARD_BRIGHTNESS, mKeyboardBrightnessSettingDefault,
                 UserHandle.USER_CURRENT);
-
+        mForceNavbar = Settings.System.getIntForUser(resolver,
+                Settings.System.NAVIGATION_BAR_SHOW, 0, UserHandle.USER_CURRENT) == 1;
         mDirty |= DIRTY_SETTINGS;
     }
 
@@ -945,7 +946,7 @@ public final class PowerManagerService extends SystemService
                         + ", tag=\"" + tag + "\", ws=" + ws + ", uid=" + uid + ", pid=" + pid);
             }
 
-  boolean blockWakelock = false;
+	    boolean blockWakelock = false;
 	    if (!mSeenWakeLocks.contains(tag)){
                 if ((flags & PowerManager.WAKE_LOCK_LEVEL_MASK) == PowerManager.PARTIAL_WAKE_LOCK){
                     mSeenWakeLocks.add(tag);
@@ -958,13 +959,12 @@ public final class PowerManagerService extends SystemService
 		}
 	    }
 
-
             WakeLock wakeLock;
             int index = findWakeLockIndexLocked(lock);
             boolean notifyAcquire;
             if (index >= 0) {
                 wakeLock = mWakeLocks.get(index);
-		wakeLock.setIsBlocked(blockWakelock);
+	        wakeLock.setIsBlocked(blockWakelock);
                 if (!wakeLock.hasSameProperties(flags, tag, ws, uid, pid)) {
                     // Update existing wake lock.  This shouldn't happen but is harmless.
                     notifyWakeLockChangingLocked(wakeLock, flags, tag, packageName,
@@ -979,7 +979,7 @@ public final class PowerManagerService extends SystemService
                 } catch (RemoteException ex) {
                     throw new IllegalArgumentException("Wake lock is already dead.");
                 }
-		wakeLock.setIsBlocked(blockWakelock);
+	        wakeLock.setIsBlocked(blockWakelock);
                 mWakeLocks.add(wakeLock);
                 setWakeLockDisabledStateLocked(wakeLock);
                 if(mBlockedUids.contains(new Integer(uid)) && uid != Process.myUid()) {
@@ -1143,7 +1143,7 @@ public final class PowerManagerService extends SystemService
                 mNotifier.onWakeLockAcquired(wakeLock.mFlags, wakeLock.mTag, wakeLock.mPackageName,
                     wakeLock.mOwnerUid, wakeLock.mOwnerPid, wakeLock.mWorkSource,
                     wakeLock.mHistoryTag);
-	   }
+            }
         }
     }
 
@@ -1669,7 +1669,7 @@ public final class PowerManagerService extends SystemService
                 final WakeLock wakeLock = mWakeLocks.get(i);
                 switch (wakeLock.mFlags & PowerManager.WAKE_LOCK_LEVEL_MASK) {
                     case PowerManager.PARTIAL_WAKE_LOCK:
-			if (wakeLock.isBlocked()){
+                        if (wakeLock.isBlocked()){
                             continue;
                         }
                         if (!wakeLock.mDisabled) {
@@ -1765,7 +1765,11 @@ public final class PowerManagerService extends SystemService
                                 buttonBrightness = mButtonBrightnessOverrideFromWindowManager;
                                 keyboardBrightness = mButtonBrightnessOverrideFromWindowManager;
                             } else {
-                                buttonBrightness = mButtonBrightness;
+                                if (!mForceNavbar) {
+                                    buttonBrightness = mButtonBrightness;
+                                } else {
+                                    buttonBrightness = 0;
+                                }
                                 keyboardBrightness = mKeyboardBrightness;
                             }
 
@@ -1889,7 +1893,7 @@ public final class PowerManagerService extends SystemService
             if (mUserActivityTimeoutOverrideFromWindowManager >= 0) {
                 timeout = (int)Math.min(timeout, mUserActivityTimeoutOverrideFromWindowManager);
             }
-	}
+        }
         if (sleepTimeout >= 0) {
             timeout = Math.min(timeout, sleepTimeout);
         }
@@ -2560,19 +2564,6 @@ public final class PowerManagerService extends SystemService
         updatePowerStateLocked();
     }
 
-    /**
-     * Boost the CPU
-     * @param duration Duration to boost the CPU for, in milliseconds.
-     * @hide
-     */
-    public void cpuBoost(int duration) {
-        if (duration > 0 && duration <= MAX_CPU_BOOST_TIME) {
-            nativeCpuBoost(duration);
-        } else {
-            Log.e(TAG, "Invalid boost duration: " + duration);
-        }
-    }
- 
     private void shutdownOrRebootInternal(final boolean shutdown, final boolean confirm,
             final String reason, boolean wait) {
         if (mHandler == null || !mSystemReady) {
@@ -3171,7 +3162,7 @@ public final class PowerManagerService extends SystemService
         public final int mOwnerPid;
         public boolean mNotifiedAcquired;
         public boolean mDisabled;
-	private boolean mIsBlocked;
+        private boolean mIsBlocked;
 
         public WakeLock(IBinder lock, int flags, String tag, String packageName,
                 WorkSource workSource, String historyTag, int ownerUid, int ownerPid) {
@@ -3956,38 +3947,11 @@ public final class PowerManagerService extends SystemService
                 Binder.restoreCallingIdentity(ident);
             }
         }
-	
-
-      @Override
-        public String getSeenWakeLocks(){
-            StringBuffer buffer = new StringBuffer();
-            Iterator<String> nextWakeLock = mSeenWakeLocks.iterator();
-            while (nextWakeLock.hasNext()){
-                String wakeLockTag = nextWakeLock.next();
-                buffer.append(wakeLockTag + "|");
-            }
-            if(buffer.length()>0){
-                buffer.deleteCharAt(buffer.length() - 1);
-            }
-            return buffer.toString();
-        }
-    }
-
-    private void setBlockedWakeLocks(String wakeLockTagsString) {
-        mBlockedWakeLocks = new HashSet<String>();
-
-        if (wakeLockTagsString!=null && wakeLockTagsString.length()!=0){
-            String[] parts = wakeLockTagsString.split("\\|");
-            for(int i = 0; i < parts.length; i++){
-                mBlockedWakeLocks.add(parts[i]);
-            }
-        }
-   }
 
         /* updates the blocked uids, so if a wake lock is acquired for it
          * can be released.
          */
-        /*public void updateBlockedUids(int uid, boolean isBlocked) {
+        public void updateBlockedUids(int uid, boolean isBlocked) {
             boolean changed = false;
             if (DEBUG_SPEW) Slog.v(TAG, "updateBlockedUids: uid = " + uid +
                                    "isBlocked = " + isBlocked);
@@ -4019,7 +3983,33 @@ public final class PowerManagerService extends SystemService
                     updatePowerStateLocked();
                 }
             }
-        }*/
+        }
+
+        @Override
+        public String getSeenWakeLocks(){
+            StringBuffer buffer = new StringBuffer();
+            Iterator<String> nextWakeLock = mSeenWakeLocks.iterator();
+            while (nextWakeLock.hasNext()){
+                String wakeLockTag = nextWakeLock.next();
+                buffer.append(wakeLockTag + "|");
+            }
+            if(buffer.length()>0){
+                buffer.deleteCharAt(buffer.length() - 1);
+            }
+            return buffer.toString();
+        }
+    }
+
+    private void setBlockedWakeLocks(String wakeLockTagsString) {
+        mBlockedWakeLocks = new HashSet<String>();
+
+        if (wakeLockTagsString!=null && wakeLockTagsString.length()!=0){
+            String[] parts = wakeLockTagsString.split("\\|");
+            for(int i = 0; i < parts.length; i++){
+                mBlockedWakeLocks.add(parts[i]);
+            }
+        }
+    }
 
     private void setButtonBrightnessOverrideFromWindowManagerInternal(int brightness) {
         synchronized (mLock) {
@@ -4028,7 +4018,7 @@ public final class PowerManagerService extends SystemService
                 mDirty |= DIRTY_SETTINGS;
                 updatePowerStateLocked();
             }
-        	}
+        }
     }
 
     private final class LocalService extends PowerManagerInternal {
@@ -4053,9 +4043,6 @@ public final class PowerManagerService extends SystemService
             }
 
         }
-
-
-       
 
         @Override
         public void setDozeOverrideFromDreamManager(int screenState, int screenBrightness) {
@@ -4184,4 +4171,3 @@ public final class PowerManagerService extends SystemService
         return false;
     }
 }
-

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 /*
- * Copyright (c) 2015 The BlurOS Project.
+ * Copyright (c) 2015 The CyanogenMod Project.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,10 +47,11 @@
     <!-- Live lock screen manager -->
     <uses-permission android:name="bluros.permission.LIVE_LOCK_SCREEN_MANAGER_ACCESS_PRIVATE" />
 
-    <!-- LiveDisplay tile -->
-    <uses-permission android:name="bluros.permission.MANAGE_LIVEDISPLAY" />
-     <!-- Weather Provider -->
+    <!-- Weather Provider -->
     <uses-permission android:name="bluros.permission.READ_WEATHER" />
+
+    <!-- NFC Tile -->
+    <uses-permission android:name="android.permission.NFC" />
 
     <application>
         <provider android:name=".cm.SpamMessageProvider"

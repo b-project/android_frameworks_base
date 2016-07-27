@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- * Copyright (C) 2013 The BlurOS Project
+ * Copyright (C) 2013 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,6 @@ import com.android.internal.telephony.ITelephony;
 import com.android.server.pm.PackageManagerService;
 import com.android.server.power.PowerManagerService;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.IWindowManager;
 import android.view.WindowManager;
 import java.lang.reflect.Method;
@@ -78,9 +77,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.OutputStreamWriter;
 
-import com.android.internal.R;
-
-import com.android.internal.util.rr.Helpers;
 import org.bluros.internal.util.ThemeUtils;
 
 public final class ShutdownThread extends Thread {
@@ -100,7 +96,6 @@ public final class ShutdownThread extends Thread {
     private static final int MOUNT_SERVICE_STOP_PERCENT = 20;
 
     private static final String SOFT_REBOOT = "soft_reboot";
-    private static final String SYSTEMUI_REBOOT = "systemui_reboot";
 
     // length of vibration before shutting down
     private static final int SHUTDOWN_VIBRATE_MS = 500;
@@ -179,7 +174,7 @@ public final class ShutdownThread extends Thread {
         KeyguardManager km = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
         boolean keyguardLocked = km.inKeyguardRestrictedInputMode() && km.isKeyguardSecure();
         boolean advancedRebootEnabled = CMSettings.Secure.getInt(context.getContentResolver(),
-                CMSettings.Secure.ADVANCED_REBOOT, 1) == 1;
+                CMSettings.Secure.ADVANCED_REBOOT, 0) == 1;
         boolean isPrimaryUser = UserHandle.getCallingUserId() == UserHandle.USER_OWNER;
 
         return advancedRebootEnabled && !keyguardLocked && isPrimaryUser;
@@ -261,11 +256,7 @@ public final class ShutdownThread extends Thread {
                                 if (selected != ListView.INVALID_POSITION) {
                                     String actions[] = context.getResources().getStringArray(
                                             com.android.internal.R.array.shutdown_reboot_actions);
-                                    if (actions[selected].equals(SYSTEMUI_REBOOT)) {
-                                        mRebootReason = actions[selected];
-                                        doSystemUIReboot();
-                                        return;
-                                    } else if (selected >= 0 && selected < actions.length) {
+                                    if (selected >= 0 && selected < actions.length) {
                                         mRebootReason = actions[selected];
                                         if (actions[selected].equals(SOFT_REBOOT)) {
                                             doSoftReboot();
@@ -284,92 +275,12 @@ public final class ShutdownThread extends Thread {
             sConfirmDialog = confirmDialogBuilder.create();
 
             closer.dialog = sConfirmDialog;
-            sConfirmDialog.setOnDismissListener(closer);                                                                                  
-            WindowManager.LayoutParams attrs = sConfirmDialog.getWindow().getAttributes();
-         
-            boolean isPrimary = UserHandle.getCallingUserId() == UserHandle.USER_OWNER;
-            int powermenuAnimations = isPrimary ? getPowermenuAnimations(context) : 0;
-
-            if (powermenuAnimations == 0) {
-            // default AOSP action
-            }
-            if (powermenuAnimations == 1) {
-                attrs.windowAnimations = R.style.PowerMenuBottomAnimation;
-                attrs.gravity = Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL;
-            }
-            if (powermenuAnimations == 2) {
-                attrs.windowAnimations = R.style.PowerMenuTopAnimation;
-                attrs.gravity = Gravity.TOP|Gravity.CENTER_HORIZONTAL;
-            }
-            if (powermenuAnimations == 3) {
-                attrs.windowAnimations = R.style.PowerMenuRotateAnimation;
-                attrs.gravity = Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL;
-            }
-            if (powermenuAnimations == 4) {
-                attrs.windowAnimations = R.style.PowerMenuXylonAnimation;
-                attrs.gravity = Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL;
-            }
-            if (powermenuAnimations == 5) {
-                attrs.windowAnimations = R.style.PowerMenuTranslucentAnimation;
-                attrs.gravity = Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL;
-            }
-            if (powermenuAnimations == 6) {
-                attrs.windowAnimations = R.style.PowerMenuTnAnimation;
-                attrs.gravity = Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL;
-            }
-            if (powermenuAnimations == 7) {
-                attrs.windowAnimations = R.style.PowerMenuflyAnimation;
-                attrs.gravity = Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL;
-            }
-            if (powermenuAnimations == 8) {
-                attrs.windowAnimations = R.style.PowerMenuCardAnimation;
-                attrs.gravity = Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL;
-            }
-            if (powermenuAnimations == 9) {
-                attrs.windowAnimations = R.style.PowerMenuTranslucentAnimation;
-                attrs.gravity = Gravity.TOP|Gravity.CENTER_HORIZONTAL;
-            }
-            if (powermenuAnimations == 10) {
-                attrs.windowAnimations = R.style.PowerMenuTranslucentAnimation;
-                attrs.gravity = Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL;
-            }
-
-            if (Settings.System.getInt(context.getContentResolver(),
-                    Settings.System.TRANSPARENT_POWER_MENU, 100) != 100) {
-                attrs.alpha = setRebootDialogAlpha(context);
-            }
-
+            sConfirmDialog.setOnDismissListener(closer);
             sConfirmDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
-            if (Settings.System.getInt(context.getContentResolver(),
-                    Settings.System.TRANSPARENT_POWER_DIALOG_DIM, 50) != 50) {
-                sConfirmDialog.getWindow().setDimAmount(setRebootDialogDim(context));
-            }
             sConfirmDialog.show();
         } else {
             beginShutdownSequence(context);
         }
-    }
-
-    private static int getPowermenuAnimations(Context context) {
-        return Settings.System.getInt(context.getContentResolver(),
-                Settings.System.POWER_MENU_ANIMATIONS, 0);
-    }
-
-    private static float setRebootDialogAlpha(Context context) {
-        int mRebootDialogAlpha = Settings.System.getInt(
-                context.getContentResolver(),
-                Settings.System.TRANSPARENT_POWER_MENU, 100);
-        double dAlpha = mRebootDialogAlpha / 100.0;
-        float alpha = (float) dAlpha;
-        return alpha;
-    }
-
-    private static float setRebootDialogDim(Context context) {
-        int mRebootDialogDim = Settings.System.getInt(context.getContentResolver(),
-                Settings.System.TRANSPARENT_POWER_DIALOG_DIM, 50);
-        double dDim = mRebootDialogDim / 100.0;
-        float dim = (float) dDim;
-        return dim;
     }
 
     private static void doSoftReboot() {
@@ -382,10 +293,6 @@ public final class ShutdownThread extends Thread {
         } catch (RemoteException e) {
             Log.e(TAG, "failure trying to perform soft reboot", e);
         }
-    }
-
-    private static void doSystemUIReboot() {
-        Helpers.restartSystemUI();
     }
 
     private static class CloseDialogReceiver extends BroadcastReceiver
@@ -543,58 +450,6 @@ public final class ShutdownThread extends Thread {
             pd.setCancelable(false);
             pd.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
 
-            WindowManager.LayoutParams attrs = pd.getWindow().getAttributes();
-
-            boolean isPrimary = UserHandle.getCallingUserId() == UserHandle.USER_OWNER;
-            int powermenuAnimations = isPrimary ? getPowermenuAnimations(context) : 0;
-
-           if (powermenuAnimations == 0) {
-           // default AOSP action
-           }
-           if (powermenuAnimations == 1) {
-                attrs.windowAnimations = R.style.PowerMenuBottomAnimation;
-                attrs.gravity = Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL;
-           }
-           if (powermenuAnimations == 2) {
-               attrs.windowAnimations = R.style.PowerMenuTopAnimation;
-               attrs.gravity = Gravity.TOP|Gravity.CENTER_HORIZONTAL;
-           }
-           if (powermenuAnimations == 3) {
-                attrs.windowAnimations = R.style.PowerMenuRotateAnimation;
-                attrs.gravity = Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL;
-            }
-            if (powermenuAnimations == 4) {
-                attrs.windowAnimations = R.style.PowerMenuXylonAnimation;
-                attrs.gravity = Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL;
-            }
-            if (powermenuAnimations == 5) {
-                attrs.windowAnimations = R.style.PowerMenuTranslucentAnimation;
-                attrs.gravity = Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL;
-            }
-            if (powermenuAnimations == 6) {
-                attrs.windowAnimations = R.style.PowerMenuTnAnimation;
-                attrs.gravity = Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL;
-            }
-            if (powermenuAnimations == 7) {
-                attrs.windowAnimations = R.style.PowerMenuflyAnimation;
-                attrs.gravity = Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL;
-            }
-            if (powermenuAnimations == 8) {
-                attrs.windowAnimations = R.style.PowerMenuCardAnimation;
-                attrs.gravity = Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL;
-            }
-            if (powermenuAnimations == 9) {
-                attrs.windowAnimations = R.style.PowerMenuTranslucentAnimation;
-                attrs.gravity = Gravity.TOP|Gravity.CENTER_HORIZONTAL;
-            }
-            if (powermenuAnimations == 10) {
-                attrs.windowAnimations = R.style.PowerMenuTranslucentAnimation;
-                attrs.gravity = Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL;
-            }
-
-            attrs.alpha = setRebootDialogAlpha(context);
-
-            pd.getWindow().setDimAmount(setRebootDialogDim(context));
             pd.show();
         }
 
@@ -1151,7 +1006,7 @@ public final class ShutdownThread extends Thread {
             if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TELEVISION)) {
                 uiContext.setTheme(com.android.internal.R.style.Theme_Leanback_Dialog_Alert);
             } else  {
-                uiContext.setTheme(android.R.style.Theme_DeviceDefault_Light_DarkActionBar);
+                uiContext.setTheme(com.android.internal.R.style.Theme_Power_Dialog);
             }
         }
         return uiContext != null ? uiContext : context;

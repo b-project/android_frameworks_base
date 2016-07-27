@@ -1,4 +1,3 @@
--dontwarn
 -keep class com.android.systemui.statusbar.policy.KeyButtonView {
   public float getDrawingAlpha();
   public void setDrawingAlpha(float);
@@ -14,6 +13,3 @@
 -keep class com.android.systemui.statusbar.phone.PhoneStatusBar
 -keep class com.android.systemui.statusbar.tv.TvStatusBar
 -keep class com.android.systemui.recents.*
-
-# org.dirtyunicorns.navigation trail-drawaing library fix
--dontwarn com.google.common.annotations.VisibleForTesting

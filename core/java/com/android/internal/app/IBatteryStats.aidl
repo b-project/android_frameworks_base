@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
- * Copyright (C) 2016 The BlurOS Project
+ * Copyright (C) 2016 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,12 +122,14 @@ interface IBatteryStats {
     void setBatteryState(int status, int health, int plugType, int level, int temp, int volt);
     long getAwakeTimeBattery();
     long getAwakeTimePlugged();
-    /** @hide **/
-    void resetStatistics();
+
+
     /** @hide */
     byte[] getDockStatistics();
     /** @hide */
     ParcelFileDescriptor getDockStatisticsStream();
+    /** @hide **/
+    void resetStatistics();
     /** @hide **/
     void setDockBatteryState(int status, int health, int plugType, int level, int temp, int volt);
     /** @hide **/

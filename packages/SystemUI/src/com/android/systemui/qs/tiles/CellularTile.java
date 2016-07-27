@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
- * Copyright (C) 2015 The BlurOS Project
+ * Copyright (C) 2015 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,14 +100,9 @@ public class CellularTile extends QSTile<QSTile.SignalState> {
 
     @Override
     protected void handleClick() {
-        boolean enabled = mDataController.isMobileDataEnabled();
         MetricsLogger.action(mContext, getMetricsCategory());
         if (mDataController.isMobileDataSupported()) {
-            if (!enabled) {
-                mDataController.setMobileDataEnabled(true);
-            } else {
-                mDataController.setMobileDataEnabled(false);
-            }
+            showDetail(true);
         } else {
             mHost.startActivityDismissingKeyguard(DATA_USAGE_SETTINGS);
         }
@@ -115,20 +110,15 @@ public class CellularTile extends QSTile<QSTile.SignalState> {
 
     @Override
     protected void handleSecondaryClick() {
-        if (mDataController.isMobileDataSupported()) {
-            showDetail(true);
-        } else {
-            mHost.startActivityDismissingKeyguard(MOBILE_NETWORK_SETTINGS);
-        }
+        handleClick();
     }
 
     @Override
     protected void handleLongClick() {
-        MetricsLogger.action(mContext, getMetricsCategory());
-        if (mDataController.isMobileDataSupported()) {
-            showDetail(true);
+        if (mTelephonyManager.getDefault().getPhoneCount() > 1) {
+            mHost.startActivityDismissingKeyguard(MOBILE_NETWORK_SETTINGS_MSIM);
         } else {
-            mHost.startActivityDismissingKeyguard(DATA_USAGE_SETTINGS);
+            mHost.startActivityDismissingKeyguard(MOBILE_NETWORK_SETTINGS);
         }
     }
 

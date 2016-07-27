@@ -33,7 +33,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.android.internal.telephony.TelephonyIntents;
-import com.android.internal.util.rr.RRUtils;
+import com.android.internal.util.bluros.BLUROSUtils;
 import com.android.systemui.utils.SpnOverride;
 
 import java.text.SimpleDateFormat;
@@ -47,7 +47,7 @@ public class CarrierLabel extends TextView {
     private Context mContext;
     private boolean mAttached;
     private static boolean isCN;
-    private int mCarrierFontSize = 10;
+    private int mCarrierFontSize = 14;
 
     Handler mHandler;
 
@@ -122,7 +122,7 @@ public class CarrierLabel extends TextView {
                         intent.getStringExtra(TelephonyIntents.EXTRA_SPN),
                         intent.getBooleanExtra(TelephonyIntents.EXTRA_SHOW_PLMN, false),
                         intent.getStringExtra(TelephonyIntents.EXTRA_PLMN));
-                isCN = RRUtils.isChineseLanguage();
+                isCN = BLUROSUtils.isChineseLanguage();
             }
         }
     };
@@ -182,7 +182,7 @@ public class CarrierLabel extends TextView {
 
     private void updateSize() {
         mCarrierFontSize = Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.STATUS_BAR_CARRIER_FONT_SIZE, 10,
+                Settings.System.STATUS_BAR_CARRIER_FONT_SIZE, 14,
                 UserHandle.USER_CURRENT);
 
         setTextSize(mCarrierFontSize);

@@ -2386,7 +2386,6 @@
     <permission android:name="android.permission.BATTERY_STATS"
         android:protectionLevel="signature|privileged|development" />
 
-
     <!-- Allows an application to reset the device battery statistics.
     <p>Not for use by third-party applications.
          @hide -->
@@ -2782,8 +2781,7 @@
                  android:backupAgent="com.android.server.backup.SystemBackupAgent"
                  android:killAfterRestore="false"
                  android:icon="@drawable/ic_launcher_android"
-                 android:supportsRtl="true"
-                 android:theme="@style/Theme.Material.DayNight.DarkActionBar">
+                 android:supportsRtl="true">
         <activity android:name="com.android.internal.app.ChooserActivity"
                 android:theme="@style/Theme.DeviceDefault.Resolver"
                 android:finishOnCloseSystemDialogs="true"

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
- * Copyright (C) 2012-2015 The BlurOS Project
- * Copyright 2014-2015 The Euphoria-OS Project
+ * Copyright (C) 2012-2015 The CyanogenMod Project
+ * Copyright (C) 2014-2015 The Euphoria-OS Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +26,14 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.provider.Settings;
 import android.os.RemoteException;
 import android.view.View;
 
-import com.android.internal.logging.MetricsConstants;
 import com.android.systemui.R;
 import com.android.systemui.screenshot.TakeScreenshotService;
 import com.android.systemui.qs.QSTile;
+
+import org.bluros.internal.logging.CMMetricsLogger;
 
 /** Quick settings tile: Screenshot **/
 public class ScreenshotTile extends QSTile<QSTile.BooleanState> {
@@ -61,7 +61,7 @@ public class ScreenshotTile extends QSTile<QSTile.BooleanState> {
         mHost.collapsePanels();
         /* wait for the panel to close */
         try {
-             Thread.sleep(1500);
+             Thread.sleep(2000);
         } catch (InterruptedException ie) {
              // Do nothing
         }
@@ -73,7 +73,7 @@ public class ScreenshotTile extends QSTile<QSTile.BooleanState> {
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.setClassName("com.android.gallery3d",
             "com.android.gallery3d.app.GalleryActivity");
-        mHost.startActivityDismissingKeyguard(intent);
+        mContext.sendBroadcast(intent);
     }
 
     @Override
@@ -81,27 +81,15 @@ public class ScreenshotTile extends QSTile<QSTile.BooleanState> {
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.setClassName("com.android.gallery3d",
             "com.android.gallery3d.app.GalleryActivity");
-        mHost.startActivityDismissingKeyguard(intent);
-    }
-
-    @Override
-    public int getMetricsCategory() {
-        return MetricsConstants.DONT_TRACK_ME_BRO;
+        mContext.sendBroadcast(intent);
     }
 
     @Override
     protected void handleUpdateState(BooleanState state, Object arg) {
         state.visible = true;
-        state.label = mContext.getString(R.string.quick_settings_screenshot_label);
-        state.contentDescription = mContext.getString(
-                R.string.accessibility_quick_settings_screenshot);
+        state.label = mContext.getString(R.string.quick_settings_screenshot);
         state.icon = ResourceIcon.get(R.drawable.ic_qs_screenshot);
     }
-
-    /**private int screenshotDelay() {
-        return Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.SCREENSHOT_DELAY, 2);
-    }**/
 
     final Runnable mScreenshotTimeout = new Runnable() {
         @Override
@@ -168,5 +156,10 @@ public class ScreenshotTile extends QSTile<QSTile.BooleanState> {
                 mHandler.postDelayed(mScreenshotTimeout, 10000);
             }
         }
+    }
+
+    @Override
+    public int getMetricsCategory() {
+        return CMMetricsLogger.DONT_LOG;
     }
 }

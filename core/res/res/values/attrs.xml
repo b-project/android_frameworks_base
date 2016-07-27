@@ -6792,11 +6792,6 @@ i
         <attr name="disableDependentsState" format="boolean" />
     </declare-styleable>
 
-    <!-- Base attributes available to SlimSeekBarPreference. -->
-    <declare-styleable name="SlimSeekBarPreference">
-        <!-- No added attributes at this time -->
-    </declare-styleable>
-
     <!-- Base attributes available to DialogPreference. -->
     <declare-styleable name="DialogPreference">
         <!-- The title in the dialog. -->
@@ -7913,15 +7908,4 @@ i
         <attr name="entries" />
         <attr name="entryValues" />
     </declare-styleable>
-
-    <declare-styleable name="SwipeBackLayout">
-        <attr name="EdgeSize" format="dimension"/>
-        <attr name="EdgeFlag" format="enum"/>
-        <attr name="ShadowLeft" format="reference"/>
-        <attr name="ShadowRight" format="reference"/>
-        <attr name="ShadowBottom" format="reference"/>
-    </declare-styleable>
-
-    <attr name="SwipeBackLayoutStyle" format="reference"/>
-
 </resources>

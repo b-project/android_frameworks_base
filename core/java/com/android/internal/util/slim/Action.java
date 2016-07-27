@@ -217,17 +217,6 @@ public class Action {
 
     }
 
-    public static boolean isNavBarEnabled(Context context) {
-        return Settings.Secure.getIntForUser(context.getContentResolver(),
-                Settings.Secure.NAVIGATION_BAR_VISIBLE ,
-                isNavBarDefault(context) ? 1 : 0, UserHandle.USER_CURRENT) == 1;
-    }
-
-    public static boolean isNavBarDefault(Context context) {
-        return context.getResources().getBoolean(
-                com.android.internal.R.bool.config_showNavigationBar);
-    }
-
     public static boolean isActionKeyEvent(String action) {
         if (action.equals(ActionConstants.ACTION_HOME)
                 || action.equals(ActionConstants.ACTION_BACK)
@@ -253,10 +242,6 @@ public class Action {
                 Intent.FLAG_ACTIVITY_NEW_TASK
                 | Intent.FLAG_ACTIVITY_SINGLE_TOP
                 | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        if (Settings.System.getInt(context.getContentResolver(),
-                    Settings.System.SLIM_ACTION_FLOATS, 0) == 1) {
-                intent.setFlags(Intent.FLAG_FLOATING_WINDOW);
-            }
         context.startActivityAsUser(intent,
                 new UserHandle(UserHandle.USER_CURRENT));
     }

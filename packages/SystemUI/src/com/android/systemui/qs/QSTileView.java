@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
- * Copyright (C) 2015 The BlurOS Project
+ * Copyright (C) 2015 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,22 +18,17 @@
 package com.android.systemui.qs;
 
 import android.annotation.Nullable;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.database.ContentObserver;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
-import android.graphics.PorterDuff.Mode;
-import android.net.Uri;
 import android.os.Handler;
-import android.os.UserHandle;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
@@ -51,8 +46,6 @@ import com.android.systemui.R;
 import com.android.systemui.qs.QSTile.AnimationIcon;
 import com.android.systemui.qs.QSTile.State;
 
-import android.provider.Settings;
-
 import java.util.Objects;
 
 /** View that represents a standard quick settings tile. **/
@@ -65,19 +58,14 @@ public class QSTileView extends ViewGroup {
     protected final Context mContext;
     private final View mIcon;
     private final View mDivider;
-    public final H mHandler = new H();
-	private int mIconSizePx;
+    private final H mHandler = new H();
+    private int mIconSizePx;
     private float mSizeScale = 1.0f;
     private final int mTileSpacingPx;
     private int mTilePaddingTopPx;
     private int mTilePaddingBelowIconPx;
     private final int mDualTileVerticalPaddingPx;
     private final View mTopBackgroundView;
-    private boolean mQsColorSwitch = false;
-    public int mIconColor;
-    public int mLabelColor;
-
-    private SettingsObserver mSettingsObserver;		
 
     private TextView mLabel;
     private QSDualTileLabel mDualLabel;
@@ -94,7 +82,7 @@ public class QSTileView extends ViewGroup {
 
         mContext = context;
         final Resources res = context.getResources();
-		updateDimens(res, 1.0f);
+        updateDimens(res, 1.0f);
         mTileSpacingPx = res.getDimensionPixelSize(R.dimen.qs_tile_spacing);
         mDualTileVerticalPaddingPx =
                 res.getDimensionPixelSize(R.dimen.qs_dual_tile_padding_vertical);
@@ -102,7 +90,6 @@ public class QSTileView extends ViewGroup {
         recreateLabel();
         setClipChildren(false);
 
-        mSettingsObserver = new SettingsObserver(mHandler);
         mTopBackgroundView = new View(context);
         mTopBackgroundView.setId(View.generateViewId());
         addView(mTopBackgroundView);
@@ -148,18 +135,12 @@ public class QSTileView extends ViewGroup {
             mDualLabel.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                     getResources().getDimensionPixelSize(R.dimen.qs_tile_text_size));
         }
-
     }
 
     void recreateLabel() {
         CharSequence labelText = null;
         CharSequence labelDescription = null;
-        mQsColorSwitch = Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.QS_COLOR_SWITCH, 0,
-                UserHandle.USER_CURRENT) == 1;
-	    mLabelColor = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.QS_TEXT_COLOR, 0xFFFFFFFF);
-        if (mLabel != null ) {
+        if (mLabel != null) {
             labelText = mLabel.getText();
             removeView(mLabel);
             mLabel = null;
@@ -169,12 +150,10 @@ public class QSTileView extends ViewGroup {
             if (mLabel != null) {
                 labelDescription = mLabel.getContentDescription();
             }
-            labelDescription = mDualLabel.getContentDescription();
             removeView(mDualLabel);
             mDualLabel = null;
         }
         final Resources res = mContext.getResources();
-	updateColors();
         if (mDual) {
             if (mDualLabel == null) {
                 mDualLabel = new QSDualTileLabel(mContext);
@@ -183,11 +162,7 @@ public class QSTileView extends ViewGroup {
                 if (mDualDetails) {
                     mDualLabel.setFirstLineCaret(mContext.getDrawable(R.drawable.qs_dual_tile_caret));
                 }
-                if (mQsColorSwitch) {
-                mDualLabel.setTextColor(mLabelColor);
-           	 } else {
                 mDualLabel.setTextColor(mContext.getColor(R.color.qs_tile_text));
-          	}
                 mDualLabel.setPadding(0, mDualTileVerticalPaddingPx, 0, mDualTileVerticalPaddingPx);
                 mDualLabel.setTypeface(CONDENSED);
                 mDualLabel.setTextSize(TypedValue.COMPLEX_UNIT_PX,
@@ -222,10 +197,6 @@ public class QSTileView extends ViewGroup {
                 mLabel.setText(labelText);
             }
             addView(mLabel);
-	     if (mQsColorSwitch) {
-                mLabel.setTextColor(mLabelColor);
-           	 }	
-	
         }
     }
 
@@ -269,37 +240,6 @@ public class QSTileView extends ViewGroup {
         return changed;
     }
 
-    public void setLabelColor() {
-        updateColors();
-        if (mLabel != null) {
-            mLabel.setTextColor(mLabelColor);
-        }
-        if (mDualLabel != null) {
-            mDualLabel.setTextColor(mLabelColor);
-        }
-    }
-
-    public void setIconColor() {
-        	if (mIcon instanceof ImageView) {
-		updateColors();
-           	ImageView iv = (ImageView) mIcon;
-            	iv.setColorFilter(mIconColor, Mode.MULTIPLY);
-		    }	
-    }
-
-    public void updateColors() {
-        final ContentResolver resolver = mContext.getContentResolver();
-          mQsColorSwitch = Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.QS_COLOR_SWITCH, 0,
-                UserHandle.USER_CURRENT) == 1;
-        if (mQsColorSwitch) {
-           mLabelColor = Settings.System.getInt(resolver,
-                    Settings.System.QS_TEXT_COLOR, 0xFFFFFFFF);
-           mIconColor = Settings.System.getInt(resolver,
-                    Settings.System.QS_ICON_COLOR, 0xFFFFFFFF);
-        }
-    }
-
     protected void setTileBackground() {
         if (mTileBackground instanceof RippleDrawable) {
             setRipple((RippleDrawable) mTileBackground);
@@ -323,19 +263,13 @@ public class QSTileView extends ViewGroup {
         mClickSecondary = clickSecondary;
         mLongClick = longClick;
     }
-	
-	
-    
-    public View createIcon() {
-	updateColors();
+
+    protected View createIcon() {
         final ImageView icon = new ImageView(mContext);
         icon.setId(android.R.id.icon);
         icon.setScaleType(ScaleType.CENTER_INSIDE);
-	  if (mQsColorSwitch) {
-            icon.setColorFilter(mIconColor, Mode.MULTIPLY);
-        } 
         return icon;
-	}
+    }
 
     public Drawable newTileBackground() {
         final int[] attrs = new int[] { android.R.attr.selectableItemBackgroundBorderless };
@@ -428,7 +362,7 @@ public class QSTileView extends ViewGroup {
                 mLabel.setTextColor(mContext.getResources().getColor(state.enabled ?
                         R.color.qs_tile_text : R.color.qs_tile_text_disabled));
             }
-        }	
+        }
     }
 
     protected void setIcon(ImageView iv, QSTile.State state) {
@@ -521,65 +455,6 @@ public class QSTileView extends ViewGroup {
             if (msg.what == STATE_CHANGED) {
                 handleStateChanged((State) msg.obj);
             }
-        }
-    }
-
- class SettingsObserver extends ContentObserver {
-        SettingsObserver(Handler handler) {
-            super(handler);
-        }
-
-        void observe() {
-            ContentResolver resolver = mContext.getContentResolver();
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.QS_COLOR_SWITCH),
-                    false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.QS_ICON_COLOR),
-                    false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.QS_TEXT_COLOR),
-                    false, this, UserHandle.USER_ALL);
-            update();
-        }
-
-        void unobserve() {
-            ContentResolver resolver = mContext.getContentResolver();
-            resolver.unregisterContentObserver(this);
-        }
-
-        @Override
-        public void onChange(boolean selfChange) {
-            update();
-        }
-
-        @Override
-        public void onChange(boolean selfChange, Uri uri) {
-	   ContentResolver resolver = mContext.getContentResolver();
-            update();
-	if (uri.equals(Settings.System.getUriFor(
-                    Settings.System.QS_COLOR_SWITCH))) {
-		 updateColors();
-		setIconColor();
-		}
-	if (uri.equals(Settings.System.getUriFor(
-                    Settings.System.QS_ICON_COLOR))) {
-		updateColors();
-		setIconColor();
-		}
-	if (uri.equals(Settings.System.getUriFor(
-                    Settings.System.QS_TEXT_COLOR))) {
-		updateColors();
-		setIconColor();
-		}
-        }
-
-        public void update() {
-	ContentResolver resolver = mContext.getContentResolver();
-	mQsColorSwitch = Settings.System.getInt(resolver,
-                Settings.System.QS_COLOR_SWITCH, 0) == 1;
-		 updateColors();  
-	         setIconColor();    
         }
     }
 }

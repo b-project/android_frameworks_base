@@ -131,9 +131,6 @@ public class VolumeDialog {
     private long mCollapseTime;
     private int mLastActiveStream;
 
-    // Volume dialog alpha
-    private int mVolumeDialogAlpha;
-
     public VolumeDialog(Context context, int windowType, VolumeDialogController controller,
                         ZenModeController zenModeController, Callback callback) {
         mContext = context;
@@ -576,7 +573,6 @@ public class VolumeDialog {
         final VolumeRow activeRow = getActiveRow();
         updateFooterH();
         updateExpandButtonH();
-        setVolumeAlpha();
         if (!mShowing) {
             trimObsoleteH();
         }
@@ -709,8 +705,7 @@ public class VolumeDialog {
 
         // update slider max
         final int max = ss.levelMax * 100;
-        final boolean maxChanged = max != row.slider.getMax();
-        if (maxChanged) {
+        if (max != row.slider.getMax()) {
             row.slider.setMax(max);
         }
 
@@ -766,7 +761,7 @@ public class VolumeDialog {
         final boolean enableSlider = !zenMuted;
         final int vlevel = row.ss.muted && (isRingVibrate || !isRingStream && !zenMuted) ? 0
                 : row.ss.level;
-        updateVolumeRowSliderH(row, enableSlider, vlevel, maxChanged);
+        updateVolumeRowSliderH(row, enableSlider, vlevel);
     }
 
     private void updateVolumeRowHeaderVisibleH(VolumeRow row) {
@@ -790,7 +785,7 @@ public class VolumeDialog {
         row.slider.setThumbTintList(tint);
     }
 
-    private void updateVolumeRowSliderH(VolumeRow row, boolean enable, int vlevel, boolean maxChanged) {
+    private void updateVolumeRowSliderH(VolumeRow row, boolean enable, int vlevel) {
         row.slider.setEnabled(enable);
         updateVolumeRowSliderTintH(row, row.stream == mActiveStream);
         if (row.tracking) {
@@ -814,7 +809,7 @@ public class VolumeDialog {
             }
         }
         final int newProgress = vlevel * 100;
-        if (progress != newProgress || maxChanged) {
+        if (progress != newProgress) {
             if (mShowing && rowVisible) {
                 // animate!
                 if (row.anim != null && row.anim.isRunning()
@@ -1170,16 +1165,5 @@ public class VolumeDialog {
         void onSettingsClicked();
         void onZenSettingsClicked();
         void onZenPrioritySettingsClicked();
-    }
-
-    private void setVolumeAlpha() {
-        mVolumeDialogAlpha = Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.TRANSPARENT_VOLUME_DIALOG, 255);
-        if (Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.TRANSPARENT_VOLUME_DIALOG, 255) != 255) {
-            if (mDialogView != null) {
-                mDialogView.getBackground().setAlpha(mVolumeDialogAlpha);
-            }
-        }
     }
 }

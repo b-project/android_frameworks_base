@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 The BlurOS Project
+ * Copyright (C) 2015 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,12 @@
 
 package com.android.systemui.qs.tiles;
 
+import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
+import android.provider.Settings.Secure;
 
+import com.android.systemui.qs.SecureSetting;
 import com.android.systemui.qs.QSTile;
 import com.android.systemui.R;
 import org.bluros.internal.logging.CMMetricsLogger;
@@ -26,8 +29,19 @@ import org.bluros.internal.logging.CMMetricsLogger;
 /** Quick settings tile: Ambient Display **/
 public class AmbientDisplayTile extends QSTile<QSTile.BooleanState> {
 
+    private static final Intent DISPLAY_SETTINGS = new Intent("android.settings.DISPLAY_SETTINGS");
+
+    private final SecureSetting mSetting;
+
     public AmbientDisplayTile(Host host) {
         super(host);
+
+        mSetting = new SecureSetting(mContext, mHandler, Secure.DOZE_ENABLED) {
+            @Override
+            protected void handleValueChanged(int value, boolean observedChange) {
+                handleRefreshState(value);
+            }
+        };
     }
 
     @Override
@@ -43,10 +57,7 @@ public class AmbientDisplayTile extends QSTile<QSTile.BooleanState> {
 
     @Override
     protected void handleLongClick() {
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.setClassName("com.android.settings",
-            "com.android.settings.Settings$AmbientDisplaySettingsActivity");
-        mHost.startActivityDismissingKeyguard(intent);
+        mHost.startActivityDismissingKeyguard(DISPLAY_SETTINGS);
     }
 
     private void setEnabled(boolean enabled) {
@@ -54,18 +65,15 @@ public class AmbientDisplayTile extends QSTile<QSTile.BooleanState> {
                 Settings.Secure.DOZE_ENABLED,
                 enabled ? 1 : 0);
     }
-    
-   private boolean isAmbientDisplayEnabled() {
-        return Settings.Secure.getInt(mContext.getContentResolver(),
-                Settings.Secure.DOZE_ENABLED, 1) == 1;
-    }
 
     @Override
     protected void handleUpdateState(BooleanState state, Object arg) {
-        state.value = isAmbientDisplayEnabled();
+        final int value = arg instanceof Integer ? (Integer)arg : mSetting.getValue();
+        final boolean enable = value != 0;
+        state.value = enable;
         state.visible = true;
         state.label = mContext.getString(R.string.quick_settings_ambient_display_label);
-        if (state.value) {
+        if (enable) {
             state.icon = ResourceIcon.get(R.drawable.ic_qs_ambientdisplay_on);
             state.contentDescription =  mContext.getString(
                     R.string.accessibility_quick_settings_ambient_display_on);

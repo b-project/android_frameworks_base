@@ -740,7 +740,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
                    Secure.LOCK_PATTERN_ENABLED,
                    Secure.LOCK_PATTERN_VISIBLE,
                    Secure.LOCK_PATTERN_TACTILE_FEEDBACK_ENABLED,
-                   Secure.LOCK_PASS_TO_SECURITY_VIEW,
+                   CMSettings.Secure.LOCK_PASS_TO_SECURITY_VIEW,
                    Secure.LOCK_PATTERN_SIZE,
                    Secure.LOCK_DOTS_VISIBLE,
                    Secure.LOCK_SHOW_ERROR_PATH,
@@ -2635,6 +2635,8 @@ class DatabaseHelper extends SQLiteOpenHelper {
                 R.bool.def_sound_effects_enabled);
         loadBooleanSetting(stmt, Settings.System.HAPTIC_FEEDBACK_ENABLED,
                 R.bool.def_haptic_feedback);
+        loadBooleanSetting(stmt, CMSettings.System.VOLUME_ADJUST_SOUNDS_ENABLED,
+                R.bool.def_volume_adjust_sounds_enabled);
 
         loadIntegerSetting(stmt, Settings.System.LOCKSCREEN_SOUNDS_ENABLED,
             R.integer.def_lockscreen_sounds_enabled);
@@ -2877,16 +2879,6 @@ class DatabaseHelper extends SQLiteOpenHelper {
                     R.bool.def_enable_mobile_data);
 
             int phoneCount = TelephonyManager.getDefault().getPhoneCount();
-            // SUB specific flags for Multisim devices
-            for (int phoneId = 0; phoneId < MAX_PHONE_COUNT; phoneId++) {
-                // Mobile Data default, based on build
-                loadRegionLockedBooleanSetting(stmt, Settings.Global.MOBILE_DATA + phoneId,
-                        R.bool.def_enable_mobile_data);
-
-                // Data roaming default, based on build
-                loadRegionLockedBooleanSetting(stmt, Settings.Global.DATA_ROAMING + phoneId,
-                        R.bool.def_enable_data_roaming);
-            }
 
             loadBooleanSetting(stmt, Settings.Global.NETSTATS_ENABLED,
                     R.bool.def_netstats_enabled);

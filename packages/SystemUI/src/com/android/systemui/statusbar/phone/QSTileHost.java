@@ -40,10 +40,8 @@ import com.android.systemui.qs.QSTile;
 import com.android.systemui.qs.tiles.AdbOverNetworkTile;
 import com.android.systemui.qs.tiles.AirplaneModeTile;
 import com.android.systemui.qs.tiles.AmbientDisplayTile;
-import com.android.systemui.qs.tiles.AppPickerTile;
 import com.android.systemui.qs.tiles.BatterySaverTile;
 import com.android.systemui.qs.tiles.BluetoothTile;
-import com.android.systemui.qs.tiles.BrightnessTile;
 import com.android.systemui.qs.tiles.CaffeineTile;
 import com.android.systemui.qs.tiles.CastTile;
 import com.android.systemui.qs.tiles.CellularTile;
@@ -52,43 +50,25 @@ import com.android.systemui.qs.tiles.CompassTile;
 import com.android.systemui.qs.tiles.CustomQSTile;
 import com.android.systemui.qs.tiles.DndTile;
 import com.android.systemui.qs.tiles.EditTile;
-import com.android.systemui.qs.tiles.ExpandedDesktopTile;
 import com.android.systemui.qs.tiles.FlashlightTile;
-import com.android.systemui.qs.tiles.FloatingWindowsTile;
 import com.android.systemui.qs.tiles.HeadsUpTile;
 import com.android.systemui.qs.tiles.HotspotTile;
 import com.android.systemui.qs.tiles.IntentTile;
-// import com.android.systemui.qs.tiles.LiveDisplayTile;
 import com.android.systemui.qs.tiles.LocationTile;
-import com.android.systemui.qs.tiles.PieTile;
-import com.android.systemui.qs.tiles.AppCircleBarTile;
-import com.android.systemui.qs.tiles.KernelAdiutorTile;
-import com.android.systemui.qs.tiles.HardwareKeysTile;
-import com.android.systemui.qs.tiles.PulseTile;
-import com.android.systemui.qs.tiles.GestureAnyWhereTile;
-import com.android.systemui.qs.tiles.ScreenrecordTile;
 import com.android.systemui.qs.tiles.LockscreenToggleTile;
-import com.android.systemui.qs.tiles.MusicTile;
-import com.android.systemui.qs.tiles.KillAppTile;
-import com.android.systemui.qs.tiles.LteTile;
-import com.android.systemui.qs.tiles.ThemesTile;
-import com.android.systemui.qs.tiles.NavigationBarTile;
 import com.android.systemui.qs.tiles.NfcTile;
 import com.android.systemui.qs.tiles.PerfProfileTile;
-import com.android.systemui.qs.tiles.ProfilesTile;
-import com.android.systemui.qs.tiles.RebootTile;
-import com.android.systemui.qs.tiles.RotationLockTile;
-import com.android.systemui.qs.tiles.LockscreenToggleTile;
-import com.android.systemui.qs.tiles.ScreenOffTile;
 import com.android.systemui.qs.tiles.PowerMenuTile;
+import com.android.systemui.qs.tiles.ProfilesTile;
+import com.android.systemui.qs.tiles.RotationLockTile;
+import com.android.systemui.qs.tiles.SleepScreenTile;
+import com.android.systemui.qs.tiles.ScreenrecordTile;
 import com.android.systemui.qs.tiles.ScreenshotTile;
 import com.android.systemui.qs.tiles.ScreenTimeoutTile;
-import com.android.systemui.qs.tiles.SoundTile;
 import com.android.systemui.qs.tiles.SyncTile;
 import com.android.systemui.qs.tiles.UsbTetherTile;
 import com.android.systemui.qs.tiles.VolumeTile;
 import com.android.systemui.qs.tiles.WifiTile;
-import com.android.systemui.qs.tiles.DolbyTile;
 import com.android.systemui.statusbar.CustomTileData;
 import com.android.systemui.statusbar.policy.BatteryController;
 import com.android.systemui.statusbar.policy.BluetoothController;
@@ -104,12 +84,10 @@ import com.android.systemui.statusbar.policy.UserSwitcherController;
 import com.android.systemui.statusbar.policy.ZenModeController;
 import com.android.systemui.tuner.TunerService;
 import com.android.systemui.tuner.TunerService.Tunable;
-import android.telephony.TelephonyManager;
 
 import bluros.app.CustomTileListenerService;
 import bluros.app.StatusBarPanelCustomTile;
 import bluros.providers.CMSettings;
-import com.android.internal.telephony.PhoneConstants;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -123,7 +101,7 @@ public class QSTileHost implements QSTile.Host, Tunable {
     private static final String TAG = "QSTileHost";
     private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
 
-    public static final int TILES_PER_PAGE = 10;
+    public static final int TILES_PER_PAGE = 8;
 
     private final Context mContext;
     private final PhoneStatusBar mStatusBar;
@@ -142,7 +120,6 @@ public class QSTileHost implements QSTile.Host, Tunable {
     private final KeyguardMonitor mKeyguard;
     private final SecurityController mSecurity;
     private final BatteryController mBattery;
-    private Handler mHandler;
 
     private CustomTileData mCustomTileData;
     private CustomTileListenerService mCustomTileListenerService;
@@ -225,19 +202,6 @@ public class QSTileHost implements QSTile.Host, Tunable {
     @Override
     public void startActivityDismissingKeyguard(final Intent intent) {
         mStatusBar.postStartActivityDismissingKeyguard(intent, 0);
-    }
-
-   public static boolean deviceSupportsLte(Context ctx) {
-        final TelephonyManager tm = (TelephonyManager)
-                ctx.getSystemService(Context.TELEPHONY_SERVICE);
-        return (tm.getLteOnCdmaMode() == PhoneConstants.LTE_ON_CDMA_TRUE)
-                || tm.getLteOnGsmMode() != 0;
-    }
- public static boolean deviceSupportsDdsSupported(Context context) {
-        TelephonyManager tm = (TelephonyManager)
-                context.getSystemService(Context.TELEPHONY_SERVICE);
-        return tm.isMultiSimEnabled()
-                && tm.getMultiSimConfiguration() == TelephonyManager.MultiSimVariants.DSDA;
     }
 
     @Override
@@ -385,58 +349,43 @@ public class QSTileHost implements QSTile.Host, Tunable {
     }
 
     public QSTile<?> createTile(String tileSpec) {
-	if (tileSpec.equals("wifi")) return new WifiTile(this);
-	else if (tileSpec.equals("bt")) return new BluetoothTile(this);
-	else if (tileSpec.equals("inversion")) return new ColorInversionTile(this);
-	else if (tileSpec.equals("cell")) return new CellularTile(this);
-	else if (tileSpec.equals("airplane")) return new AirplaneModeTile(this);
-	else if (tileSpec.equals("dnd")) return new DndTile(this);
-	else if (tileSpec.equals("rotation")) return new RotationLockTile(this);
-	else if (tileSpec.equals("flashlight")) return new FlashlightTile(this);
-	else if (tileSpec.equals("location")) return new LocationTile(this);
-	else if (tileSpec.equals("cast")) return new CastTile(this);
-	else if (tileSpec.equals("hotspot")) return new HotspotTile(this);
-	else if (tileSpec.equals("edit")) return new EditTile(this);
-	else if (tileSpec.equals("adb_network")) return new AdbOverNetworkTile(this);
-	else if (tileSpec.equals("compass")) return new CompassTile(this);
-	else if (tileSpec.equals("nfc")) return new NfcTile(this);
-	else if (tileSpec.equals("profiles")) return new ProfilesTile(this);
-	else if (tileSpec.equals("sync")) return new SyncTile(this);
-	else if (tileSpec.equals("volume_panel")) return new VolumeTile(this);
-	else if (tileSpec.equals("usb_tether")) return new UsbTetherTile(this);
-	else if (tileSpec.equals("screen_timeout")) return new ScreenTimeoutTile(this);
-	else if (tileSpec.equals("performance")) return new PerfProfileTile(this);
-	else if (tileSpec.equals("lockscreen")) return  new LockscreenToggleTile(this);
-	else if (tileSpec.equals("ambient_display")) return new AmbientDisplayTile(this);
-//	else if (tileSpec.equals("live_display")) return new LiveDisplayTile(this);
-	else if (tileSpec.equals("brightness")) return new BrightnessTile(this);
-	else if (tileSpec.equals("screen_off")) return new ScreenOffTile(this);
-	else if (tileSpec.equals("screenshot")) return new ScreenshotTile(this);
-	else if (tileSpec.equals("expanded_desktop")) return new ExpandedDesktopTile(this);
-	else if (tileSpec.equals("music")) return new MusicTile(this);
-	else if (tileSpec.equals("reboot")) return new RebootTile(this);
-	else if (tileSpec.equals("heads_up")) return new HeadsUpTile(this);
-	else if (tileSpec.equals("lte")) return new LteTile(this);
-	else if (tileSpec.equals("themes")) return new ThemesTile(this);
-	else if (tileSpec.equals("navbar")) return new NavigationBarTile(this);
-	else if (tileSpec.equals("appcirclebar")) return new AppCircleBarTile(this);
-	else if (tileSpec.equals("kernel_adiutor")) return new KernelAdiutorTile(this);
-	else if (tileSpec.equals("screenrecord")) return new ScreenrecordTile(this);
-	else if (tileSpec.equals("gesture_anywhere")) return new GestureAnyWhereTile(this);
-	else if (tileSpec.equals("battery_saver")) return new BatterySaverTile(this);
-	else if (tileSpec.equals("power_menu")) return new PowerMenuTile(this);
-	else if (tileSpec.equals("app_picker")) return new AppPickerTile(this);
-	else if (tileSpec.equals("kill_app")) return new KillAppTile(this);
-	else if (tileSpec.equals("caffeine")) return new CaffeineTile(this);
-	else if (tileSpec.equals("hw_keys")) return new HardwareKeysTile(this);	
-	else if (tileSpec.equals("sound")) return new SoundTile(this);
-	else if (tileSpec.equals("lockscreen")) return new LockscreenToggleTile(this);
-	else if (tileSpec.equals("pulse")) return new PulseTile(this);
-	else if (tileSpec.equals("pie")) return new PieTile(this);
-	else if (tileSpec.equals("float_mode")) return new FloatingWindowsTile(this);
-	else if (tileSpec.equals("dolby")) return new DolbyTile(this);
-	else if (tileSpec.startsWith(IntentTile.PREFIX)) return IntentTile.create(this,tileSpec);
-	else throw new IllegalArgumentException("Bad tile spec: " + tileSpec);
+        if (tileSpec.equals("wifi")) return new WifiTile(this);
+        else if (tileSpec.equals("bt")) return new BluetoothTile(this);
+        else if (tileSpec.equals("inversion")) return new ColorInversionTile(this);
+        else if (tileSpec.equals("cell")) return new CellularTile(this);
+        else if (tileSpec.equals("airplane")) return new AirplaneModeTile(this);
+        else if (tileSpec.equals("dnd")) return new DndTile(this);
+        else if (tileSpec.equals("rotation")) return new RotationLockTile(this);
+        else if (tileSpec.equals("flashlight")) return new FlashlightTile(this);
+        else if (tileSpec.equals("location")) return new LocationTile(this);
+        else if (tileSpec.equals("cast")) return new CastTile(this);
+        else if (tileSpec.equals("hotspot")) return new HotspotTile(this);
+        else if (tileSpec.equals("edit")) return new EditTile(this);
+        else if (tileSpec.equals("adb_network")) return new AdbOverNetworkTile(this);
+        else if (tileSpec.equals("compass")) return new CompassTile(this);
+        else if (tileSpec.equals("nfc")) return new NfcTile(this);
+        else if (tileSpec.equals("power_menu")) return new PowerMenuTile(this);
+        else if (tileSpec.equals("profiles")) return new ProfilesTile(this);
+        else if (tileSpec.equals("sleepscreen")) return new SleepScreenTile(this);
+        else if (tileSpec.equals("screenrecord")) return new ScreenrecordTile(this);
+        else if (tileSpec.equals("screenshot")) return new ScreenshotTile(this);
+        else if (tileSpec.equals("sync")) return new SyncTile(this);
+        else if (tileSpec.equals("volume_panel")) return new VolumeTile(this);
+        else if (tileSpec.equals("usb_tether")) return new UsbTetherTile(this);
+        else if (tileSpec.equals("screen_timeout")) return new ScreenTimeoutTile(this);
+        else if (tileSpec.equals("performance")) return new PerfProfileTile(this);
+        else if (tileSpec.equals("lockscreen")) return  new LockscreenToggleTile(this);
+        else if (tileSpec.equals("ambient_display")) return new AmbientDisplayTile(this);
+        else if (tileSpec.equals("heads_up")) return new HeadsUpTile(this);
+        else if (tileSpec.equals("battery_saver")) return new BatterySaverTile(this);
+        else if (tileSpec.equals("caffeine")) return new CaffeineTile(this);
+        else if (tileSpec.startsWith(IntentTile.PREFIX)) return IntentTile.create(this,tileSpec);
+        else if (TextUtils.split(tileSpec, "\\|").length == 3) {
+            /** restores placeholder for
+             * {@link bluros.app.StatusBarPanelCustomTile#persistableKey()} **/
+            return new CustomQSTile(this, tileSpec);
+        } else
+            throw new IllegalArgumentException("Bad tile spec: " + tileSpec);
     }
 
     protected List<String> loadTileSpecs(String tileList) {
@@ -463,11 +412,10 @@ public class QSTileHost implements QSTile.Host, Tunable {
                 tiles.add(tile);
             }
         }
-        // ensure edit tile is present
-        if (tiles.size() < TILES_PER_PAGE && !tiles.contains("edit")) {
+        // ensure edit tile is present, default placement should be handled in the default
+        // tile list.
+        if (!tiles.contains("edit")) {
             tiles.add("edit");
-        } else if (tiles.size() > TILES_PER_PAGE && !tiles.contains("edit")) {
-            tiles.add((TILES_PER_PAGE - 1), "edit");
         }
         return tiles;
     }
@@ -517,7 +465,11 @@ public class QSTileHost implements QSTile.Host, Tunable {
         else if (spec.equals("adb_network")) return R.string.quick_settings_network_adb_label;
         else if (spec.equals("compass")) return R.string.quick_settings_compass_label;
         else if (spec.equals("nfc")) return R.string.quick_settings_nfc_label;
+        else if (spec.equals("power_menu")) return R.string.quick_settings_powermenu_label;
         else if (spec.equals("profiles")) return R.string.quick_settings_profiles;
+        else if (spec.equals("screenrecord")) return R.string.quick_settings_screenrecord;
+        else if (spec.equals("screenshot")) return R.string.quick_settings_screenshot;
+        else if (spec.equals("sleepscreen")) return R.string.quick_settings_sleepscreen_label;
         else if (spec.equals("sync")) return R.string.quick_settings_sync_label;
         else if (spec.equals("volume_panel")) return R.string.quick_settings_volume_panel_label;
         else if (spec.equals("usb_tether")) return R.string.quick_settings_usb_tether_label;
@@ -525,30 +477,9 @@ public class QSTileHost implements QSTile.Host, Tunable {
         else if (spec.equals("performance")) return R.string.qs_tile_performance;
         else if (spec.equals("lockscreen")) return R.string.quick_settings_lockscreen_label;
         else if (spec.equals("ambient_display")) return R.string.quick_settings_ambient_display_label;
-     //   else if (spec.equals("live_display")) return R.string.live_display_title;
-        else if (spec.equals("music")) return R.string.quick_settings_music_label;
-        else if (spec.equals("brightness")) return R.string.quick_settings_brightness_label;
-        else if (spec.equals("screen_off")) return R.string.quick_settings_screen_off_label;
-        else if (spec.equals("screenshot")) return R.string.quick_settings_screenshot_label;
-        else if (spec.equals("expanded_desktop")) return R.string.quick_settings_expanded_desktop_label;
-        else if (spec.equals("reboot")) return R.string.quick_settings_reboot_label;
         else if (spec.equals("heads_up")) return R.string.quick_settings_heads_up_label;
-        else if (spec.equals("lte")) return R.string.qs_lte_label;
-        else if (spec.equals("themes")) return R.string.quick_settings_themes;
-        else if (spec.equals("navbar")) return R.string.quick_settings_navigation_bar;
-        else if (spec.equals("appcirclebar")) return R.string.quick_settings_appcirclebar_title;
-        else if (spec.equals("kernel_adiutor")) return R.string.quick_settings_kernel_title;
-        else if (spec.equals("screenrecord")) return R.string.quick_settings_screenrecord;
-        else if (spec.equals("restartui")) return R.string.quick_settings_systemui_restart_label;
-        else if (spec.equals("gesture_anywhere")) return R.string.quick_settings_gesture_anywhere_label;
         else if (spec.equals("battery_saver")) return R.string.quick_settings_battery_saver_label;
-        else if (spec.equals("power_menu")) return R.string.quick_settings_power_menu_label;
-        else if (spec.equals("app_picker")) return R.string.navbar_app_picker;
-        else if (spec.equals("kill_app")) return R.string.qs_kill_app;
         else if (spec.equals("caffeine")) return R.string.quick_settings_caffeine_label;
-        else if (spec.equals("hw_keys")) return R.string.quick_settings_hwkeys_title;
-        else if (spec.equals("sound")) return R.string.quick_settings_sound_label;
-        else if (spec.equals("dolby")) return R.string.quick_settings_dolby_title;
         return 0;
     }
 
@@ -568,7 +499,11 @@ public class QSTileHost implements QSTile.Host, Tunable {
         else if (spec.equals("adb_network")) return R.drawable.ic_qs_network_adb_on;
         else if (spec.equals("compass")) return R.drawable.ic_qs_compass_on;
         else if (spec.equals("nfc")) return R.drawable.ic_qs_nfc_on;
+        else if (spec.equals("power_menu")) return R.drawable.ic_qs_powermenu;
         else if (spec.equals("profiles")) return R.drawable.ic_qs_profiles_on;
+        else if (spec.equals("screenrecord")) return R.drawable.ic_qs_screenrecord;
+        else if (spec.equals("screenshot")) return R.drawable.ic_qs_screenshot;
+        else if (spec.equals("sleepscreen")) return R.drawable.ic_qs_sleep;
         else if (spec.equals("sync")) return R.drawable.ic_qs_sync_on;
         else if (spec.equals("volume_panel")) return R.drawable.ic_qs_volume_panel;
         else if (spec.equals("usb_tether")) return R.drawable.ic_qs_usb_tether_on;
@@ -576,37 +511,16 @@ public class QSTileHost implements QSTile.Host, Tunable {
         else if (spec.equals("performance")) return R.drawable.ic_qs_perf_profile;
         else if (spec.equals("lockscreen")) return R.drawable.ic_qs_lock_screen_on;
         else if (spec.equals("ambient_display")) return R.drawable.ic_qs_ambientdisplay_on;
-      //  else if (spec.equals("live_display")) return R.drawable.ic_livedisplay_auto;
-        else if (spec.equals("music")) return R.drawable.ic_qs_media_play;
-        else if (spec.equals("brightness")) return R.drawable.ic_qs_brightness_auto_on;
-        else if (spec.equals("screen_off")) return R.drawable.ic_qs_power;
-        else if (spec.equals("screenshot")) return R.drawable.ic_qs_screenshot;
-        else if (spec.equals("expanded_desktop")) return R.drawable.ic_qs_expanded_desktop;
-        else if (spec.equals("reboot")) return R.drawable.ic_qs_reboot;
         else if (spec.equals("heads_up")) return R.drawable.ic_qs_heads_up_on;
-        else if (spec.equals("lte")) return R.drawable.ic_qs_lte_on;
-        else if (spec.equals("themes")) return R.drawable.ic_qs_themes;
-        else if (spec.equals("navbar")) return R.drawable.ic_qs_navbar_on;
-        else if (spec.equals("appcirclebar")) return R.drawable.ic_qs_appcirclebar_on;
-        else if (spec.equals("kernel_adiutor")) return R.drawable.ic_qs_kernel_adiutor;	
-        else if (spec.equals("screenrecord")) return R.drawable.ic_qs_screenrecord;	
-        else if (spec.equals("restartui")) return R.drawable.ic_qs_systemui_restart;
-        else if (spec.equals("gesture_anywhere")) return R.drawable.ic_qs_gestures_on;
         else if (spec.equals("battery_saver")) return R.drawable.ic_qs_battery_saver_on;
-        else if (spec.equals("power_menu")) return R.drawable.ic_qs_power_menu;
-        else if (spec.equals("app_picker")) return R.drawable.ic_qs_app_picker;
-        else if (spec.equals("kill_app")) return R.drawable.ic_app_kill;
         else if (spec.equals("caffeine")) return R.drawable.ic_qs_caffeine_on;
-		else if (spec.equals("hw_keys")) return R.drawable.ic_qs_hwkeys_on;
-        else if (spec.equals("sound")) return R.drawable.ic_qs_ringer_silent;
-        else if (spec.equals("dolby")) return R.drawable.ic_qs_dolby_title;
         return 0;
     }
 
     void updateCustomTile(StatusBarPanelCustomTile sbc) {
         synchronized (mTiles) {
-            if (mTiles.containsKey(sbc.getKey())) {
-                QSTile<?> tile = mTiles.get(sbc.getKey());
+            if (mTiles.containsKey(sbc.persistableKey())) {
+                QSTile<?> tile = mTiles.get(sbc.persistableKey());
                 if (tile instanceof CustomQSTile) {
                     CustomQSTile qsTile = (CustomQSTile) tile;
                     qsTile.update(sbc);
@@ -618,8 +532,8 @@ public class QSTileHost implements QSTile.Host, Tunable {
     void addCustomTile(StatusBarPanelCustomTile sbc) {
         synchronized (mTiles) {
             mCustomTileData.add(new CustomTileData.Entry(sbc));
-            mTileSpecs.add(sbc.getKey());
-            mTiles.put(sbc.getKey(), new CustomQSTile(this, sbc));
+            mTileSpecs.add(sbc.persistableKey());
+            mTiles.put(sbc.persistableKey(), new CustomQSTile(this, sbc));
             if (mCallback != null) {
                 mCallback.onTilesChanged();
             }

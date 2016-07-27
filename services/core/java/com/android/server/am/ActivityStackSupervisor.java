@@ -2170,8 +2170,7 @@ public final class ActivityStackSupervisor implements DisplayListener {
                                 intentActivity.task.setTaskToReturnTo(HOME_ACTIVITY_TYPE);
                             }
                             options = null;
-                            movedToFront = true;
-                        }             
+                        }
                     }
                     if (!movedToFront) {
                         if (DEBUG_TASKS) Slog.d(TAG_TASKS, "Bring to front target: " + targetStack
@@ -2378,6 +2377,7 @@ public final class ActivityStackSupervisor implements DisplayListener {
                 if (DEBUG_TASKS) Slog.v(TAG_TASKS,
                         "Starting new activity " + r + " in new task " + r.task);
             } else {
+                reuseTask.stack = targetStack;
                 r.setTask(reuseTask, taskToAffiliate);
             }
             if (isLockTaskModeViolation(r.task)) {
@@ -2446,6 +2446,7 @@ public final class ActivityStackSupervisor implements DisplayListener {
             // An existing activity is starting this new activity, so we want
             // to keep the new one in the same task as the one that is starting
             // it.
+            sourceTask.stack = targetStack;
             r.setTask(sourceTask, null);
             if (DEBUG_TASKS) Slog.v(TAG_TASKS, "Starting new activity " + r
                     + " in existing task " + r.task + " from source " + sourceRecord);
@@ -4179,7 +4180,6 @@ public final class ActivityStackSupervisor implements DisplayListener {
                             }
                             getStatusBarService().disable(flags, mToken,
                                     mService.mContext.getPackageName());
-                            getStatusBarService().screenPinningStateChanged(true);
                         }
                         mWindowManager.disableKeyguard(mToken, LOCK_TASK_TAG);
                         if (getDevicePolicyManager() != null) {
@@ -4196,7 +4196,6 @@ public final class ActivityStackSupervisor implements DisplayListener {
                         if (getStatusBarService() != null) {
                             getStatusBarService().disable(StatusBarManager.DISABLE_NONE, mToken,
                                     mService.mContext.getPackageName());
-                            getStatusBarService().screenPinningStateChanged(false);
                         }
                         mWindowManager.reenableKeyguard(mToken);
                         if (getDevicePolicyManager() != null) {

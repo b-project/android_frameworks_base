@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2013-2015 The BlurOS Project
+     Copyright (C) 2013-2015 The CyanogenMod Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@
         <item>@string/reboot_soft</item>
         <item>@string/reboot_recovery</item>
         <item>@string/reboot_bootloader</item>
-	<item>@string/reboot_systemui</item>
     </array>
 
     <!-- Do not translate. Defines the shutdown actions passed to the kernel.
@@ -39,7 +38,6 @@
         <item>soft_reboot</item>
         <item>recovery</item>
         <item>bootloader</item>
-	<item>systemui_reboot</item>
      </string-array>
 
     <!-- List of packages that should not be themed.

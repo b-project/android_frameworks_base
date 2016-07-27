@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014 The Android Open Source Project
- * Copyright (C) 2015 The BlurOS Project
+ * Copyright (C) 2015 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,17 +78,10 @@ public class ColorInversionTile extends QSTile<QSTile.BooleanState> {
 
     @Override
     protected void handleClick() {
-	 boolean mQSCSwitch = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.QS_COLOR_SWITCH, 0) == 1;
         MetricsLogger.action(mContext, getMetricsCategory(), !mState.value);
         mSetting.setValue(mState.value ? 0 : 1);
-	 if (!mQSCSwitch) {
         mEnable.setAllowAnimation(true);
         mDisable.setAllowAnimation(true);
-	} else {
-	 mEnable.setAllowAnimation(false);
-	  mDisable.setAllowAnimation(false);
-	}
     }
 
     @Override
@@ -100,20 +93,10 @@ public class ColorInversionTile extends QSTile<QSTile.BooleanState> {
     protected void handleUpdateState(BooleanState state, Object arg) {
         final int value = arg instanceof Integer ? (Integer) arg : mSetting.getValue();
         final boolean enabled = value != 0;
-	boolean mQSCSwitch = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.QS_COLOR_SWITCH, 0) == 1;
-	 if (mQSCSwitch) {
-	state.icon = ResourceIcon.get(R.drawable.ic_qs_inversion_on);
-	} else {
-	state.value = enabled;
-	}
-        state.visible = true;      
+        state.visible = true;
+        state.value = enabled;
         state.label = mContext.getString(R.string.quick_settings_inversion_label);
-	 if (mQSCSwitch) {
-	state.icon = ResourceIcon.get(R.drawable.ic_qs_inversion_off);
-	} else {
         state.icon = enabled ? mEnable : mDisable;
-	}
     }
 
     @Override
