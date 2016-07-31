@@ -3980,6 +3980,16 @@ package android.app {
     field public java.lang.String serviceDetails;
   }
 
+  public class BlurDialogFragmentHelper {
+    ctor public BlurDialogFragmentHelper(android.app.DialogFragment);
+    method public void onActivityCreated();
+    method public void onCreate();
+    method public void onDismiss();
+    method public void onStart();
+    method public void setAnimDuration(int);
+    method public void setBgColorResId(int);
+  }
+
   public class DatePickerDialog extends android.app.AlertDialog implements android.widget.DatePicker.OnDateChangedListener android.content.DialogInterface.OnClickListener {
     ctor public DatePickerDialog(android.content.Context, android.app.DatePickerDialog.OnDateSetListener, int, int, int);
     ctor public DatePickerDialog(android.content.Context, int, android.app.DatePickerDialog.OnDateSetListener, int, int, int);
@@ -4094,6 +4104,7 @@ package android.app {
     method public boolean getShowsDialog();
     method public int getTheme();
     method public boolean isCancelable();
+    method public static android.app.DialogFragment newInstance();
     method public void onCancel(android.content.DialogInterface);
     method public android.app.Dialog onCreateDialog(android.os.Bundle);
     method public void onDismiss(android.content.DialogInterface);
@@ -10541,6 +10552,448 @@ package android.database.sqlite {
     method public abstract void onBegin();
     method public abstract void onCommit();
     method public abstract void onRollback();
+  }
+
+}
+
+package android.dolby {
+
+  public class DsClient {
+    ctor public DsClient();
+    method public boolean bindDsService(android.content.Context);
+    method public int getBandCount() throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public int[] getBandFrequencies() throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public int[] getDsApParam(java.lang.String) throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public java.lang.String getDsApVersion() throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public boolean getDsOn() throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public java.lang.String getDsVersion() throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public float[] getGeq(int, int) throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public static float getGeqBandGainLowerBound();
+    method public static float getGeqBandGainUpperBound();
+    method public int getIeqPreset(int) throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public int getProfileCount() throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public java.lang.String[] getProfileNames() throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public android.dolby.DsClientSettings getProfileSettings(int) throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public int getSelectedProfile() throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public boolean isMonoSpeaker() throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public boolean isProfileModified(int) throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public boolean isProfileNameModified(int) throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public void registerDsApParamEvents(android.dolby.IDsApParamEvents) throws java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException;
+    method public void registerVisualizer(android.dolby.IDsVisualizerEvents) throws java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException;
+    method public void resetProfile(int) throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public void setDsApParam(java.lang.String, int[]) throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public deprecated void setDsOn(boolean) throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public int setDsOnChecked(boolean) throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public void setEventListener(android.dolby.IDsClientEvents);
+    method public void setGeq(int, int, float[]) throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public void setIeqPreset(int, int) throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public void setNonPersistentMode(boolean) throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public void setProfileName(int, java.lang.String) throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public void setProfileSettings(int, android.dolby.DsClientSettings) throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public void setSelectedProfile(int) throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.IllegalStateException, java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException, java.lang.UnsupportedOperationException;
+    method public void unBindDsService(android.content.Context);
+    method public void unregisterDsApParamEvents() throws java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException;
+    method public void unregisterVisualizer() throws java.lang.NullPointerException, android.os.RemoteException, java.lang.RuntimeException;
+  }
+
+  public class DsClientSettings implements android.os.Parcelable {
+    ctor public DsClientSettings();
+    ctor public DsClientSettings(android.os.Parcel);
+    method public int describeContents();
+    method public boolean getDialogEnhancerOn();
+    method public boolean getGeqOn();
+    method public boolean getHeadphoneVirtualizerOn();
+    method public boolean getSpeakerVirtualizerOn();
+    method public boolean getVolumeLevellerOn();
+    method public void readFromParcel(android.os.Parcel);
+    method public void setDialogEnhancerOn(boolean);
+    method public void setGeqOn(boolean);
+    method public void setHeadphoneVirtualizerOn(boolean);
+    method public void setSpeakerVirtualizerOn(boolean);
+    method public void setVolumeLevellerOn(boolean);
+    method public void writeToParcel(android.os.Parcel, int);
+    field public static final android.os.Parcelable.Creator<android.dolby.DsClientSettings> CREATOR;
+    field public static final java.util.HashSet<java.lang.String> basicProfileParams;
+  }
+
+  public class DsCommon {
+    ctor public DsCommon();
+    field public static final java.lang.String CMDINIT = "init";
+    field public static final java.lang.String CMDNAME = "cmd";
+    field public static final java.lang.String CMDONOFF = "on off";
+    field public static final int CMDSELECTGAME = 2; // 0x2
+    field public static final int CMDSELECTMOVIE = 0; // 0x0
+    field public static final int CMDSELECTMUSIC = 1; // 0x1
+    field public static final int CMDSELECTPRESET1 = 4; // 0x4
+    field public static final int CMDSELECTPRESET2 = 5; // 0x5
+    field public static final int CMDSELECTVOICE = 3; // 0x3
+    field public static final int CODE_DS_OFF = 16; // 0x10
+    field public static final int CODE_DS_ON = 17; // 0x11
+    field public static final int CODE_LAUNCH_APP = 48; // 0x30
+    field public static final int CODE_SET_PROFILE_0 = 32; // 0x20
+    field public static final int CODE_SET_PROFILE_1 = 33; // 0x21
+    field public static final int CODE_SET_PROFILE_2 = 34; // 0x22
+    field public static final int CODE_SET_PROFILE_3 = 35; // 0x23
+    field public static final int CODE_SET_PROFILE_4 = 36; // 0x24
+    field public static final int CODE_SET_PROFILE_5 = 37; // 0x25
+    field public static final int DS_INVALID_ARGUMENT = -1; // 0xffffffff
+    field public static final int DS_INVALID_STATE = -3; // 0xfffffffd
+    field public static final int DS_NOT_RUNNING = -2; // 0xfffffffe
+    field public static final int DS_NO_ERROR = 0; // 0x0
+    field public static final int DS_OPERATION_NOT_PERMITTED = -4; // 0xfffffffc
+    field public static final int DS_PARAM_CHANGED_MSG = 8; // 0x8
+    field public static final int DS_PROFILE_NAME_AND_SETTINGS_MODIFIED = 3; // 0x3
+    field public static final int DS_PROFILE_NAME_MODIFIED = 2; // 0x2
+    field public static final int DS_PROFILE_NOT_MODIFIED = 0; // 0x0
+    field public static final int DS_PROFILE_SETTINGS_MODIFIED = 1; // 0x1
+    field public static final int DS_STATUS_CHANGED_MSG = 1; // 0x1
+    field public static final int DS_UNKNOWN_ERROR = -5; // 0xfffffffb
+    field public static final int EQ_SETTINGS_CHANGED_MSG = 7; // 0x7
+    field public static final java.lang.String[][] GEQ_NAMES_XML;
+    field public static final java.lang.String[] IEQ_PRESET_NAMES;
+    field public static final java.lang.String[] IEQ_PRESET_NAMES_XML;
+    field public static final java.lang.String INIT_ACTION = "com.dolby.ds.srvcmd.init";
+    field public static final java.lang.String LAUNCH_DOLBY_APP_ACTION = "com.dolby.ds.srvcmd.launchapp";
+    field public static final java.lang.String ONOFF_ACTION = "com.dolby.ds.srvcmd.toggleonoff";
+    field public static final java.lang.String[] PROFILE_NAMES;
+    field public static final java.lang.String[] PROFILE_NAMES_XML;
+    field public static final int PROFILE_NAME_CHANGED_MSG = 4; // 0x4
+    field public static final int PROFILE_SELECTED_MSG = 2; // 0x2
+    field public static final int PROFILE_SETTINGS_CHANGED_MSG = 3; // 0x3
+    field public static final java.lang.String SELECTPROFILE_ACTION = "com.dolby.ds.srvcmd.select";
+    field public static final int VISUALIZER_SUSPENDED_MSG = 6; // 0x6
+    field public static final int VISUALIZER_UPDATED_MSG = 5; // 0x5
+    field public static final java.lang.String WIDGET_CLASS = "widget class";
+  }
+
+  public class DsConstants {
+    ctor public DsConstants();
+    field public static final int DS_NO_ERROR = 0; // 0x0
+    field public static final int DS_REQUEST_FAILED_EFFECT_SUSPENDED = 1; // 0x1
+    field public static final float[] GEQ_BAND_GAIN_RANGE;
+    field public static final int IEQ_PRESETS_NUMBER = 4; // 0x4
+    field public static final int IEQ_PRESET_FOCUSED = 3; // 0x3
+    field public static final int IEQ_PRESET_INDEX_MAX = 3; // 0x3
+    field public static final int IEQ_PRESET_INDEX_MIN = 0; // 0x0
+    field public static final int IEQ_PRESET_OFF = 0; // 0x0
+    field public static final int IEQ_PRESET_OPEN = 1; // 0x1
+    field public static final int IEQ_PRESET_RICH = 2; // 0x2
+    field public static final int PROFILES_NUMBER = 6; // 0x6
+    field public static final int PROFILE_GAME = 2; // 0x2
+    field public static final int PROFILE_INDEX_FIRST_CUSTOM = 4; // 0x4
+    field public static final int PROFILE_INDEX_MAX = 5; // 0x5
+    field public static final int PROFILE_INDEX_MIN = 0; // 0x0
+    field public static final int PROFILE_MOVIE = 0; // 0x0
+    field public static final int PROFILE_MUSIC = 1; // 0x1
+    field public static final int PROFILE_VOICE = 3; // 0x3
+    field public static final int PROFLIE_CUSTOM_1 = 4; // 0x4
+    field public static final int PROFLIE_CUSTOM_2 = 5; // 0x5
+  }
+
+  public class DsLog {
+    ctor public DsLog();
+    method public static void log1(java.lang.String, java.lang.String);
+    method public static void log2(java.lang.String, java.lang.String);
+    method public static void log3(java.lang.String, java.lang.String);
+    field public static final int DEFAULT_LOG_LEVEL = 3; // 0x3
+    field public static final int LOG_LEVEL_0 = 0; // 0x0
+    field public static final int LOG_LEVEL_1 = 1; // 0x1
+    field public static final int LOG_LEVEL_2 = 2; // 0x2
+    field public static final int LOG_LEVEL_3 = 3; // 0x3
+  }
+
+  public abstract interface IDs implements android.os.IInterface {
+    method public abstract int getBandCount(int[]) throws android.os.RemoteException;
+    method public abstract int getBandFrequencies(int[]) throws android.os.RemoteException;
+    method public abstract int getDsApParam(java.lang.String, int[]) throws android.os.RemoteException;
+    method public abstract int getDsApParamLength(java.lang.String, int[]) throws android.os.RemoteException;
+    method public abstract int getDsApVersion(java.lang.String[]) throws android.os.RemoteException;
+    method public abstract int getDsOn(boolean[]) throws android.os.RemoteException;
+    method public abstract int getDsVersion(java.lang.String[]) throws android.os.RemoteException;
+    method public abstract int getGeq(int, int, float[]) throws android.os.RemoteException;
+    method public abstract int getIeqPreset(int, int[]) throws android.os.RemoteException;
+    method public abstract int getMonoSpeaker(boolean[]) throws android.os.RemoteException;
+    method public abstract int getProfileCount(int[]) throws android.os.RemoteException;
+    method public abstract int getProfileModified(int, int[]) throws android.os.RemoteException;
+    method public abstract int getProfileNames(java.lang.String[]) throws android.os.RemoteException;
+    method public abstract int getProfileSettings(int, android.dolby.DsClientSettings[]) throws android.os.RemoteException;
+    method public abstract int getSelectedProfile(int[]) throws android.os.RemoteException;
+    method public abstract void registerCallback(android.dolby.IDsServiceCallbacks, int) throws android.os.RemoteException;
+    method public abstract void registerDsApParamEvents(int) throws android.os.RemoteException;
+    method public abstract void registerVisualizerData(int) throws android.os.RemoteException;
+    method public abstract int resetProfile(int, int) throws android.os.RemoteException;
+    method public abstract int setDsApParam(int, java.lang.String, int[]) throws android.os.RemoteException;
+    method public abstract int setDsOn(int, boolean) throws android.os.RemoteException;
+    method public abstract int setGeq(int, int, int, float[]) throws android.os.RemoteException;
+    method public abstract int setIeqPreset(int, int, int) throws android.os.RemoteException;
+    method public abstract int setNonPersistentMode(boolean) throws android.os.RemoteException;
+    method public abstract int setProfileName(int, int, java.lang.String) throws android.os.RemoteException;
+    method public abstract int setProfileSettings(int, int, android.dolby.DsClientSettings) throws android.os.RemoteException;
+    method public abstract int setSelectedProfile(int, int) throws android.os.RemoteException;
+    method public abstract void unregisterCallback(android.dolby.IDsServiceCallbacks) throws android.os.RemoteException;
+    method public abstract void unregisterDsApParamEvents(int) throws android.os.RemoteException;
+    method public abstract void unregisterVisualizerData(int) throws android.os.RemoteException;
+  }
+
+  public static abstract class IDs.Stub extends android.os.Binder implements android.dolby.IDs {
+    ctor public IDs.Stub();
+    method public android.os.IBinder asBinder();
+    method public static android.dolby.IDs asInterface(android.os.IBinder);
+    method public boolean onTransact(int, android.os.Parcel, android.os.Parcel, int) throws android.os.RemoteException;
+  }
+
+  public abstract interface IDsApParamEvents {
+    method public abstract void onDsApParamChange(int, java.lang.String);
+  }
+
+  public abstract interface IDsClientEvents {
+    method public abstract void onClientConnected();
+    method public abstract void onClientDisconnected();
+    method public abstract void onDsOn(boolean);
+    method public abstract void onEqSettingsChanged(int, int);
+    method public abstract void onProfileNameChanged(int, java.lang.String);
+    method public abstract void onProfileSelected(int);
+    method public abstract void onProfileSettingsChanged(int);
+  }
+
+  public abstract interface IDsServiceCallbacks implements android.os.IInterface {
+    method public abstract void onDsApParamChange(int, java.lang.String) throws android.os.RemoteException;
+    method public abstract void onDsOn(boolean) throws android.os.RemoteException;
+    method public abstract void onEqSettingsChanged(int, int) throws android.os.RemoteException;
+    method public abstract void onProfileNameChanged(int, java.lang.String) throws android.os.RemoteException;
+    method public abstract void onProfileSelected(int) throws android.os.RemoteException;
+    method public abstract void onProfileSettingsChanged(int) throws android.os.RemoteException;
+    method public abstract void onVisualizerSuspended(boolean) throws android.os.RemoteException;
+    method public abstract void onVisualizerUpdated(float[], float[]) throws android.os.RemoteException;
+  }
+
+  public static abstract class IDsServiceCallbacks.Stub extends android.os.Binder implements android.dolby.IDsServiceCallbacks {
+    ctor public IDsServiceCallbacks.Stub();
+    method public android.os.IBinder asBinder();
+    method public static android.dolby.IDsServiceCallbacks asInterface(android.os.IBinder);
+    method public boolean onTransact(int, android.os.Parcel, android.os.Parcel, int) throws android.os.RemoteException;
+  }
+
+  public abstract interface IDsVisualizerEvents {
+    method public abstract void onVisualizerSuspended(boolean);
+    method public abstract void onVisualizerUpdate(float[], float[]);
+  }
+
+}
+
+package android.dolby.ds {
+
+  public final class AudioDevice extends java.lang.Enum {
+    method public int toInt();
+    method public static android.dolby.ds.AudioDevice valueOf(java.lang.String);
+    method public static final android.dolby.ds.AudioDevice[] values();
+    enum_constant public static final android.dolby.ds.AudioDevice DEVICE_ANLG_DOCK_HEADSET;
+    enum_constant public static final android.dolby.ds.AudioDevice DEVICE_AUX_DIGITAL;
+    enum_constant public static final android.dolby.ds.AudioDevice DEVICE_BLUETOOTH_A2DP;
+    enum_constant public static final android.dolby.ds.AudioDevice DEVICE_BLUETOOTH_A2DP_HEADPHONES;
+    enum_constant public static final android.dolby.ds.AudioDevice DEVICE_BLUETOOTH_A2DP_SPEAKER;
+    enum_constant public static final android.dolby.ds.AudioDevice DEVICE_BLUETOOTH_SCO;
+    enum_constant public static final android.dolby.ds.AudioDevice DEVICE_BLUETOOTH_SCO_CARKIT;
+    enum_constant public static final android.dolby.ds.AudioDevice DEVICE_BLUETOOTH_SCO_HEADSET;
+    enum_constant public static final android.dolby.ds.AudioDevice DEVICE_DGTL_DOCK_HEADSET;
+    enum_constant public static final android.dolby.ds.AudioDevice DEVICE_EARPIECE;
+    enum_constant public static final android.dolby.ds.AudioDevice DEVICE_REMOTE_SUBMIX;
+    enum_constant public static final android.dolby.ds.AudioDevice DEVICE_SPEAKER;
+    enum_constant public static final android.dolby.ds.AudioDevice DEVICE_USB_ACCESSORY;
+    enum_constant public static final android.dolby.ds.AudioDevice DEVICE_USB_DEVICE;
+    enum_constant public static final android.dolby.ds.AudioDevice DEVICE_WIRED_HEADPHONE;
+    enum_constant public static final android.dolby.ds.AudioDevice DEVICE_WIRED_HEADSET;
+  }
+
+  public class Ds {
+    ctor public Ds(int) throws java.lang.ClassNotFoundException, java.lang.IllegalAccessException, java.lang.IllegalStateException, java.lang.InstantiationException, java.lang.reflect.InvocationTargetException, java.lang.NoSuchMethodException;
+    method public void createDsLpaEffect(int);
+    method public void destroyDsLpaEffect();
+    method public int[] getDsApParam(java.lang.String);
+    method public int getDsApParamLength(java.lang.String);
+    method public java.lang.String getDsApVersion() throws android.os.DeadObjectException;
+    method public boolean getDsOn() throws android.os.DeadObjectException;
+    method public java.lang.String getDsVersion();
+    method public float[] getGeq(int, int) throws java.lang.IllegalArgumentException;
+    method public int getIeqPreset(int) throws java.lang.IllegalArgumentException;
+    method public int getLpaAudioSessionId();
+    method public int getProfileCount();
+    method public int getProfileModified(int);
+    method public java.lang.String[] getProfileNames();
+    method public android.dolby.DsClientSettings getProfileSettings(int) throws java.lang.IllegalArgumentException;
+    method public int getSelectedProfile();
+    method public int getVisualizerData(float[], float[]) throws android.os.DeadObjectException;
+    method public boolean getVisualizerOn() throws android.os.DeadObjectException;
+    method public boolean isBasicProfileSettings(java.lang.String);
+    method public boolean isLpaActive();
+    method public static boolean populateSettings(java.io.InputStream, java.lang.String);
+    method public boolean resetProfile(int) throws android.os.DeadObjectException, java.lang.IllegalArgumentException, java.lang.UnsupportedOperationException;
+    method public void restoreCurrentProfiles();
+    method public void saveDsStateAndSettings();
+    method public boolean setDsApParam(java.lang.String, int[]) throws android.os.DeadObjectException, java.lang.UnsupportedOperationException;
+    method public void setDsOn(boolean) throws android.os.DeadObjectException;
+    method public boolean setGeq(int, int, float[]) throws android.os.DeadObjectException, java.lang.IllegalArgumentException;
+    method public boolean setIeqPreset(int, int) throws android.os.DeadObjectException, java.lang.IllegalArgumentException;
+    method public boolean setProfileName(int, java.lang.String) throws java.lang.IllegalArgumentException, java.lang.UnsupportedOperationException;
+    method public boolean setProfileSettings(int, android.dolby.DsClientSettings) throws android.os.DeadObjectException, java.lang.IllegalArgumentException;
+    method public boolean setSelectedProfile(int) throws android.os.DeadObjectException, java.lang.IllegalArgumentException;
+    method public int setVisualizerOn(boolean) throws android.os.DeadObjectException;
+    method public boolean validateDsEffect();
+    field public static final java.lang.String DS_CURRENT_FILENAME = "ds1-current.xml";
+    field public static final java.lang.String DS_STATE_FILENAME = "ds1-state.xml";
+  }
+
+  public class DsAkSettings {
+    ctor public DsAkSettings();
+    ctor public DsAkSettings(android.dolby.ds.DsAkSettings);
+    ctor public DsAkSettings(int[][]);
+    method public short[] get(java.lang.String) throws java.lang.IllegalArgumentException;
+    method public short get(java.lang.String, int);
+    method public static int getAkParamIndex(java.lang.String);
+    method public static int getAkSettingIndex(int, int);
+    method public static int getGeqBandCount();
+    method public static int[] getGeqBandFrequencies();
+    method public static int getNumElementsPerDevice();
+    method public static int getNumOfParams();
+    method public static int getParamArrayLength(java.lang.String);
+    method public static java.lang.String[] getParamsDefinitions();
+    method public static java.lang.Object[] getSettingsDefinitions();
+    method public static boolean isAkParamLengthValid(java.lang.String, int);
+    method public static boolean isConstantAkParamsDefined();
+    method public static boolean isValidParamValue(int, short);
+    method public void set(int[][]) throws java.lang.IllegalArgumentException;
+    method public void set(java.lang.String, short[]) throws java.lang.IllegalArgumentException;
+    method public short set(java.lang.String, int, short) throws java.lang.IllegalArgumentException;
+    method public static void setConstantAkParam(java.lang.String, int[]);
+    field public static final short AK_DS1_FEATURE_AUTO = 2; // 0x2
+    field public static final short AK_DS1_FEATURE_OFF = 0; // 0x0
+    field public static final short AK_DS1_FEATURE_ON = 1; // 0x1
+    field public static java.util.HashSet<java.lang.String> akSettableParamDefinitions;
+  }
+
+  public static class DsAkSettings.ParameterDefn {
+    ctor public DsAkSettings.ParameterDefn(java.lang.String, int, int, int);
+    field public int len;
+    field public short lowerBound;
+    field public java.lang.String paramName;
+    field public short upperBound;
+  }
+
+  protected static class DsAkSettings.SettingDefn {
+    ctor public DsAkSettings.SettingDefn(int, int);
+    field public short offset;
+    field public byte parameter;
+  }
+
+  public class DsConfigParser {
+    ctor public DsConfigParser(java.io.InputStream, boolean);
+    method public int[][] getGeqSettingArray(java.lang.String, int[][]);
+    method public int[][] getIeqSettingArray();
+    method public boolean getParserStatusFlag();
+    method public int getProfileSettingIeq(java.lang.String);
+    method public java.lang.String getProfileSettingName(java.lang.String);
+    method public java.util.HashSet<java.lang.String> getSavedParams();
+    method public int[][] getSettingArray(java.lang.String, boolean);
+  }
+
+  public class DsEffect {
+    ctor public DsEffect(int) throws java.lang.ClassNotFoundException, java.lang.IllegalAccessException, java.lang.InstantiationException, java.lang.reflect.InvocationTargetException, java.lang.NoSuchMethodException, java.lang.RuntimeException;
+    method public boolean getEnabled() throws java.lang.IllegalStateException;
+    method public short[] getVersion();
+    method public short[] getVisualizerData();
+    method public boolean getVisualizerOn();
+    method public boolean hasControl() throws java.lang.IllegalStateException;
+    method public void release();
+    method public int setAllProfileSettings(android.dolby.ds.DsProfileSettings);
+    method public int setAllSettings(java.util.Map<android.dolby.ds.AudioDevice, android.dolby.ds.DsAkSettings>);
+    method public int setEnabled(boolean) throws java.lang.IllegalStateException;
+    method public int setSingleSetting(int, int, short[], android.dolby.ds.AudioDevice);
+    method public void setTuningSettings(java.util.Map<java.lang.String, int[]>);
+    method public int setVisualizerOn(boolean);
+    field protected static final int DS_PARAM_ALL_VALUES = 2; // 0x2
+    field protected static final int DS_PARAM_DEFINE_PARAMS = 5; // 0x5
+    field protected static final int DS_PARAM_DEFINE_SETTINGS = 1; // 0x1
+    field protected static final int DS_PARAM_SINGLE_DEVICE_VALUE = 3; // 0x3
+    field protected static final int DS_PARAM_TUNING = 0; // 0x0
+    field protected static final int DS_PARAM_VERSION = 6; // 0x6
+    field protected static final int DS_PARAM_VISUALIZER_DATA = 4; // 0x4
+    field protected static final int DS_PARAM_VISUALIZER_ENABLE = 7; // 0x7
+    field public static final java.util.UUID EFFECT_DS;
+    field public static final java.util.UUID EFFECT_TYPE_DS;
+    field public static final java.util.UUID EFFECT_TYPE_NULL;
+    field protected android.media.audiofx.AudioEffect audioEffect;
+    field protected java.lang.Class classAudioEffect;
+    field protected java.lang.reflect.Method methodGetParameter;
+    field protected java.lang.reflect.Method methodSetParameter;
+  }
+
+  public final class DsEndpoint extends java.lang.Enum {
+    method public android.dolby.ds.AudioDevice toDevice();
+    method public static android.dolby.ds.DsEndpoint valueOf(java.lang.String);
+    method public static final android.dolby.ds.DsEndpoint[] values();
+    enum_constant public static final android.dolby.ds.DsEndpoint GENERIC;
+  }
+
+  public class DsPresetsConfiguration {
+    ctor public DsPresetsConfiguration();
+    method public static android.dolby.ds.DsProfileSettings[] getCurrentSettings();
+    method public static android.dolby.ds.DsProfileSettings[] getDefaultSettings();
+    method public static android.dolby.ds.DsProfileSettings getOffProfileSettings();
+    method public static boolean getParserStatusFlag();
+    method public static boolean xmlConfigParsing(java.io.InputStream, java.io.InputStream, boolean);
+  }
+
+  public class DsProfileSettings {
+    method public void addParamSaved(java.lang.String);
+    method public android.dolby.DsClientSettings extractClientSettings();
+    method public android.dolby.ds.DsProfileSettings.Category getCategory();
+    method public java.lang.String getCurrentProfileSettings();
+    method public java.lang.String getDescription();
+    method public java.lang.String getDisplayName();
+    method public int[] getDsApParam(java.lang.String) throws java.lang.UnsupportedOperationException;
+    method public float[] getGeq(int);
+    method public short[][] getGeqGainArray();
+    method public int getIeqPreset();
+    method public java.lang.Object[] getParamsSaved();
+    method public boolean isCustom();
+    method public void newFrom(android.dolby.ds.DsProfileSettings);
+    method public void newFrom(java.lang.String);
+    method public void removeParamSaved(java.lang.String);
+    method public void setDescription(java.lang.String);
+    method public void setDisplayName(java.lang.String);
+    method public void setDsApParam(java.lang.String, short[]) throws java.lang.UnsupportedOperationException;
+    method public short[] setGeq(int, float[]);
+    method public static void setIeqBandTargets(int, int[]) throws java.lang.IllegalArgumentException, java.lang.UnsupportedOperationException;
+    method public void setIeqPreset(int);
+    method public java.util.ArrayList updateFromClientSettings(android.dolby.DsClientSettings);
+    field public static final int DB_SCALING_FACTOR = 16; // 0x10
+  }
+
+  public static final class DsProfileSettings.Category extends java.lang.Enum {
+    method public static android.dolby.ds.DsProfileSettings.Category FromInt(int);
+    method public int toInt();
+    method public static android.dolby.ds.DsProfileSettings.Category valueOf(java.lang.String);
+    method public static final android.dolby.ds.DsProfileSettings.Category[] values();
+    enum_constant public static final android.dolby.ds.DsProfileSettings.Category CUSTOMIZED;
+    enum_constant public static final android.dolby.ds.DsProfileSettings.Category GAME;
+    enum_constant public static final android.dolby.ds.DsProfileSettings.Category MOVIE;
+    enum_constant public static final android.dolby.ds.DsProfileSettings.Category MUSIC;
+    enum_constant public static final android.dolby.ds.DsProfileSettings.Category VOICE;
+    field public static final int COUNT = 5; // 0x5
+  }
+
+  public class DsStoreUtil {
+    ctor public DsStoreUtil();
+    method public static java.lang.String[] loadDsState();
+    method public static void saveDsProfileSettings(android.dolby.ds.DsProfileSettings[]);
+    method public static void saveDsState(java.lang.String, java.lang.String);
+    method public static void storeDsPath(java.lang.String, java.lang.String);
+  }
+
+  public class DsVersion {
+    ctor public DsVersion();
+    field public static final java.lang.String DS_VERSION = "DS version 1.8.0.0";
+    field public static final java.lang.String DS_VERSION_BUILD = "5";
   }
 
 }

@@ -394,11 +394,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
     View mExpandedContents;
     TextView mNotificationPanelDebugText;
 
-    // Aokp logo
-    private boolean mAokpLogo;
-    private int mAokpLogoColor;
-    private ImageView blurosLogo;
-
     // settings
     private QSDragPanel mQSPanel;
     private QSTileHost mQSTileHost;
@@ -550,12 +545,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     Settings.System.LOCKSCREEN_MAX_NOTIF_CONFIG),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.STATUS_BAR_BLUROS_LOGO),
-                    false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.STATUS_BAR_BLUROS_LOGO_COLOR),
-                    false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.USE_SLIM_RECENTS), false, this,
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
@@ -663,12 +652,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             // This method reads CMSettings.Secure.RECENTS_LONG_PRESS_ACTIVITY
             updateCustomRecentsLongPressHandler(false);
 
-            // BLUROS logo
-            mAokpLogo = Settings.System.getIntForUser(resolver,
-                    Settings.System.STATUS_BAR_BLUROS_LOGO, 0, mCurrentUserId) == 1;
-            mAokpLogoColor = Settings.System.getIntForUser(resolver,
-                    Settings.System.STATUS_BAR_BLUROS_LOGO_COLOR, 0xFFFFFFFF, mCurrentUserId);
-            showAokpLogo(mAokpLogo, mAokpLogoColor);
 
             mBlurRadius = CMSettings.Secure.getInt(mContext.getContentResolver(),
                     CMSettings.Secure.LOCKSCREEN_BLUR_RADIUS,  95);
@@ -4142,15 +4125,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             }
         }
     };
-
-    public void showAokpLogo(boolean show, int color) {
-        if (mStatusBarView == null) return;
-        blurosLogo = (ImageView) mStatusBarView.findViewById(R.id.bluros_logo);
-        blurosLogo.setColorFilter(color, Mode.SRC_IN);
-        if (blurosLogo != null) {
-            blurosLogo.setVisibility(show ? (mAokpLogo ? View.VISIBLE : View.GONE) : View.GONE);
-        }
-    }
 
     private BroadcastReceiver mPackageBroadcastReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {

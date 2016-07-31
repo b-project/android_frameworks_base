@@ -83,6 +83,8 @@
 
     <!-- Height of a medium notification in the status bar -->
     <dimen name="notification_mid_height">128dp</dimen>
+    
+    <dimen name="status_bar_expanded_header_elevation">0.0dp</dimen>
 
     <!-- Height of a the summary ("more card") notification on keyguard. -->
     <dimen name="notification_summary_height">44dp</dimen>
@@ -134,7 +136,7 @@
     <dimen name="status_bar_header_height">72dp</dimen>
 
     <!-- Height of the status bar header bar when expanded -->
-    <dimen name="status_bar_header_height_expanded">110dp</dimen>
+    <dimen name="status_bar_header_height_expanded">100dp</dimen>
 
     <!-- Height of the status bar header bar when on Keyguard -->
     <dimen name="status_bar_header_height_keyguard">40dp</dimen>
@@ -163,7 +165,7 @@
     <!-- The size of the gesture span needed to activate the "pull" notification expansion -->
     <dimen name="pull_span_min">25dp</dimen>
 
-    <dimen name="qs_tile_height">90.0dip</dimen>
+    <dimen name="qs_tile_height">110.0dip</dimen>
     <dimen name="qs_tile_icon_size">48.0dip</dimen>
     <dimen name="qs_tile_text_size">12sp</dimen>
     <dimen name="qs_tile_divider_height">1dp</dimen>
@@ -178,7 +180,7 @@
     <dimen name="qs_tile_spacing">0dp</dimen>
     <dimen name="qs_panel_padding_bottom">0dp</dimen>
     <dimen name="qs_detail_item_height">48dp</dimen>
-    <dimen name="qs_brightness_padding_top">1dp</dimen>
+    <dimen name="qs_brightness_padding_top">-10dp</dimen>
     <dimen name="qs_detail_header_text_size">20sp</dimen>
     <dimen name="qs_detail_button_text_size">14sp</dimen>
     <dimen name="qs_detail_item_primary_text_size">16sp</dimen>
@@ -393,7 +395,7 @@
     <dimen name="data_usage_graph_marker_width">4dp</dimen>
 
     <!-- The padding bottom of the clock group when QS is expanded. -->
-    <dimen name="clock_expanded_bottom_margin">20dp</dimen>
+    <dimen name="clock_expanded_bottom_margin">43dp</dimen>
 
     <!-- The padding bottom of the clock group when QS is collapsed. -->
     <dimen name="clock_collapsed_bottom_margin">10dp</dimen>

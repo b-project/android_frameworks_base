@@ -506,7 +506,7 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
             mDockBatteryLevel.setForceShown(mExpanded && mShowBatteryTextExpanded);
             mDockBatteryLevel.setVisibility(View.VISIBLE);
         }
-        applyHeaderBackgroundShadow();
+       // applyHeaderBackgroundShadow();
     }
 
     private void updateSignalClusterDetachment() {
@@ -1193,7 +1193,7 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
       //      setQSHeaderAlpha();
 
             mShowTaskManager = Settings.System.getIntForUser(resolver,
-                    Settings.System.ENABLE_TASK_MANAGER, 0, currentUserId) == 1;
+                    Settings.System.ENABLE_TASK_MANAGER, 1, currentUserId) == 1;
 
             updateVisibilities();
             requestCaptureValues();
@@ -1227,19 +1227,7 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
         } else {
             mBackgroundImage.setImageDrawable(dw);
         }
-        applyHeaderBackgroundShadow();
-    }
-
-    private void applyHeaderBackgroundShadow() {
-        final int headerShadow = Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.STATUS_BAR_CUSTOM_HEADER_SHADOW, 0,
-                UserHandle.USER_CURRENT);
-
-        if (mBackgroundImage != null) {
-            ColorDrawable shadow = new ColorDrawable(Color.BLACK);
-            shadow.setAlpha(headerShadow);
-            mBackgroundImage.setForeground(shadow);
-        }
+     //   applyHeaderBackgroundShadow();
     }
 
     @Override
@@ -1248,7 +1236,7 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
              public void run() {
                 // TODO we dont need to do this every time but we dont have
                 // an other place to know right now when custom header is enabled
-                enableTextShadow();
+             //   enableTextShadow();
                 doUpdateStatusBarCustomHeader(headerImage, force);
             }
         });
@@ -1260,33 +1248,9 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
              public void run() {
                 mCurrentBackground = null;
                 mBackgroundImage.setVisibility(View.GONE);
-                disableTextShadow();
+            //    disableTextShadow();
             }
         });
-    }
-
-    /**
-     * makes text more readable on light backgrounds
-     */
-    private void enableTextShadow() {
-        mTime.setShadowLayer(5, 0, 0, Color.BLACK);
-        mAmPm.setShadowLayer(5, 0, 0, Color.BLACK);
-        mDateCollapsed.setShadowLayer(5, 0, 0, Color.BLACK);
-        mDateExpanded.setShadowLayer(5, 0, 0, Color.BLACK);
-        mBatteryLevel.setShadowLayer(5, 0, 0, Color.BLACK);
-        mAlarmStatus.setShadowLayer(5, 0, 0, Color.BLACK);
-    }
-
-    /**
-     * default
-     */
-    private void disableTextShadow() {
-        mTime.setShadowLayer(0, 0, 0, Color.BLACK);
-        mAmPm.setShadowLayer(0, 0, 0, Color.BLACK);
-        mDateCollapsed.setShadowLayer(0, 0, 0, Color.BLACK);
-        mDateExpanded.setShadowLayer(0, 0, 0, Color.BLACK);
-        mBatteryLevel.setShadowLayer(0, 0, 0, Color.BLACK);
-        mAlarmStatus.setShadowLayer(0, 0, 0, Color.BLACK);
     }
 
     private void setQSHeaderAlpha() {
