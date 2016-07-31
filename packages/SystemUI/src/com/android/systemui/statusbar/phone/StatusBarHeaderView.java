@@ -887,18 +887,6 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
         }
         updateAmPmTranslation();
     }
-	
-    public static void updatePreferences(Context mContext) {
-
-        // atualiza
-        mTranslucentHeader = (Settings.System.getInt(mContext.getContentResolver(), Settings.System.TRANSLUCENT_HEADER_PREFERENCE_KEY, 1) == 1);
-        mTranslucencyPercentage =  Settings.System.getInt(mContext.getContentResolver(), Settings.System.TRANSLUCENTCYCY_PRECENTAGE_PREFERENCE_KEY, 60);
-        mTranslucencyPercentage = 255 - ((mTranslucencyPercentage * 255) / 100);
-
-        // transparente ?
-        handleStatusBarHeaderViewBackround();
-
-    }
 
     public void setEditing(boolean editing) {
         mEditing = editing;
@@ -1146,6 +1134,10 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
                     CMSettings.System.STATUS_BAR_SHOW_BATTERY_PERCENT), false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.ENABLE_TASK_MANAGER), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.TRANSLUCENT_HEADER_PREFERENCE_KEY), false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.TRANSLUCENT_HEADER_PRECENTAGE_PREFERENCE_KEY), false, this, UserHandle.USER_ALL);               
             update();
         }
 
@@ -1181,7 +1173,13 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
                     resolver, CMSettings.System.STATUS_BAR_SHOW_WEATHER, 1) == 1;
             mShowTaskManager = Settings.System.getIntForUser(resolver,
                     Settings.System.ENABLE_TASK_MANAGER, 1, currentUserId) == 1;
-
+            mTranslucentHeader = Settings.System.getIntForUser(resolver,
+                Settings.System.TRANSLUCENT_HEADER_PREFERENCE_KEY, 0, currentUserId) == 1;
+            mTranslucencyPercentage = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.TRANSLUCENT_HEADER_PRECENTAGE_PREFERENCE_KEY, 70);
+          //  mTranslucencyPercentage = 255 - ((mTranslucencyPercentage * 255) / 100);
+            handleStatusBarHeaderViewBackround();
+            updateEverything();
             updateVisibilities();
             requestCaptureValues();
         }

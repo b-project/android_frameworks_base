@@ -122,7 +122,7 @@ public class KeyguardPINView extends KeyguardPinBasedInputView {
                 CMSettings.System.LOCKSCREEN_PIN_SCRAMBLE_LAYOUT, 0) == 1);
 
         boolean quickUnlock = (Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.LOCKSCREEN_QUICK_UNLOCK_CONTROL, 0) == 1);
+                Settings.System.LOCKSCREEN_QUICK_UNLOCK_CONTROL, 1) == 1);
 
         if (scramblePin) {
             Collections.shuffle(sNumbers);

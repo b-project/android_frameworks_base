@@ -794,26 +794,6 @@ public class NotificationPanelView extends PanelView implements
         mWeatherController.removeCallback(this);
     }
 
-	//BlurOS Project 
-
-    public static void updatePreferences(Context mContext) {
-
-        // atualiza
-        mBlurScale = Settings.System.getInt(mContext.getContentResolver(), Settings.System.BLUR_SCALE_PREFERENCE_KEY, 10);
-        mBlurRadius = Settings.System.getInt(mContext.getContentResolver(), Settings.System.BLUR_RADIUS_PREFERENCE_KEY, 5);
-        mBlurDarkColorFilter = Color.LTGRAY;
-        mBlurMixedColorFilter = Color.GRAY;
-        mBlurLightColorFilter = Color.DKGRAY;
-        mTranslucentQuickSettings = (Settings.System.getInt(mContext.getContentResolver(), Settings.System.TRANSLUCENT_QUICK_SETTINGS_PREFERENCE_KEY, 1) == 1);
-        mBlurredStatusBarExpandedEnabled = (Settings.System.getInt(mContext.getContentResolver(), Settings.System.STATUS_BAR_EXPANDED_ENABLED_PREFERENCE_KEY, 1) == 1);
-        mTranslucencyPercentage = Settings.System.getInt(mContext.getContentResolver(), Settings.System.TRANSLUCENTCY_PRECENTAGE_PREFERENCE_KEY, 60);
-        mTranslucencyPercentage = 255 - ((mTranslucencyPercentage * 255) / 100);
-
-        // transparente ?
-        handleQuickSettingsBackround();
-
-    }
-
     public static void recycle() {
 
         // limpa e recicla
@@ -880,8 +860,13 @@ public class NotificationPanelView extends PanelView implements
             // obtém o tamamho real da tela
             mScreenDimens = DisplayUtils.getRealScreenDimensions(context);
 
+            //We don't want SystemUI to crash for Arithmetic Exception
+            if(mBlurScale==0){
+                mBlurScale=1;
+            }
+
             // obtém a screenshot da tela com escala reduzida
-            mScreenBitmap = DisplayUtils.takeSurfaceScreenshot(context, mBlurScale);
+            mScreenBitmap = DisplayUtils.takeSurfaceScreenshot(context, mBlurScale);			
 
         }
 
@@ -896,21 +881,10 @@ public class NotificationPanelView extends PanelView implements
 
                 // calback
                 mCallback.dominantColor(DisplayUtils.getDominantColorByPixelsSampling(mScreenBitmap, 20, 20));
-
-                // blur engine
-            //    if (mBlurEngine == BlurUtils.BlurEngine.RenderScriptBlur) {
-//
-   //                 mScreenBitmap = mBlurUtils.renderScriptBlur(mScreenBitmap, mBlurRadius);
-//
-  //              } else if (mBlurEngine == BlurUtils.BlurEngine.StackBlur) {
-
-    //                mScreenBitmap = mBlurUtils.stackBlur(mScreenBitmap, mBlurRadius);
-//
-  //              } else if (mBlurEngine == BlurUtils.BlurEngine.FastBlur) {
-//
-  //                  mBlurUtils.fastBlur(mScreenBitmap, mBlurRadius);
-//
-  //              }
+                //We don't want SystemUI to crash for Arithmetic Exception
+                if(mBlurRadius == 0){
+                    mBlurRadius=1;
+                }
                 mScreenBitmap = mBlurUtils.renderScriptBlur(mScreenBitmap, mBlurRadius);
                 return mScreenBitmap;
 
@@ -3248,6 +3222,16 @@ public class NotificationPanelView extends PanelView implements
             resolver.registerContentObserver(CMSettings.Secure.getUriFor(
                     CMSettings.Secure.LOCK_SCREEN_WEATHER_ENABLED), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.BLUR_SCALE_PREFERENCE_KEY), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.BLUR_RADIUS_PREFERENCE_KEY), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.TRANSLUCENT_QUICK_SETTINGS_PREFERENCE_KEY), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_EXPANDED_ENABLED_PREFERENCE_KEY), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.TRANSLUCENT_QUICK_SETTINGS_PRECENTAGE_PREFERENCE_KEY), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.ENABLE_TASK_MANAGER), false, this, UserHandle.USER_ALL);
             update();
         }
@@ -3291,8 +3275,24 @@ public class NotificationPanelView extends PanelView implements
             mQSShadeAlpha = Settings.System.getInt(
                     resolver, Settings.System.QS_TRANSPARENT_SHADE, 255);
             mShowTaskManager = Settings.System.getIntForUser(resolver,
-                    Settings.System.ENABLE_TASK_MANAGER, 0, UserHandle.USER_CURRENT) == 1;
-          //  setQSBackgroundAlpha();
+                    Settings.System.ENABLE_TASK_MANAGER, 1, UserHandle.USER_CURRENT) == 1;
+            mBlurScale = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.BLUR_SCALE_PREFERENCE_KEY, 10);
+            mBlurRadius = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.BLUR_RADIUS_PREFERENCE_KEY, 5);
+            mTranslucentQuickSettings =  Settings.System.getIntForUser(resolver,
+                    Settings.System.TRANSLUCENT_QUICK_SETTINGS_PREFERENCE_KEY, 0, UserHandle.USER_CURRENT) == 1;
+            mBlurredStatusBarExpandedEnabled = Settings.System.getIntForUser(resolver,
+                    Settings.System.STATUS_BAR_EXPANDED_ENABLED_PREFERENCE_KEY, 0, UserHandle.USER_CURRENT) == 1;
+            mTranslucencyPercentage = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.TRANSLUCENT_QUICK_SETTINGS_PRECENTAGE_PREFERENCE_KEY, 60);
+
+            mBlurDarkColorFilter = Color.LTGRAY;
+            mBlurMixedColorFilter = Color.GRAY;
+            mBlurLightColorFilter = Color.DKGRAY;
+            mTranslucencyPercentage = 255 - ((mTranslucencyPercentage * 255) / 100);
+            handleQuickSettingsBackround();
+           // StatusBarHeaderView.handleStatusBarHeaderViewBackround();
         }
     }
 

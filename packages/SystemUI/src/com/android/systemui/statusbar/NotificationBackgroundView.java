@@ -18,10 +18,15 @@ package com.android.systemui.statusbar;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.ContentResolver;
+import android.database.ContentObserver;
 import android.graphics.Canvas;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
+import android.os.Handler;
+import android.net.Uri;
+import android.os.UserHandle;
 import android.util.AttributeSet;
 import android.provider.Settings;
 import android.util.Log;
@@ -32,7 +37,8 @@ import com.android.systemui.statusbar.phone.NotificationPanelView;
  * A view that can be used for both the dimmed and normal background of an notification.
  */
 public class NotificationBackgroundView extends View {
-
+	
+	private SettingsObserver mSettingsObserver;
     private Drawable mBackground;
     private int mClipTopAmount;
     private int mActualHeight;
@@ -40,11 +46,64 @@ public class NotificationBackgroundView extends View {
     private static boolean mTranslucentNotifications;
     public NotificationBackgroundView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mSettingsObserver = new SettingsObserver(new Handler());
+    }
+
+     @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        mSettingsObserver.observe();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mSettingsObserver.unobserve();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         draw(canvas, mBackground);
+    }
+    
+    class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+        
+        void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.TRANSLUCENT_NOTIFICATIONS_PREFERENCE_KEY), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.TRANSLUCENT_NOTIFICATIONS_PRECENTAGE_PREFERENCE_KEY), false, this);
+            update();
+        }
+
+        void unobserve() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.unregisterContentObserver(this);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            update();
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            update();
+        }
+
+        public void update() {
+            ContentResolver resolver = mContext.getContentResolver();
+            mTranslucentNotifications = Settings.System.getIntForUser(resolver,
+                    Settings.System.TRANSLUCENT_NOTIFICATIONS_PREFERENCE_KEY, 0, UserHandle.USER_CURRENT) == 1;
+            mTranslucencyPercentage = Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.TRANSLUCENT_NOTIFICATIONS_PRECENTAGE_PREFERENCE_KEY, 70);
+            
+            mTranslucencyPercentage = 255 - ((mTranslucencyPercentage * 255) / 100);
+        }
     }
 
     private void draw(Canvas canvas, Drawable drawable) {
@@ -162,14 +221,5 @@ public class NotificationBackgroundView extends View {
             RippleDrawable ripple = (RippleDrawable) mBackground;
             ripple.setColor(ColorStateList.valueOf(color));
         }
-    }
-
-    public static void updatePreferences(Context mContext) {
-
-        // atualiza
-        mTranslucentNotifications = (Settings.System.getInt(mContext.getContentResolver(), Settings.System.TRANSLUCENT_NOTIFICATIONS_PREFERENCE_KEY, 1) == 1);
-        mTranslucencyPercentage = Settings.System.getInt(mContext.getContentResolver(), Settings.System.TRANSLUCENT_PRECENTAGE_PREFERENCE_KEY, 40);
-        mTranslucencyPercentage = 255 - ((mTranslucencyPercentage * 255) / 100);
-
     }
 }
