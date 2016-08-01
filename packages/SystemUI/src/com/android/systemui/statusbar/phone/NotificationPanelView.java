@@ -3102,7 +3102,7 @@ public class NotificationPanelView extends PanelView implements
             mHeadsUpExistenceChangedRunnable.run();
             updateNotificationTranslucency();
         } else {
-			mHeadsUpShowing = false;
+			mHeadsUpShowing = true;
             mHeadsUpAnimatingAway = true;
             mNotificationStackScroller.runAfterAnimationFinished(
                     mHeadsUpExistenceChangedRunnable);
