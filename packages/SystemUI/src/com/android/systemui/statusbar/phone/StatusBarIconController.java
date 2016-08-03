@@ -138,8 +138,8 @@ public class StatusBarIconController implements Tunable {
         mHandler = new Handler();
         mClockController = new ClockController(statusBar, mNotificationIcons, mHandler);
         mCenterClockLayout = statusBar.findViewById(R.id.center_clock_layout);
-        mNetworkTraffic = (NetworkTraffic) statusBar.findViewById(R.id.networkTraffic);
-        mCarrierLabel = (CarrierLabel) statusBar.findViewById(R.id.statusbar_carrier_text);
+        mNetworkTraffic = (NetworkTraffic) statusBar.findViewById(R.id.network_traffic);
+        mCarrierLabel = (CarrierLabel) statusBar.findViewById(R.id.status_bar_carrier_label);
         updateResources();
 
         TunerService.get(mContext).addTunable(this, ICON_BLACKLIST);

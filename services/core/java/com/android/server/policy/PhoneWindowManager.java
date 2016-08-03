@@ -739,8 +739,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     private int mCurrentUserId;
     private boolean haveEnableGesture = false;
-    
-    private boolean haveEnableTwoGesture = false;
 
     // Maps global key codes to the components that will handle them.
     private GlobalKeyManager mGlobalKeyManager;
@@ -1019,9 +1017,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     Settings.System.PA_PIE_STATE), false, this,
                     UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.TWO_FINGER_GESTURE), false, this,
-                    UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.THREE_FINGER_GESTURE), false, this,
                     UserHandle.USER_ALL);
             updateSettings();
@@ -1085,7 +1080,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     private SystemGesturesPointerEventListener mSystemGestures;
     private OPGesturesListener mOPGestures;
-    private BlurGesturesListener mBlurGestures;
 
     private EdgeGestureManager.EdgeGestureActivationListener mEdgeGestureActivationListener
             = new EdgeGestureManager.EdgeGestureActivationListener() {
@@ -1799,13 +1793,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     context, minHorizontal, maxHorizontal, minVertical, maxVertical, maxRadius);
         }
 
-        mBlurGestures = new BlurGesturesListener(context, new BlurGesturesListener.Callbacks() {
-            @Override
-            public void onSwipeTwoFinger() {
-                mHandler.post(mScreenshotRunnable);
-            }
-        });
-
         mOPGestures = new OPGesturesListener(context, new OPGesturesListener.Callbacks() {
             @Override
             public void onSwipeThreeFinger() {
@@ -2163,19 +2150,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         mHasPermanentMenuKey = hasPermanentMenu;
     }
 
-     private void enableSwipeTwoFingerGesture(boolean enable){
-        if (enable) {
-            if (haveEnableTwoGesture) return;
-            haveEnableTwoGesture = true;
-            mWindowManagerFuncs.registerPointerEventListener(mBlurGestures);
-        } else {
-            if (!haveEnableTwoGesture) return;
-            haveEnableTwoGesture = false;
-            mWindowManagerFuncs.unregisterPointerEventListener(mBlurGestures);
-        }
-    }
-
-
      private void enableSwipeThreeFingerGesture(boolean enable){
         if (enable) {
             if (haveEnableGesture) return;
@@ -2398,14 +2372,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mPieState = (Settings.System.getIntForUser(resolver,
                     Settings.System.PA_PIE_STATE, 0, UserHandle.USER_CURRENT) == 1);
 
-            //Two Finger Gesture
-            boolean twoFingerGesture = Settings.System.getIntForUser(resolver,
-                    Settings.System.TWO_FINGER_GESTURE, 1, UserHandle.USER_CURRENT) == 1;
-            enableSwipeTwoFingerGesture(twoFingerGesture);
-
             //Three Finger Gesture
             boolean threeFingerGesture = Settings.System.getIntForUser(resolver,
-                    Settings.System.THREE_FINGER_GESTURE, 1, UserHandle.USER_CURRENT) == 1;
+                    Settings.System.THREE_FINGER_GESTURE, 0, UserHandle.USER_CURRENT) == 1;
             enableSwipeThreeFingerGesture(threeFingerGesture);
 
             // Configure wake gesture.
