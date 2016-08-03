@@ -313,11 +313,6 @@ public class NotificationPanelView extends PanelView implements
 
     };
 
-    // Task manager
-    private boolean mShowTaskManager;
-    private boolean mTaskManagerShowing;
-    private LinearLayout mTaskManagerPanel;
-
     private int mQSBackgroundColor;
     // Used to identify whether showUnlock() can dismiss the keyguard
     // or not.
@@ -423,6 +418,11 @@ public class NotificationPanelView extends PanelView implements
             mKeyguardStatusView.setAlpha(1f);
         }
     };
+
+    // Task manager
+    private boolean mShowTaskManager;
+    private boolean mTaskManagerShowing;
+    private LinearLayout mTaskManagerPanel;
 
     public NotificationPanelView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -613,7 +613,7 @@ public class NotificationPanelView extends PanelView implements
             }
         });
         mKeyguardWeatherInfo = (TextView) mKeyguardStatusView.findViewById(R.id.weather_info);
-      //  setQSBackgroundAlpha();
+        setQSBackgroundAlpha();
  		// BlurOS Project        
             mNotificationPanelView = this;
 
@@ -3261,7 +3261,7 @@ public class NotificationPanelView extends PanelView implements
             mDoubleTapToSleepEnabled = CMSettings.System.getInt(
                     resolver, CMSettings.System.DOUBLE_TAP_SLEEP_GESTURE, 1) == 1;
             mQsSmartPullDown = Settings.System.getIntForUser(
-                    resolver, Settings.System.QS_SMART_PULLDOWN, 1,
+                    resolver, Settings.System.QS_SMART_PULLDOWN, 0,
                     UserHandle.USER_CURRENT);
 
             boolean wasKeyguardWeatherEnabled = mKeyguardWeatherEnabled;
