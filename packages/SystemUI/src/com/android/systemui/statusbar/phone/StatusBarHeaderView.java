@@ -1172,7 +1172,7 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
             mShowWeather = CMSettings.System.getInt(
                     resolver, CMSettings.System.STATUS_BAR_SHOW_WEATHER, 1) == 1;
             mShowTaskManager = Settings.System.getIntForUser(resolver,
-                    Settings.System.ENABLE_TASK_MANAGER, 1, currentUserId) == 1;
+                    Settings.System.ENABLE_TASK_MANAGER, 0, currentUserId) == 1;
             mTranslucentHeader = Settings.System.getIntForUser(resolver,
                 Settings.System.TRANSLUCENT_HEADER_PREFERENCE_KEY, 1, currentUserId) == 1;
             mTranslucencyPercentage = Settings.System.getInt(mContext.getContentResolver(),
