@@ -3948,6 +3948,12 @@ public final class Settings {
          * @hide
          */
         public static final String NETWORK_TRAFFIC_HIDEARROW = "network_traffic_hidearrow";
+        
+        /**
+         * Custom Pulse Widths
+         * @hide
+         */
+        public static final String PULSE_CUSTOM_DIMEN = "pulse_custom_dimen";
 
         /**
          * Whether to display app circle sidebar
