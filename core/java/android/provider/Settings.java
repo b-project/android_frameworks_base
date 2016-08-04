@@ -3954,6 +3954,30 @@ public final class Settings {
          * @hide
          */
         public static final String PULSE_CUSTOM_DIMEN = "pulse_custom_dimen";
+        
+        /**
+         * Custom Spacing Between Pulse Bars
+         * @hide
+         */
+        public static final String PULSE_CUSTOM_DIV = "pulse_custom_div";
+        
+        /**
+         * Size of Filled bars
+         * @hide
+         */
+        public static final String PULSE_FILLED_BLOCK_SIZE = "pulse_filled_block_size";
+        
+         /**
+         * Size of Empty Spaces Between Horizontal Visualizer Bars
+         * @hide
+         */
+        public static final String PULSE_EMPTY_BLOCK_SIZE = "pulse_empty_block_size";
+        
+         /**
+         * Pulse Fudge Factor
+         * @hide
+         */
+        public static final String PULSE_CUSTOM_FUDGE_FACTOR = "pulse_custom_fudge_factor";
 
         /**
          * Whether to display app circle sidebar
