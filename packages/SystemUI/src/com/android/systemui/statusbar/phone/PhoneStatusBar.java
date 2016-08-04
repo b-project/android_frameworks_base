@@ -669,6 +669,13 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     Settings.System.TRANSLUCENT_HEADER_PRECENTAGE_PREFERENCE_KEY), false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.TRANSLUCENT_NOTIFICATIONS_PRECENTAGE_PREFERENCE_KEY), false, this, UserHandle.USER_ALL);
+        	resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVBAR_TINT_SWITCH),
+                    false, this, UserHandle.USER_ALL);
+			resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVBAR_BUTTON_COLOR),
+                    false, this, UserHandle.USER_ALL);
+                    
             update();
         }
 
@@ -684,7 +691,14 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                     if (mBatterySaverWarningColor != 0) {
                         mBatterySaverWarningColor = mContext.getResources()
                                 .getColor(com.android.internal.R.color.battery_saver_mode_color);
-                    }
+		} else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.NAVBAR_TINT_SWITCH))) {
+		    mNavigationController.updateNavbarOverlay(getNavbarThemedResources());
+		} else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.NAVBAR_BUTTON_COLOR))) {
+		    mNavigationController.updateNavbarOverlay(getNavbarThemedResources());
+		} 
+                    
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.USE_SLIM_RECENTS))) {
                 updateRecents();
