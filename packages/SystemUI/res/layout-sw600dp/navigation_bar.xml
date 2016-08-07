@@ -55,11 +55,7 @@
             android:orientation="horizontal"
             android:clipChildren="false"
             android:clipToPadding="false"
-<<<<<<< HEAD
             android:id="@+id/nav_buttons"
-=======
-            android:id="@+id/container"
->>>>>>> b2f935e... WindowManager: Fixups After Removing Old Navbar Customizations
             android:animateLayoutChanges="true"
             >
 

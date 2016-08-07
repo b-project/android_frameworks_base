@@ -89,4 +89,5 @@
     <string name="pie_hour_format_12">hh:mm</string>
     <string name="pie_hour_format_24">HH:mm</string>
     <string name="pie_am_pm">a</string>
+	<string name="quick_settings_dolby_title">Dolby</string>
 </resources>

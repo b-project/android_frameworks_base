@@ -613,7 +613,7 @@ public class NotificationPanelView extends PanelView implements
             }
         });
         mKeyguardWeatherInfo = (TextView) mKeyguardStatusView.findViewById(R.id.weather_info);
-      //  setQSBackgroundAlpha();
+        setQSBackgroundAlpha();
  		// BlurOS Project        
             mNotificationPanelView = this;
 
@@ -794,7 +794,26 @@ public class NotificationPanelView extends PanelView implements
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mSettingsObserver.unobserve();
-        mWeatherController.removeCallback(this);
+    }
+
+	//BlurOS Project 
+
+    public static void updatePreferences(Context mContext) {
+
+        // atualiza
+        mBlurScale = Settings.System.getInt(mContext.getContentResolver(), Settings.System.BLUR_SCALE_PREFERENCE_KEY, 10);
+        mBlurRadius = Settings.System.getInt(mContext.getContentResolver(), Settings.System.BLUR_RADIUS_PREFERENCE_KEY, 5);
+        mBlurDarkColorFilter = Color.LTGRAY;
+        mBlurMixedColorFilter = Color.GRAY;
+        mBlurLightColorFilter = Color.DKGRAY;
+        mTranslucentQuickSettings = (Settings.System.getInt(mContext.getContentResolver(), Settings.System.TRANSLUCENT_QUICK_SETTINGS_PREFERENCE_KEY, 1) == 1);
+        mBlurredStatusBarExpandedEnabled = (Settings.System.getInt(mContext.getContentResolver(), Settings.System.STATUS_BAR_EXPANDED_ENABLED_PREFERENCE_KEY, 1) == 1);
+        mTranslucencyPercentage = Settings.System.getInt(mContext.getContentResolver(), Settings.System.TRANSLUCENT_QUICK_SETTINGS_PRECENTAGE_PREFERENCE_KEY, 60);
+        mTranslucencyPercentage = 255 - ((mTranslucencyPercentage * 255) / 100);
+
+        // transparente ?
+        handleQuickSettingsBackround();
+
     }
 
     public static void recycle() {
@@ -3098,11 +3117,11 @@ public class NotificationPanelView extends PanelView implements
     @Override
     public void onHeadsUpPinnedModeChanged(final boolean inPinnedMode) {
         if (inPinnedMode) {
-			mHeadsUpShowing = true;
+	//		mHeadsUpShowing = true;
             mHeadsUpExistenceChangedRunnable.run();
             updateNotificationTranslucency();
         } else {
-			mHeadsUpShowing = true;
+	//		mHeadsUpShowing = true;
             mHeadsUpAnimatingAway = true;
             mNotificationStackScroller.runAfterAnimationFinished(
                     mHeadsUpExistenceChangedRunnable);
